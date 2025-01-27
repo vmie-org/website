@@ -27,8 +27,8 @@ jobs:
         id: idtoken
         with:
            script: |
-               const coredemo = require('@actions/core')
-               return await coredemo.getIDToken()
+            const core = require('@actions/core');
+            return await core.getIDToken();
            result-encoding: string
       - name: Upload Pre-built Static Files
         id: upload
