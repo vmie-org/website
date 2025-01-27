@@ -37,7 +37,7 @@ jobs:
           app_location: "/dist" # Index path
           api_location: "" # No API folder
           output_location: "/" # Directly upload the folder (avoid building)
-          github_id_token: ${{ steps.idtoken.outputs.result }}
+          github_id_token: ${{ env.ID_TOKEN }}
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
