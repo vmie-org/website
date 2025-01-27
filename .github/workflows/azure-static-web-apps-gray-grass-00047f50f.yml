@@ -23,12 +23,9 @@ jobs:
           submodules: true
           lfs: false
       - name: Get Id Token
-        uses: actions/github-script@v6
         id: idtoken
-        with:
-           script: |
-            return await require('@actions/core').getIDToken();
-           result-encoding: string
+        run: |
+          echo "ID_TOKEN=$(curl -s --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' ${{ secrets.GITHUB_TOKEN }}_OIDC_URL)" >> $GITHUB_ENV
       - name: Upload Pre-built Static Files
         id: upload
         uses: Azure/static-web-apps-deploy@v1
