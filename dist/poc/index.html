@@ -1658,9 +1658,6 @@
 
     <script type="module">
 
-        import { createChart } from '../../lib/lightweight-charts/lightweight-charts.esm.development.js';
-        import {userService} from "../services/userService.js";
-        import {libService} from "../services/libService.js";
         import {timeService} from "../services/timeService.js";
         import {apiService} from "../services/apiServices.js";
         import * as Datepicker from "./lib/vuejs-datepicker/vuejs-datepicker.js";
@@ -1674,7 +1671,6 @@
             },
             data() {
                 return {				
-                    libService:libService,
                     timeService:timeService,
 					doctors: null,
 					showMenu: false,
