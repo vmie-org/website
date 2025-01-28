@@ -1,0 +1,152 @@
+table.blueTable {
+    border: 1px solid rgb(255, 255, 220);
+    background-color: #EEE;
+    width: 94%;
+    overflow-y: auto;
+    text-align: left;
+    border: 0px; 
+    border-collapse: separate;
+    border: 1px solid #ddd;
+    margin: 0 auto;
+  }
+  table.blueTable td, table.blueTable th {
+    border: 1px solid #FFF;
+    padding: 3px 2px;
+  }
+  table.blueTable tbody td {
+    font-size: 13px;
+  }
+  table.blueTable tr:nth-child(even) {
+    background: #FEFEFE;
+  }
+  table.blueTable tr:hover {
+    background: #DDD;
+  }
+  table.blueTable tr.selected, table.blueTable tr.selected:nth-child(even) {
+    background: #DDE;
+  }
+  table.blueTable tr.focused, table.blueTable tr.focused:nth-child(even) {
+    background: #C8C8C8;
+  }
+  table.blueTable thead {
+    background: #FFFFFF;
+    border-bottom: 2px solid #BBB;
+  }
+  table.blueTable thead th {
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    color: #000;
+    border: 1px solid #EEE;
+  }
+  
+  table.blueTable tfoot {
+    font-size: 14px;
+    font-weight: bold;
+    color: #FFFFFF;
+    background: #D0E4F5;
+    border-top: 2px solid #444444;
+  }
+  table.blueTable tfoot td {
+    font-size: 14px;
+  }
+  table.blueTable tfoot .links {
+    text-align: right;
+  }
+  table.blueTable tfoot .links a{
+    display: inline-block;
+    background: rgb(255, 255, 231);
+    color: #FFFFFF;
+    padding: 2px 8px;
+    border-radius: 5px;
+  }
+
+  .w-tif{    
+    width: fit-content;
+  }
+
+
+  .otb-alert-row{
+    border-top: 1px solid #ddd;
+  }
+  .otb-alert-row:hover{
+    background-color: #dff;
+  }
+
+  .otb-alert-checkbox{
+    min-height: 30px;
+    min-width: 50px;
+    border: 1px solid #ddd;
+    text-align: center;
+    height: 30px;
+  }
+  .otb-alert-checkbox.checked{
+    background-color: silver;
+  }
+  .otb-alert-checkbox:hover{
+    border: 1px solid gray;      
+  }
+  .otb-number-column{
+    text-align: right;
+  }
+
+
+
+
+.otb-toggle-checkbox {
+  display: none
+}
+
+.otb-toggle-checkbox+.toggler {
+  top: 6px;
+  width: 26px;
+  height: 14px;
+  background: #bababa;
+  display: inline-block;
+  border-radius: 3px;
+  position: relative;
+  transition: all .5s ease;
+  text-indent: 3px;
+  white-space: nowrap
+}
+
+.otb-toggle-checkbox+.toggler:before {
+  opacity: 0;
+  content: " ";
+  background-image: url(https://stocktech.org/newSiteIconsSprite_v42j.png);
+  background-position: -138px -325px;
+  display: inline-block;
+  width: 9px;
+  height: 8px;
+  position: absolute;
+  left: 2px;
+  top: 3px;
+  line-height: 15px;
+  transition: all .5s ease
+}
+
+.otb-toggle-checkbox+.toggler:after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background-color: #fff;
+  position: absolute;
+  border-radius: 3px;
+  top: 1px;
+  left: 1px;
+  box-shadow: 1px 2px 3px 0 rgba(0,0,0,.21);
+  transition: all .5s ease
+}
+
+.otb-toggle-checkbox:checked+.toggler {
+  background: #1256a0
+}
+
+.otb-toggle-checkbox:checked+.toggler:before {
+  opacity: 1
+}
+
+.otb-toggle-checkbox:checked+.toggler:after {
+  left: 13px;
+  box-shadow: 0 2px 1px 0 rgba(0,0,0,.2)
+}
