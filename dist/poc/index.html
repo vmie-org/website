@@ -214,6 +214,9 @@
 			</div>
 			</div>
 
+
+		<div class="alert alert-success"> Disclaimer: This proof of concept contains generated information and no information is collected from users. </div>
+		
             <div class="row" v-cloak >
 
             <div class="col-12" style="min-width: 300px; text-align: left" v-if="options.seeAsDoctor || options.seeAsOwner">
@@ -1571,7 +1574,7 @@
             
             
             <transition name="modal">
-                <div class="modal-mask"  v-if="showLoginForm">
+                <div class="modal-mask"  v-if="false && showLoginForm">
                     <div class="modal-wrapper">
                         <div class="modal-container" :class="isMobile?'mobile':'w400'" :style="isMobile?'max-height:'+window.innerHeight+'px':''">
 
