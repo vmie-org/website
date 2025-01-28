@@ -1,0 +1,93 @@
+table.mobileTable {
+    border: solid #1C6EA4;
+    border-width: 0px 0px 0px 0px;
+    
+  /* background-color: #EEEEEE; */
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+  }
+table.mobileTable td, table.mobileTable th {
+  text-align: center;
+  border: solid #DDD;
+  border-width: 0px 1px 0px 0px;
+  padding: 6px 0px;
+}
+table.mobileTable td.end-column, table.mobileTable th.end-column{
+  border-width: 0px 0px 0px 0px;
+}
+  table.mobileTable tbody td {
+    /* font-size: 13px; */
+  }
+  .start-column {
+    height: 35px;
+    overflow-y: hidden;
+    border: solid #AAAAAA;
+    border-width: 1px 0px 1px 1px;
+    padding: 5px;
+    border-radius: 10px 0px 0px  10px;
+  }
+  .end-column {
+    height: 35px;
+    overflow-y: hidden;
+    border: solid #AAAAAA;
+    border-width: 1px 1px 1px 0px;
+    padding: 5px;
+    border-radius: 0px 10px 10px 0px;
+  }
+  .mid-column {
+    height: 35px;
+    overflow-y: hidden;
+    border: solid #AAAAAA;
+    border-width: 1px 0px 1px 0px;
+    padding: 5px;
+    border-radius: 0px;
+  }
+  table.mobileTable tr:nth-child(even) {
+    /* background: #D0E4F5; */
+  }
+  table.mobileTable thead {
+    background: #1C6EA4;
+    background: -moz-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+    background: -webkit-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+    background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+    border-bottom: 2px solid #444444;
+  }
+  table.mobileTable thead th {
+    font-size: 15px;
+    font-weight: bold;
+    color: #FFFFFF;
+    text-align: center;
+    border-left: 2px solid #D0E4F5;
+  }
+  table.mobileTable thead th:first-child {
+    border-left: none;
+  }
+  
+  table.mobileTable tfoot {
+    /* font-size: 14px; */
+    font-weight: bold;
+    color: #FFFFFF;
+    background: #D0E4F5;
+    background: -moz-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
+    background: -webkit-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
+    background: linear-gradient(to bottom, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
+    border-top: 2px solid #444444;
+  }
+  table.mobileTable tfoot td {
+    /* font-size: 14px; */
+  }
+  table.mobileTable tfoot .links {
+    text-align: right;
+  }
+  table.mobileTable tfoot .links a{
+    display: inline-block;
+    background: #1C6EA4;
+    color: #FFFFFF;
+    padding: 2px 8px;
+    border-radius: 5px;
+  }
+
+.otb-table-scroll{
+  overflow-x: scroll;
+}
