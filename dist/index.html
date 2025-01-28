@@ -142,7 +142,7 @@ var apiService = {
                 apiService.getText("./content/index.txt", this.parseContent);
             },
             parseContent(content){
-                let lines = content.split('\r\n');
+                let lines = content.split('\n');
 
                 lines = lines.map(line => line.trim());
 
