@@ -144,6 +144,11 @@ var apiService = {
                     url: "./content/compatibility.txt",
                     isSelected: false,
                 },
+                {
+                    title: "Software Architecture",
+                    url: "./content/architecture.txt",
+                    isSelected: false,
+                },
             ],
         },
         mounted: function () {
@@ -179,6 +184,13 @@ var apiService = {
                     }
                     else if(line.indexOf('# ') === 0){
                         return `<h1>${line.substring(2)}</h1>`;
+                    }
+                    else if(line.indexOf('![') === 0){
+                        let img = line.substring(line.indexOf('(')+1);
+                        let imgSource = img.split(' ')[0];
+                        let imgAlt = img.substring(imgSource.length + 2);
+                        imgAlt = imgAlt.substring(0, imgAlt.length-2);
+                        return `<center style='color: silver; border: 1px solid #ddd'><img src='${imgSource}' alt='${imgAlt}' /><br>${imgAlt}</center>`;
                     }
                     if(line.indexOf('**') >= 0){
                         line = line.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
