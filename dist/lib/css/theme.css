@@ -695,7 +695,7 @@ nav ul li.tag-h1 a {
 }
 
 nav ul li.tag-h2+.tag-h1 {
-    margin-top: 10px
+    # margin-top: 10px
 }
 
 nav ul a {

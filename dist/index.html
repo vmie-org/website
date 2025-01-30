@@ -50,7 +50,7 @@
     <div class="wrapper">
         <nav>
             <ul>
-                <li v-for="page in websitePages" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)"><a href="#header-1">{{page.title}}</a></li>
+                <li v-for="page in websitePages" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)"><a :href="'#' + page.id">{{page.title}}</a></li>
             </ul>
         </nav>
         <section style="height: auto;">
@@ -135,16 +135,19 @@ var apiService = {
             htmlContent: null,
             websitePages: [
                 {
+                    id: 1,
                     title: "Our Mission",
                     url: "./content/index.txt",
                     isSelected: false,
                 },
                 {
+                    id: 2,
                     title: "Compatibility check",
                     url: "./content/compatibility.txt",
                     isSelected: false,
                 },
                 {
+                    id: 3,
                     title: "Software Architecture",
                     url: "./content/architecture.txt",
                     isSelected: false,
@@ -152,15 +155,20 @@ var apiService = {
             ],
         },
         mounted: function () {
-            this.renderPage();
+            let page = this.websitePages[0];
+            let pageId = location.hash;
+            if(pageId){
+                let hrefPage = this.websitePages.find(p=> "#" + p.id == pageId);
+                if(hrefPage){
+                    page = hrefPage;
+                }
+            }
+            this.renderPage(page);
         },
         computed: {
         },
         methods: {
             renderPage(page){
-                if(!page){
-                    page = this.websitePages[0];
-                }
                 this.websitePages.forEach(page => {
                     page.isSelected = false;
                 });
