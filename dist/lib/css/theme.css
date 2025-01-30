@@ -516,11 +516,8 @@ td:first-child {
 }
 
 hr {
-    border: 0;
+    border: 1px solid silver;
     outline: none;
-    height: 11px;
-    background: transparent url("../images/hr.gif") center center repeat-x;
-    margin: 0 0 20px
 }
 
 dt {

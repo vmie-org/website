@@ -1,0 +1,25 @@
+## Checking veterinary medicine app compatibility
+Organization for Veterinary Medicine Information Exchange
+
+### Self assessment
+
+You can check the compatibility of your data model against the information exchange open standards using our self-assessment compatibility tool.
+
+The tool is a javascipt app that will comapre your data model against the standard data models. 
+You will get a comatibility report and a compatibility class. 
+Application in the same compatibility class are sharing compatible data model structures.
+
+You can also use our self-assessment compatibility tool to remap model properties and plan your migration toward a higher compatibility class. 
+
+Reducing development costs to achieve a higher compatibility class is an advantages that we consider to amount as an insentive to adopt reforms toward information exchange compatibility. 
+
+<a href="./poc">Self-assessment Compatibility Tool</a>
+
+### Certified assessment
+
+We do provide support at no cost to asses and certify veterinary medicine apps compatibility against the information exchange open standards, subject to our voluniters availability.
+
+Whether if you already have an app or you are planning or designing an app, getting more information about information exchange open standards in an early stage of app development is a quick win.
+
+-----------
+<div style="text-align: right">Contact us at:<br>office@vmie.org</div>

@@ -48,9 +48,11 @@
       <!-- banner end -->
 
     <div class="wrapper">
-      <nav>
-        <ul></ul>
-      </nav>
+        <nav>
+            <ul>
+                <li v-for="page in websitePages" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)"><a href="#header-1">{{page.title}}</a></li>
+            </ul>
+        </nav>
         <section style="height: auto;">
             <p v-if="htmlContent" v-html="htmlContent"></p>
         </section>
@@ -131,15 +133,34 @@ var apiService = {
         data: {
             apiService: apiService,
             htmlContent: null,
+            websitePages: [
+                {
+                    title: "Our Mission",
+                    url: "./content/index.txt",
+                    isSelected: false,
+                },
+                {
+                    title: "Compatibility check",
+                    url: "./content/compatibility.txt",
+                    isSelected: false,
+                },
+            ],
         },
         mounted: function () {
-            this.loadContent();
+            this.renderPage();
         },
         computed: {
         },
         methods: {
-            loadContent(){
-                apiService.getText("./content/index.txt", this.parseContent);
+            renderPage(page){
+                if(!page){
+                    page = this.websitePages[0];
+                }
+                this.websitePages.forEach(page => {
+                    page.isSelected = false;
+                });
+                apiService.getText(page.url, this.parseContent);
+                page.isSelected = true;
             },
             parseContent(content){
                 let lines = content.split('\n');
@@ -161,6 +182,9 @@ var apiService = {
                     }
                     if(line.indexOf('**') >= 0){
                         line = line.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                    }
+                    if(line.indexOf('-----------') == 0){
+                        return '<hr>';
                     }
                     return `${line}<br/>`;
                 }).join('');
