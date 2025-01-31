@@ -37,11 +37,15 @@
       <!-- banner start -->
       <div id="banner">
         <span id="logo"></span>
-        <a href="https://github.com/vmie-org/website" class="button fork"><strong>View On GitHub</strong></a>
-          <div class="downloads">
+        <a v-if="!isMobile" href="https://github.com/vmie-org/website" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads" v-if="!isMobile">
             <span>Free:</span>
             <ul>
-              <li><a href="./poc" class="button">Tools</a></li>
+                <li><a href="./poc" class="button">Tools</a></li>
+            </ul>
+          </div><div v-if="isMobile">
+            <ul>
+                <li v-for="(page, index) in websitePages" v-if="index > 0" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)"><a class="button" :href="'?page=' + page.id + '#' + page.id">{{page.id}}</a></li>
             </ul>
           </div>
       </div>
@@ -131,6 +135,7 @@ var apiService = {
     var app = new Vue({
         el: '#app',
         data: {
+            isMobile: true,
             apiService: apiService,
             htmlContent: null,
             websitePages: [
