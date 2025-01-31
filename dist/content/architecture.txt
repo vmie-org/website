@@ -1,5 +1,7 @@
 ## Software Architecture enabling Information Exchange in Veterinary Medicine
 
+<i>"The lack of reference architectures and relevant patterns makes compliance harder than it should be."</i> - Eduardo B. Fernández on <a targe="_blank" href="https://www.researchgate.net/publication/302066474_A_survey_of_compliance_issues_in_cloud_computing">researchgate.net</a>
+
 ### Relations in Veterinary Medicine
 
 An oversimplified ERD diagram is showing a potential visualization of the relations in the veterinary medicine space. There are no hard rules on defining the multiplicity between objects as there are rarely true one-to-one or one-to-many relations. However, from practical reasons most designs would avoid many-to-many relations as much as possible in favor of simplicity and performance over flexibility. One-way navigation can also be used with simmilar considerations and results.

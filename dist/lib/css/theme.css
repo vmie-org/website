@@ -500,19 +500,17 @@ table {
 th {
     text-align: left;
     padding: 5px 10px;
-    border-bottom: 1px solid #e5e5e5;
     color: #444
 }
 
 td {
     text-align: left;
     padding: 5px 10px;
-    border-bottom: 1px solid #e5e5e5;
-    border-right: 1px solid #ffcc00
+    border: 1px solid silver;
 }
 
 td:first-child {
-    border-left: 1px solid #ffcc00
+    border-left: 1px solid silver
 }
 
 hr {
@@ -610,7 +608,7 @@ header p {
 
 #banner .downloads {
     float: right;
-    margin: 0 45px 0 0
+    margin: 0 45px 0 0;
 }
 
 #banner .downloads span {
@@ -753,7 +751,7 @@ footer {
     section {
         border: 1px solid #e5e5e5;
         border-width: 1px 0;
-        padding: 20px 0;
+        padding: 20px 10px;
         margin: 190px auto 20px;
         max-width: 600px
     }
@@ -779,7 +777,7 @@ footer {
     }
 
     header h1 {
-        font-size: 32px;
+        font-size: 24px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -822,7 +820,7 @@ footer {
     }
 
     header h1 {
-        font-size: 24px;
+        font-size: 16px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -835,7 +833,8 @@ footer {
     }
 
     #banner {
-        display: none
+        top: 55px;
+        position: inherit;
     }
 
     header ul {

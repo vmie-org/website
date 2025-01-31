@@ -1,0 +1,31 @@
+### Security Overview
+
+Here is how applications vulnerabilities are mapped to existent regulations:
+
+| ***Insecure Interfaces and APIs*** | This is not a threat, is a vulnerability. |
+| ***Malicious Insiders*** | Not a threat, a vulnerability. Is not mapped. |
+| ***Shared Technology issues*** | ISO 27000-27002 and PCI-DSS compliance. |
+| ***Data Loss and Leakage*** | ISO 17862 and HIPPA compliance. |
+| ***Account or Service Hijacking*** | There is no clear mapping in current regulations. |
+
+If you are looking for technical guidance check our <a href="https://localhost:1442/vmie/dist/?page=Architecture#Architecture">Software Architecture</a> page.
+
+### Security challenges
+
+Medical apps are expected to provide secured services to their customers. If the apps are exploited the data is at risk. A vulnerability on one of the apps can damage the entire exchange system. For this reason, the security at the information exchange level is not sufficient.
+Periodic penetration tests have to be performed to keep the participant apps and the entire system at low risk.
+Another concern is data storage. The data can be exchanged only beteen participants that the user has agreed with. Non-sensitive and statistical data is easier to exchange.
+
+### Existent standards
+
+We will only include few examples.
+
+The ***human medicine domain*** is strongly regulated and it's security standards are well defined by regulatory acts like HIPAA
+
+Health Insurance ***Portability and Accountability*** Act of 1996 (HIPAA) Rules and the Health Information Technology for Economic and Clinical Health (HITECH) Act.
+
+### Links
+
+71% of tested medical apps have at least one high level security vulnerability. According to <a targe="_blank" href="https://www.helpnetsecurity.com/2020/09/30/covid-19-tracking-apps-leak-data/">helpnetsecurity.com</a>
+
+The lack of reference architectures and relevant patterns makes compliance harder than it should be. According to Eduardo B. Fernández on <a targe="_blank" href="https://www.researchgate.net/publication/302066474_A_survey_of_compliance_issues_in_cloud_computing">researchgate.net</a>

@@ -39,7 +39,7 @@
         <span id="logo"></span>
         <a href="https://github.com/vmie-org/website" class="button fork"><strong>View On GitHub</strong></a>
           <div class="downloads">
-            <span>Downloads:</span>
+            <span>Free:</span>
             <ul>
               <li><a href="./poc" class="button">Tools</a></li>
             </ul>
@@ -50,7 +50,7 @@
     <div class="wrapper">
         <nav>
             <ul>
-                <li v-for="page in websitePages" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)"><a :href="'#' + page.id">{{page.title}}</a></li>
+                <li v-for="page in websitePages" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)"><a :href="'?page=' + page.id + '#' + page.id">{{page.title}}</a></li>
             </ul>
         </nav>
         <section style="height: auto;">
@@ -135,19 +135,25 @@ var apiService = {
             htmlContent: null,
             websitePages: [
                 {
-                    id: 1,
+                    id: "Welcome",
                     title: "Our Mission",
                     url: "./content/index.txt",
                     isSelected: false,
                 },
                 {
-                    id: 2,
+                    id: "Compatibility",
                     title: "Compatibility check",
                     url: "./content/compatibility.txt",
                     isSelected: false,
                 },
                 {
-                    id: 3,
+                    id: "Security",
+                    title: "Information and Security",
+                    url: "./content/security.txt",
+                    isSelected: false,
+                },
+                {
+                    id: "Architecture",
                     title: "Software Architecture",
                     url: "./content/architecture.txt",
                     isSelected: false,
@@ -179,10 +185,21 @@ var apiService = {
                 let lines = content.split('\n');
 
                 lines = lines.map(line => line.trim());
+                var tableBuilder = null;
 
                 this.htmlContent = lines.map(line => {
+
                     if(!line.length){
+                        if(tableBuilder){
+                            var table = tableBuilder + "</table></p><p>";
+                            tableBuilder = null;
+                            return table;
+                        }
                         return "</p><p>";
+                    }
+
+                    if(line.indexOf('#### ') === 0){
+                        return `<h4>${line.substring(5)}</h4>`;
                     }
                     if(line.indexOf('### ') === 0){
                         return `<h3>${line.substring(4)}</h3>`;
@@ -200,9 +217,21 @@ var apiService = {
                         imgAlt = imgAlt.substring(0, imgAlt.length-2);
                         return `<center style='color: silver; border: 1px solid #ddd'><img src='${imgSource}' alt='${imgAlt}' /><br>${imgAlt}</center>`;
                     }
-                    if(line.indexOf('**') >= 0){
+                    if(line.indexOf('***') >= 0){
+                        line = line.replace(/\*\*\*(.*?)\*\*\*/g, '<b><i>$1</i></b>')
+                    }
+                    else if(line.indexOf('**') >= 0){
                         line = line.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
                     }
+                 
+                    if(line.indexOf('| ') === 0 && line.lastIndexOf(' |') == line.length-2){
+                        if(!tableBuilder){
+                            tableBuilder = "<table>";
+                        }
+                        tableBuilder += "<tr><td>" + line.substring(1, line.length-3).split(" | ").join("</td><td>") + "</td></tr>";
+                        return null;
+                    }
+
                     if(line.indexOf('-----------') == 0){
                         return '<hr>';
                     }

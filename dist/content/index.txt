@@ -1,10 +1,10 @@
-## Name of Organization:
-Organization for Veterinary Medicine Information Exchange
+## Veterinary Medicine Information Exchange 
+### <div style='float: right'>- non-profit organisation -</div><br>
 
-## Mission:
+### Mission:
 To foster and promote the development and adoption of common standards for information exchange in veterinary medicine, with the aim of improving global communication, efficiency, and quality in the veterinary field.
 
-## Core Activities:
+### Core Activities:
 
 1. **Advocacy and Promotion**  
    Advocate for the creation, development, and widespread adoption of standardized methods for information exchange within veterinary medicine, to ensure interoperability, transparency, and consistency across practices, institutions, and regions.
@@ -38,34 +38,34 @@ To foster and promote the development and adoption of common standards for infor
 
 ---
 
-## Documentation for NPO Registration
+### Documentation for NPO Registration
 
-### 1. Mission Statement
+#### 1. Mission Statement
 Provide a clear and concise description of the organization’s purpose, vision, and scope of activities. Include the core activities listed above, emphasizing the impact on veterinary medicine.
 
-### 2. Organizational Structure
+#### 2. Organizational Structure
 Outline the governance structure, such as the board of directors, management team, and key roles within the organization. This section may include bylaws, meeting procedures, and decision-making processes.
 
-### 3. Non-Profit Status
+#### 3. Non-Profit Status
 Clearly state that the organization is a non-profit entity, detailing its tax-exempt status (if applicable) and ensuring that profits will not be distributed to members, directors, or officers but used for the organization’s mission.
 
-### 4. Target Audience and Stakeholders
+#### 4. Target Audience and Stakeholders
 Define the main beneficiaries of the organization’s activities, including veterinary professionals, institutions, regulatory bodies, and the wider community involved in veterinary care.
 
-### 5. Funding and Revenue Generation
+#### 5. Funding and Revenue Generation
 Explain how the organization will be funded, whether through grants, donations, membership fees, or other sources of revenue. Ensure transparency about the allocation of funds.
 
-### 6. Accountability and Transparency
+#### 6. Accountability and Transparency
 Describe the measures in place for financial accountability, including annual audits, financial reporting, and transparency in how resources are used to fulfill the organization’s mission.
 
-### 7. Strategic Plan
+#### 7. Strategic Plan
 Include a short- to medium-term strategic plan outlining the objectives, timeline, and measurable goals for the organization’s activities over the next 3 to 5 years.
 
-### 8. Partnerships and Collaborations
+#### 8. Partnerships and Collaborations
 List potential or existing partners, such as legal bodies, veterinary associations, and educational institutions, which will help in fulfilling the mission and carrying out activities.
 
-### 9. Risk Management and Mitigation
+#### 9. Risk Management and Mitigation
 Identify potential risks (e.g., funding instability, challenges in standard adoption) and outline strategies to mitigate these risks.
 
-### 10. Bylaws and Articles of Incorporation
+#### 10. Bylaws and Articles of Incorporation
 Draft the organization’s bylaws, which outline the rules governing the internal operations, and submit the articles of incorporation to register the NPO with the relevant authorities.

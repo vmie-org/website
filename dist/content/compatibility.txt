@@ -1,4 +1,4 @@
-## Checking veterinary medicine app compatibility
+### Checking veterinary medicine app compatibility
 Organization for Veterinary Medicine Information Exchange
 
 ### Self assessment
