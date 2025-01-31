@@ -37,15 +37,24 @@
       <!-- banner start -->
       <div id="banner">
         <span id="logo"></span>
+
         <a v-if="!isMobile" href="https://github.com/vmie-org/website" class="button fork"><strong>View On GitHub</strong></a>
-        <div class="downloads" v-if="!isMobile">
-            <span>Free:</span>
+        <ul v-else style="float: left; display: inline-block; margin-left: 0px; left: 20px;">
+            <li v-for="(page, index) in websitePages" v-if="index > 0" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)"><a class="button" :href="'?page=' + page.id + '#' + page.id">{{page.id}}</a></li>
+        </ul>        
+        
+        <div class="downloads">
+            <span v-if="!isMobile">Free:</span>
             <ul>
-                <li><a href="./poc" class="button">Tools</a></li>
-            </ul>
-          </div><div v-if="isMobile">
-            <ul>
-                <li v-for="(page, index) in websitePages" v-if="index > 0" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)"><a class="button" :href="'?page=' + page.id + '#' + page.id">{{page.id}}</a></li>
+                <li v-if="!isMobile"><a href="./poc" class="button">Tools</a></li>
+                <li>
+                    <a @click="isMobile = !isMobile" class="button"><div style="display: inline-block;">
+                        <div class="menu-bar"></div>
+                        <div class="menu-bar"></div>
+                        <div class="menu-bar"></div>
+                    </div>
+                    </a>
+                </li>
             </ul>
           </div>
       </div>
@@ -135,7 +144,7 @@ var apiService = {
     var app = new Vue({
         el: '#app',
         data: {
-            isMobile: true,
+            isMobile: false,
             apiService: apiService,
             htmlContent: null,
             websitePages: [
