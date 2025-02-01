@@ -1,0 +1,9 @@
+## Privacy Policy
+
+### Single Sign In
+
+While you sign in with other identity providers you have the option to keep your account identity private.
+If you need to publish an application on vmie.org your you have to provide a link to one of your public profiles.
+
+<a href='https://vmie.org'>vmie.org</a> does not collect by default information from users.
+When you choose to enrole into one of our information exchange program, you will be presented with the privacy policy of the service of your choice.
