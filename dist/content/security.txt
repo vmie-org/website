@@ -29,3 +29,5 @@ Health Insurance ***Portability and Accountability*** Act of 1996 (HIPAA) Rules 
 71% of tested medical apps have at least one high level security vulnerability. According to <a targe="_blank" href="https://www.helpnetsecurity.com/2020/09/30/covid-19-tracking-apps-leak-data/">helpnetsecurity.com</a>
 
 The lack of reference architectures and relevant patterns makes compliance harder than it should be. According to Eduardo B. Fernández on <a targe="_blank" href="https://www.researchgate.net/publication/302066474_A_survey_of_compliance_issues_in_cloud_computing">researchgate.net</a>
+
+Human Health Insurance Portability and Accountability Act on <a targe="_blank" href="https://aspe.hhs.gov/reports/health-insurance-portability-accountability-act-1996">hhs.gov</a>

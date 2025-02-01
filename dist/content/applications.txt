@@ -1,0 +1,13 @@
+### Join our data exchange program
+
+We are building a catalogue of trusted service providers.
+
+We partner with field regulators and policy enforcement organisations to verify the security level of each service provider and we issue data exchange recomandations that the service providrs can use in the interaction with other service providers.
+
+We aim to provide a transparent multi-level security framework where veterinary medicine apps can join at any level and adopt as many security standards as they can to reach higher levels of data exchange.
+On higher levels, having secure technology has to be backed by field regulators to confirm the authenticity of a servie provider. 
+For this reason we are looking forward to partner with regulators and policy enforcement organisations.
+
+We are working on defining the framework that is secure and flexible enough to allow apps developer to gradually engage and adopt standards on a cost-effective quick-win business strategy.
+
+We consider that self management of the apps enrolement and journey is important and we are currently working on the solution to provide this option.
