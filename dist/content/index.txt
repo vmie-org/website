@@ -4,6 +4,11 @@
 ### Mission:
 To foster and promote the development and adoption of common standards for information exchange in veterinary medicine, with the aim of improving global communication, efficiency, and quality in the veterinary field.
 
+### Next milestone
+
+We are building a portal where you can signin, define your professional profile and cast a public vote for decisions we have to make. Transparecy is how we gain trust.
+We want to partner with tech professionals to define standards, validate directions and know eachother's vision and interests.
+
 ### Core Activities:
 
 1. **Advocacy and Promotion**  
