@@ -25,7 +25,6 @@
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"WebSite","description":"Leap Day is a theme for GitHub Pages.","headline":"Leap Day theme","name":"Leap Day theme","url":"https://pages-themes.github.io/leap-day/"}</script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-      
 </head>
 <body>
     <div id="app">
@@ -38,7 +37,10 @@
       <div id="banner">
         <span id="logo"></span>
 
-        <a v-if="!isMobile" href="https://github.com/vmie-org/website" class="button fork"><strong>View On GitHub</strong></a>
+        <a v-if="!loggedIn" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="loginText = 'Login with Linkedin'" class="button fork">
+            <strong><span style="color: blue; font-family: Sans; border: 1px solid blue; border-radius: 2px; padding: 0px 5px">in</span>
+              {{loginText}}</strong>
+        </a>
         <ul v-else style="float: left; display: inline-block; margin-left: 0px; left: 20px;">
             <li v-for="(page, index) in websitePages" v-if="index > 0 && page.title" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)"><a class="button" :href="'?page=' + page.id + '#' + page.id">{{page.id}}</a></li>
         </ul>        
@@ -68,14 +70,20 @@
                 </li>
             </ul>
         </nav>
+
         <section style="height: auto;">
             <p v-if="htmlContent" v-html="htmlContent"></p>
+
+        <a v-if="!isMobile" @click="login()" @mouseenter="loginText = 'Login with Linkedin'" class="button fork">
+            <strong><span style="color: blue; font-family: Sans; border: 1px solid blue; border-radius: 2px; padding: 0px 5px">in</span>
+              {{loginText}}</strong>
+        </a>
         </section>
     </div>
     <footer>
       
         <p>
-            <div><small>Source available on <a href="https://github.com/vmie-org/website">GitHub</a></small></div>
+            <div><small>Code on <a href="https://github.com/vmie-org/website">GitHub</a></small></div>
             <div><small>Hosted on <a href="https://vmie.org">vmie.org</a></small></div>
             <div><small>Linkedin <a href="www.linkedin.com/in/vmie">@vmie</a></small></div>
             <div><small>Slack <a href="https://vmie.slack.com">@vmie</a></small></div>
@@ -149,6 +157,8 @@ var apiService = {
     var app = new Vue({
         el: '#app',
         data: {
+            loggedIn: false,
+            loginText: 'Login',
             isMobile: false,
             apiService: apiService,
             htmlContent: null,
@@ -205,6 +215,11 @@ var apiService = {
         computed: {
         },
         methods: {
+            login(){
+                this.apiService.getData("https://vmie.org:5000/api/linkedin/login");
+                ///apiService.getData("https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=77uny28orqmlmv&redirect_uri=https://vmie.org:5000/api/linkedin/callback&scope=profile%20email%20openid&state=fabaecf3-288e-4c22-bc2c-c07208231f97");
+                //apiService.getData("https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=77uny28orqmlmv&redirect_uri=https://vmie.org:5000/api/linkedin/callback&scope=profile%20email%20openid&state=fabaecf3-288e-4c22-bc2c-c07208231f97");
+            },
             renderPage(page){
                 this.websitePages.forEach(page => {
                     page.isSelected = false;
