@@ -1,0 +1,5 @@
+This is a <span style='color: red; font-weight: bold'>PUBLIC CHAT</span> space. 
+DO NOT include sensitive content.
+DO NOT provide veterinary/medical advice using this chat.
+<b style='display: none'>If you see information that should not be public, 
+use the delete icon to hide it from public.</b>

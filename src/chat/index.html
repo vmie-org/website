@@ -8,9 +8,9 @@
     src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
     crossorigin="anonymous"></script>
-    <script src="./lib/vue/vue.js" asp-append-version="true"></script>
+    <script src="./../lib/vue/vue.js" asp-append-version="true"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="./lib/css/theme.css">
+    <link rel="stylesheet" href="./../lib/css/theme.css">
     <!-- theme -->
     <meta property="og:title" content="Veterinary Medicine Information Exchange" />
     <meta property="og:locale" content="en_US" />
@@ -27,13 +27,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
     
-    <link rel="stylesheet" href="./lib/data-tables/jquery.dataTables.min.css" />
-    <link rel="stylesheet" href="./lib/css/mobile.table.css"/>
-    <link rel="stylesheet" href="./lib/bootstrap/css/bootstrap-icons.css">
+    <link rel="stylesheet" href="./../lib/data-tables/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="./../lib/css/mobile.table.css"/>
+    <link rel="stylesheet" href="./../lib/bootstrap/css/bootstrap-icons.css">
 
-    <link rel="stylesheet" href="./lib/css/table.css" />
-    <link rel="stylesheet" href="./lib/css/modal.css" />
-    <link rel="stylesheet" href="./lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./../lib/css/table.css" />
+    <link rel="stylesheet" href="./../lib/css/modal.css" />
+    <link rel="stylesheet" href="./../lib/bootstrap/css/bootstrap.min.css" />
 </head>
 <body>
     <div id="app">
@@ -56,15 +56,12 @@
             <strong>
                 {{user.name}}
             </strong>
-        </a>
-        <ul v-else style="float: left; display: inline-block; margin-left: 0px; left: 20px;">
-            <li v-for="(page, index) in websitePages" v-if="index > 0 && page.title" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)"><a class="button" :href="'?page=' + page.id">{{page.id}}</a></li>
-        </ul>        
+        </a>     
         
         <div class="downloads">
             <span v-if="!isMobile">Free:</span>
             <ul>
-                <li v-if="!isMobile"><a href="./poc" class="button">Tools</a></li>
+                <li v-if="!isMobile"><a href=".." class="button">Home</a></li>
                 <li>
                     <a @click="isMobile = !isMobile" class="button"><div style="display: inline-block;">
                         <div class="menu-bar"></div>
@@ -79,16 +76,25 @@
       <!-- banner end -->
 
     <div class="wrapper">
-        <nav>
-            <ul>
-                <li v-for="page in websitePages" v-if="page.title" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)">
-                    <a :href="'?page=' + page.id">{{page.title}}</a>
-                </li>
-            </ul>
-        </nav>
 
         <section style="height: auto;">
             <p v-if="htmlContent" v-html="htmlContent"></p>
+
+            <div class="messages-area">
+                <div v-for="msg in messages">
+                    <span class="message-name" :class="user && msg.userId == user.userId ? 'mine':''" :title="msg.name">{{msg.initials}}:</span>
+                    {{msg.text}}
+                </div>
+            </div>
+            <div class="message-area">
+                <textarea :disabled="msg.sending" placeholder="Type your toughts" v-on:keyup.enter="sendMessage()" @keyup="countCharacters()" v-model="msg.text" class="message-box"></textarea>
+                <span @click="sendMessage()" style="display: inline-block; background-color: aquamarine; width: 40px; vertical-align: middle; border-radius: 5px;"><div>Send<br>now</div></span>
+            </div>
+            <div>
+                <small v-if="msg.charactesLeft >= 0" class="text-secondary">{{msg.charactesLeft}} charactes left.</small>
+                <small v-if="msg.charactesLeft < 0" class="text-danger">Your message was too long</small>
+                <small @click="showProfile = true" class="text-secondary float-right">Manage your privacy</small>
+            </div>
         </section>
 
         <div class="float-right">
@@ -105,8 +111,8 @@
             <br>
         </div>
 
-        <div v-if="selectedPage && selectedPage.id == 'Decisions'">
-            <div style="padding: 10px 0px 30px 0px;" v-if="users.length"> 
+        <div>
+            <div v-if="false" style="padding: 10px 0px 30px 0px;" v-if="users.length"> 
                 Decision board is under construction
                 <table class="blueTable">
                     <tr>
@@ -311,6 +317,13 @@ var apiService = {
     var app = new Vue({
         el: '#app',
         data: {
+            msg: {
+                charactesLeft: 255,
+                text: null,
+                sending: false,
+            },
+            messages: [],
+
             loggedIn: false,
             loginText: 'Login',
             isMobile: false,
@@ -360,6 +373,12 @@ var apiService = {
                     url: "./content/decisions.txt",
                     isSelected: false,
                 },
+                {
+                    id: "Chat",
+                    title:  "Public chat space",
+                    url: "./content/chat.txt",
+                    isSelected: false,
+                },
             ],
 
             // user management
@@ -371,19 +390,14 @@ var apiService = {
             users: [],
         },
         mounted: function () {
-            let page = this.websitePages[0];
-            let pageId = this.findGetParameter('page');
-            if(pageId){
-                let hrefPage = this.websitePages.find(p=> p.id == pageId);
-                if(hrefPage){
-                    page = hrefPage;
-                    this.selectedPage = page;
-                    if(page.id == 'Decisions'){
-                        this.loadUsers();
-                    }
-                }
+
+            let hrefPage = this.websitePages.find(p=> p.id == "Chat");
+            if(hrefPage){
+                this.selectedPage = hrefPage;
             }
-            this.renderPage(page);
+            this.loadUsers();
+            this.loadMessages();
+            this.renderPage(hrefPage);
 
             var session = localStorage.getItem('session');
             if(session){
@@ -403,6 +417,45 @@ var apiService = {
         computed: {
         },
         methods: {
+            // Messenger
+            countCharacters(){
+                this.msg.charactesLeft = 255 - (this.msg.text ? this.msg.text.length : 0);
+                if(this.msg.charactesLeft < 0){
+                    this.msg.text = this.msg.text.substring(0, 255);
+                }
+            },
+            sendMessage(){
+                if(!this.user){
+                    this.msg.text = "Please login!";
+                    return;
+                }
+                var text = this.msg.text.trim();
+                var initials = this.user.name ? this.buildAcronym(this.user.name) : "AU";
+                apiService.postData("https://vmie.org:5000/api/chat/send", { message: text, initials: initials }, this.messageSent);
+                this.msg.sending = true;
+            },
+            messageSent(){   
+                this.msg.sending = false;            
+                this.messages.push({
+                    text: text,
+                    name: this.user.name ? this.user.name : "Anonymous User",
+                    initials: this.user.name ? this.buildAcronym(this.user.name) : "AU",
+                    icon: this.user ? this.user.avatarUrl : null,
+                });
+                this.msg.text = null;
+            },
+            buildAcronym(str){
+                var matches = str.match(/\b(\w)/g); // ['J','S','O','N']
+                return matches.join('').toUpperCase();
+            },
+            loadMessages(){
+                apiService.postData("https://vmie.org:5000/api/messages/list", { take: 50 }, this.messagesListReceived);
+            },
+            messagesListReceived(messages){
+                this.messages = messages;
+            },
+
+
             getCookie(name) {
                 var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
                 if (match) return match[2];
@@ -470,9 +523,8 @@ var apiService = {
                 this.websitePages.forEach(page => {
                     page.isSelected = false;
                 });
-                apiService.getText(page.url, this.parseContent);
+                apiService.getText("./." + page.url, this.parseContent);
                 page.isSelected = true;
-                selectedPage = page;
             },
             parseContent(content){
                 let lines = content.split('\n');
@@ -535,4 +587,30 @@ var apiService = {
     });
 
 </script>
+<style>
+    .message-area{        
+        border: 1px solid gray;
+        border-radius: 5px;
+        margin: 5px;
+    }
+    .messages-area{        
+        border: 1px solid silver;
+        border-radius: 2px;
+    }
+    .message-name{
+        color: gray;
+        font-style: italic; 
+    }
+    .mine {
+        font-weight: bold; 
+    }
+
+    .message-box{
+        width: 90%;
+        background: rgb(255, 255, 255);
+        border: 1px solid gray;
+        outline: 0;
+        cursor: text;
+        resize: none;
+    }
 </style>
