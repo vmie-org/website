@@ -58,7 +58,7 @@
             </strong>
         </a>
         <ul v-else style="float: left; display: inline-block; margin-left: 0px; left: 20px;">
-            <li v-for="(page, index) in websitePages" v-if="index > 0 && page.title" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)"><a class="button" :href="'?page=' + page.id + '#' + page.id">{{page.id}}</a></li>
+            <li v-for="(page, index) in websitePages" v-if="index > 0 && page.title" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)"><a class="button" :href="'?page=' + page.id">{{page.id}}</a></li>
         </ul>        
         
         <div class="downloads">
@@ -82,7 +82,7 @@
         <nav>
             <ul>
                 <li v-for="page in websitePages" v-if="page.title" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)">
-                    <a :href="'?page=' + page.id + '#' + page.id">{{page.title}}</a>
+                    <a :href="'?page=' + page.id">{{page.title}}</a>
                 </li>
             </ul>
         </nav>
@@ -110,13 +110,18 @@
                 Decision board is under construction
                 <table class="blueTable">
                     <tr>
+                        <td>Id</td>
                         <td>User</td>
                         <td>Col 1</td>
                         <td>Col 2</td>
                         <td>Col 3</td>
                     </tr>
                     <tr v-for="user in users">
-                        <td>{{user.name}}</td>
+                        <td>{{user.id}}</td>
+                        <td>
+                            <img :src="user.avatarUrl" height="24" width="24"/>
+                            {{user.name}}
+                        </td>
                         <td>col 1</td>
                         <td>col 2</td>
                         <td>col 3</td>
@@ -248,7 +253,7 @@
 
     
 var apiService = {
-		jwt: null,
+        jwt: null,
 		postData(url, payload, handler){
 			var context = this;
 			$.ajax({
@@ -367,9 +372,9 @@ var apiService = {
         },
         mounted: function () {
             let page = this.websitePages[0];
-            let pageId = location.hash;
+            let pageId = this.findGetParameter('page');
             if(pageId){
-                let hrefPage = this.websitePages.find(p=> "#" + p.id == pageId);
+                let hrefPage = this.websitePages.find(p=> p.id == pageId);
                 if(hrefPage){
                     page = hrefPage;
                     this.selectedPage = page;
@@ -379,14 +384,45 @@ var apiService = {
                 }
             }
             this.renderPage(page);
-            this.getUserInfo();
+
+            var session = localStorage.getItem('session');
+            if(session){
+                session = JSON.parse(session);
+                if(session){
+                    apiService.jwt = session.jwt;
+                    this.getUserInfo();
+                }
+            }
+            else if(!apiService.jwt){
+                let sessionId = this.findGetParameter('session');
+                if(sessionId){
+                    this.getUserSession(sessionId);
+                }
+            }
         },
         computed: {
         },
         methods: {
+            getCookie(name) {
+                var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+                if (match) return match[2];
+            },
+            findGetParameter(parameterName) {
+                var result = null,
+                    tmp = [];
+                location.search
+                    .substr(1)
+                    .split("&")
+                    .forEach(function (item) {
+                    tmp = item.split("=");
+                    if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+                    });
+                return result;
+            },
+
             // users listing
             loadUsers(){
-                apiService.getData("https://localhost:5000/api/user/list", this.usesListeceived);
+                apiService.postData("https://vmie.org:5000/api/user/list", { take: 20 }, this.usesListeceived);
             },
             usesListeceived(users){
                 this.users = users;
@@ -402,11 +438,15 @@ var apiService = {
                 ///apiService.getData("https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=77uny28orqmlmv&redirect_uri=https://vmie.org:5000/api/linkedin/callback&scope=profile%20email%20openid&state=fabaecf3-288e-4c22-bc2c-c07208231f97");
                 //apiService.getData("https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=77uny28orqmlmv&redirect_uri=https://vmie.org:5000/api/linkedin/callback&scope=profile%20email%20openid&state=fabaecf3-288e-4c22-bc2c-c07208231f97");
             },
-            getUserInfo(page){
-                this.websitePages.forEach(page => {
-                    page.isSelected = false;
-                });
-                apiService.getData("https://localhost:5000/api/user/info", this.userInfoReceived);
+            getUserSession(sessionId){
+                apiService.getData("https://vmie.org:5000/api/user/session?session=" + sessionId, this.userSessionReceived);
+            },
+            userSessionReceived(session){
+                localStorage.setItem("session", JSON.stringify(session));
+                this.getUserInfo();
+            },
+            getUserInfo(){
+                apiService.getData("https://vmie.org:5000/api/user/info", this.userInfoReceived);
             },
             userInfoReceived(user){
                 if(user && user.name == 'DELETED'){
@@ -419,10 +459,10 @@ var apiService = {
                 this.showUserProfile = true;
             },
             updateAccount(){
-                apiService.postData("https://localhost:5000/api/user/info", this.user, this.userInfoReceived);
+                apiService.postData("https://vmie.org:5000/api/user/info", this.user, this.userInfoReceived);
             },
             deleteAccount(){
-                apiService.postData("https://localhost:5000/api/user/delete", this.user, this.userInfoReceived);
+                apiService.postData("https://vmie.org:5000/api/user/delete", this.user, this.userInfoReceived);
             },
 
             // page utilities

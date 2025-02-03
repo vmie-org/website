@@ -13,4 +13,4 @@ We are working on defining the framework that is secure and flexible enough to a
 We consider that self management of the apps enrolement and journey is important and we are currently working on the solution to provide this option.
 
 -----------
-<div style="text-align: right">Looking for :<br><a href='?page=Privacy#Privacy'>Privacy Policy</a></div>
+<div style="text-align: right">Looking for :<br><a href='?page=Privacy'>Privacy Policy</a></div>
