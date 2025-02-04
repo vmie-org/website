@@ -54,7 +54,7 @@
         </a>
         <a v-if="user" @click="showProfile()" class="button fork">
             <strong>
-                {{user.name}}
+                <img :src="user.avatarUrl" height="18" width="18" style="margin-right: 5px; border: 1px solid white;"/> {{user.name}}
             </strong>
         </a>
         <ul v-else style="float: left; display: inline-block; margin-left: 0px; left: 20px;">
@@ -64,7 +64,7 @@
         <div class="downloads">
             <span v-if="!isMobile">Free:</span>
             <ul>
-                <li v-if="!isMobile"><a href="./poc" class="button">Tools</a></li>
+                <li v-if="!isMobile"><a href="./chat" class="button">Chat</a></li>
                 <li>
                     <a @click="isMobile = !isMobile" class="button"><div style="display: inline-block;">
                         <div class="menu-bar"></div>
@@ -270,7 +270,7 @@ var apiService = {
 			}).fail(function (data) {
 			});
 		},
-		getData(url, handler){
+		getData(url, handler, failHandler){
 			var context = this;
 			$.ajax({
 				headers: {
@@ -283,6 +283,9 @@ var apiService = {
 			}).done(function (data) {
 				handler(data);
 			}).fail(function (data) {
+                if(failHandler){
+                    failHandler(data)
+                }
 			});
 		},
 		getText(url, handler){
@@ -446,7 +449,10 @@ var apiService = {
                 this.getUserInfo();
             },
             getUserInfo(){
-                apiService.getData("https://localhost:5000/api/user/info", this.userInfoReceived);
+                apiService.getData("https://vmie.org:5000/api/user/info", this.userInfoReceived, this.noUserInfoReceived);
+            },
+            noUserInfoReceived(data){
+                user = null;
             },
             userInfoReceived(user){
                 if(user && user.name == 'DELETED'){

@@ -499,7 +499,7 @@ var apiService = {
                 this.getUserInfo();
             },
             getUserInfo(){
-                apiService.getData("https://localhost:5000/api/user/info", this.userInfoReceived);
+                apiService.getData("https://vmie.org:5000/api/user/info", this.userInfoReceived);
             },
             userInfoReceived(user){
                 if(user && user.name == 'DELETED'){
