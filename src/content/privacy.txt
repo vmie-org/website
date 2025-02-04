@@ -2,8 +2,42 @@
 
 ### Single Sign In
 
-While you sign in with other identity providers you have the option to keep your account identity private.
+While you sign in with other identity providers you have the option to keep your account identity private. (see User privacy options)
 If you need to publish an application on vmie.org your you have to provide a link to one of your public profiles.
 
 <a href='https://vmie.org'>vmie.org</a> does not collect by default information from users.
 When you choose to enrole into one of our information exchange program, you will be presented with the privacy policy of the service of your choice.
+
+### Chat privacy
+
+We use a PUBLIC CHAT space.
+DO NOT provide veterinary/medical advice using our chat.
+Do not include sensitive information in your messsages.
+We periodically process conversations to build knoekedge and support decisions.
+You can delete all your conversations from vmie using the privacy form on your profile. 
+
+
+### User privacy options
+
+If you are logged in, you can manage your privacy from your profile.
+To open the privacy form click your name (you have to be logged in).
+![User privacy options](./img/privacy.png "User privacy options")
+
+### Browser
+
+We use a browser cookies, local storage and th indexDb to persist data while you are logged in.
+A special "session" cookie is used to handle your authentication.
+
+Coockies of other services can be used:
+**LinedIn**: We use LinkedIn for authentication. We collect your name and your avatar to build your user profile. By default, your name and avatar will be public on vmie. You can hide your name or avatar from others.
+
+## Terms and Conditions
+
+**vmie** is reserving the right to limit your access or remove your account without notice, depending on the conditions, if your activity is found to go against community standards or affect other users, businesses or our resources.
+
+### Community standards
+
+Keep discussions relevant and professional.
+Maintain confidentiality and respect privacy.
+DO NOT provide veterinary/medical advice using our chat.
+Do not include sensitive information in your messsages.
