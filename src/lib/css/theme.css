@@ -776,7 +776,7 @@ footer {
         position: relative;
         left: auto;
         bottom: auto;
-        width: auto
+        #width: auto
     }
 }
 
@@ -871,7 +871,7 @@ footer {
         position: relative;
         left: auto;
         bottom: auto;
-        width: auto
+        #width: auto
     }
 }
 
@@ -886,6 +886,6 @@ footer {
         position: relative;
         left: auto;
         bottom: auto;
-        width: auto
+        #width: auto
     }
 }
