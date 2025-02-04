@@ -54,17 +54,14 @@
         </a>
         <a v-if="user" @click="showProfile()" class="button fork">
             <strong>
-                {{user.name}}
+                <img :src="user.avatarUrl" height="18" width="18" style="margin-right: 5px; border: 1px solid white;"/> {{user.name}}
             </strong>
-        </a>
-        <ul v-else style="float: left; display: inline-block; margin-left: 0px; left: 20px;">
-            <li v-for="(page, index) in websitePages" v-if="index > 0 && page.title" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)"><a class="button" :href="'?page=' + page.id">{{page.id}}</a></li>
-        </ul>        
+        </a>       
         
         <div class="downloads">
             <span v-if="!isMobile">Free:</span>
             <ul>
-                <li v-if="!isMobile"><a href="./poc" class="button">Tools</a></li>
+                <li v-if="!isMobile"><a href="./chat" class="button">Chat</a></li>
                 <li>
                     <a @click="isMobile = !isMobile" class="button"><div style="display: inline-block;">
                         <div class="menu-bar"></div>
@@ -88,6 +85,15 @@
         </nav>
 
         <section style="height: auto;">
+
+        <div v-if="isMobile" style="display: inline-block; margin-left: 0px; left: 20px;">
+            <span v-for="(page, index) in websitePages" v-if="index > 0 && page.title " 
+                 @click="renderPage(page)"><a class="btn btn-light pagename" :class="page.isSelected ? 'active' : ''" :href="'?page=' + page.id">
+                {{page.id}}
+            </a></span>
+            <hr>
+        </div> 
+
             <p v-if="htmlContent" v-html="htmlContent"></p>
         </section>
 
@@ -270,7 +276,7 @@ var apiService = {
 			}).fail(function (data) {
 			});
 		},
-		getData(url, handler){
+		getData(url, handler, failHandler){
 			var context = this;
 			$.ajax({
 				headers: {
@@ -283,6 +289,8 @@ var apiService = {
 			}).done(function (data) {
 				handler(data);
 			}).fail(function (data) {
+                if(failHandler)
+				failHandler(data);
 			});
 		},
 		getText(url, handler){
@@ -322,12 +330,14 @@ var apiService = {
                     id: "Welcome",
                     title: "Our Mission",
                     url: "./content/index.txt",
+                    hideOnMobile: true,
                     isSelected: false,
                 },
                 {
                     id: "Compatibility",
                     title: "Compatibility check",
                     url: "./content/compatibility.txt",
+                    hideOnMobile: true,
                     isSelected: false,
                 },
                 {
@@ -346,12 +356,21 @@ var apiService = {
                     id: "Join",
                     title: "Join our Data Exchange Programm",
                     url: "./content/applications.txt",
+                    hideOnMobile: true,
                     isSelected: false,
                 },
                 {
                     id: "Decisions",
                     title:  "Decision Board",
                     url: "./content/decisions.txt",
+                    hideOnMobile: true,
+                    isSelected: false,
+                },
+                {
+                    id: "Chat",
+                    title:  "Public chat space",
+                    url: "./content/decisions.txt",
+                    hideOnMobile: true,
                     isSelected: false,
                 },
                 {
@@ -371,6 +390,7 @@ var apiService = {
             users: [],
         },
         mounted: function () {
+            this.isMobile = window.screen.width < 500;
             let page = this.websitePages[0];
             let pageId = this.findGetParameter('page');
             if(pageId){
@@ -431,6 +451,7 @@ var apiService = {
             // user management  
             logout(){
                 this.apiService.getData("https://vmie.org:5000/api/logout");
+                localStorage.removeItem("session");
                 this.user = null;
             },
             login(){
@@ -443,10 +464,15 @@ var apiService = {
             },
             userSessionReceived(session){
                 localStorage.setItem("session", JSON.stringify(session));
+                apiService.jwt = session.jwt;
                 this.getUserInfo();
             },
             getUserInfo(){
-                apiService.getData("https://localhost:5000/api/user/info", this.userInfoReceived);
+                apiService.getData("https://vmie.org:5000/api/user/info", this.userInfoReceived, this.noUserInfoReceived);
+            },
+            noUserInfoReceived(data){
+                user = null;
+                this.logout();
             },
             userInfoReceived(user){
                 if(user && user.name == 'DELETED'){
@@ -470,6 +496,9 @@ var apiService = {
                 this.websitePages.forEach(page => {
                     page.isSelected = false;
                 });
+                if(page.id == 'Chat'){
+                    window.location.href = "./chat";
+                }
                 apiService.getText(page.url, this.parseContent);
                 page.isSelected = true;
                 selectedPage = page;
@@ -535,4 +564,12 @@ var apiService = {
     });
 
 </script>
+<style>
+    .pagename{
+        border: 1px solid silver;
+        border-radius: 3px;
+        padding: 5px 10px;
+        color: black;
+        margin: 5px;
+    }
 </style>

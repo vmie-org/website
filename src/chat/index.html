@@ -54,7 +54,7 @@
         </a>
         <a v-if="user" @click="showProfile()" class="button fork">
             <strong>
-                {{user.name}}
+                <img :src="user.avatarUrl" height="18" width="18" style="margin-right: 5px; border: 1px solid white;"/> {{user.name}}
             </strong>
         </a>     
         
@@ -88,15 +88,20 @@
                 <br>
             </div>
             <div class="messages-area" id="messages">
-                <div v-for="msg in messages">
+                <div v-for="msg in messages" v-if="!msg.deleted">
                     <div class="message-item">
-                        <span class="message-name" :class="user && msg.userId == user.userId ? 'mine':''" :title="msg.name">{{msg.initials}}:</span>
-                        <span class="message-text">{{msg.text}}</span>
+                        <span class="message-name" :class="user && msg.userId == user.id ? 'mine':''" :title="msg.name">{{msg.initials}}:</span>
+                        <span class="message-text">
+{{msg.message}}
+<span class="actions">
+<span class="float-right bin" @click="deleteMessage(msg)"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M3 6H21M5 6V20C5 21.1046 5.89543 22 7 22H17C18.1046 22 19 21.1046 19 20V6M8 6V4C8 2.89543 8.89543 2 10 2H14C15.1046 2 16 2.89543 16 4V6" stroke="gray" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M14 11V17" stroke="gray" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M10 11V17" stroke="gray" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></span>
+</span>
+</span>
                     </div>
                 </div>
             </div>
             <div class="message-area">
-                <textarea :disabled="msg.sending" placeholder="Type your toughts" v-on:keyup.enter="sendMessage()" @keyup="countCharacters()" v-model="msg.text" class="message-box"></textarea>
+                <textarea :disabled="msg.sending" :placeholder="user ? 'Type your toughts' : 'Please login!'" v-on:keyup.enter="sendMessage()" @click="if(user && !user.privacyAgreed) showProfile()" @keyup="countCharacters()" v-model="msg.message" class="message-box"></textarea>
                 <span @click="sendMessage()" style="float: right; display: block; width: 32px; border-radius: 5px;">
                     <div>
                         <svg width="48" height="48" viewBox="450 1070 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -108,9 +113,10 @@
             <div>
                 <small @click="showUserProfile = true" v-if="msg.charactesLeft >= 0" class="text-secondary">{{msg.charactesLeft}} charactes left.</small>
                 <small v-if="msg.charactesLeft < 0" class="text-danger">Your message was too long</small>
-                <small v-if="false" @click="showProfile = true" class="text-secondary float-right">Manage your privacy</small>
+                <small v-if="false" @click="showProfile()" class="text-secondary float-right">Manage your privacy</small>
             
                 <span v-if="dummyCont <= 0" @click="dummyCont = 20" class="messages-resume float-right">Continue</span></div>
+                <div class="float-right"><a href="https://vmie.org?page=Privacy">Privacy policy</a> <span v-if="user && user.privacyAgreed" @click="showProfile()"> agreed by you</span></div>
         </section>
 
         <div class="float-right">
@@ -191,6 +197,15 @@
                     <div>We can <b>auto-hide</b> your your messages on an expiration policy.</div>
                     <small style="color: gray">Messages that are pinned or voted by other members will not auto-hide. We will continue to periodically process messages even while they are hiddden.</small>                        
                 </div>
+                <div v-if="user" class="alert alert-warning">
+                    <div class="btn float-right" :class="user.privacyAgreed ? 'btn-light':'btn-secondary'" v-on:click="updateAccountPrivacy()" 
+                    title="I agree privacy policy"><input type="checkbox" v-model="user.privacyAgreed" id="privacyPolicy"> <label style="margin-bottom: 0" for="privacyPolicy">I agree</label></div>
+                
+                    <div>Interacting with vmie requires you to agree our <a href="https://vmie.org?page=Privacy">Privacy policy</a> and <a href="https://vmie.org?page=Privacy">Terms and conditions</a></div>
+                    <small v-if="!user.privacyAgreed" style="color: gray">You haven't agreed our privacy policy yet.</small>                        
+                    <small v-if="user.privacyAgreed" style="color: gray">You agreed our privacy policy.</small>                        
+                </div>
+
                 <div class="alert alert-warning">
                     <div class="btn btn-danger float-right" v-on:click="deleteConversations()" title="Delete all my conversations from vmie">delete all my conversations</div>
                 
@@ -292,7 +307,7 @@
     
 var apiService = {
         jwt: null,
-		postData(url, payload, handler){
+		postData(url, payload, handler, failHandler){
 			var context = this;
 			$.ajax({
 				headers: {
@@ -306,9 +321,11 @@ var apiService = {
 			}).done(function (data) {
 				handler(data);
 			}).fail(function (data) {
+                		if(failHandler)
+				failHandler(data);
 			});
 		},
-		getData(url, handler){
+		getData(url, handler, failHandler){
 			var context = this;
 			$.ajax({
 				headers: {
@@ -321,6 +338,8 @@ var apiService = {
 			}).done(function (data) {
 				handler(data);
 			}).fail(function (data) {
+                	if(failHandler)
+				failHandler(data);
 			});
 		},
 		getText(url, handler){
@@ -423,7 +442,7 @@ var apiService = {
             users: [],
 
             // dummy content for debugging
-            simulate: true,            
+            simulate: false,            
             dummySentences: [
                 "Lorem ipsum dolor sit amet.",
                 "Consectetur adipiscing elit.",
@@ -491,11 +510,12 @@ var apiService = {
                     }
                     var index = Math.floor(Math.random() * (this.dummySentences.length - 1));
                     var name = "Anonymous User";
-                    var text = this.dummySentences[index];
+                    var message = this.dummySentences[index];
                     this.messages.push({
-                        text: text,
+                        deleted: false,
+                        message: message,
                         name: name,
-                        initials: this.buildAcronym(text).substring(0,2),
+                        initials: this.buildAcronym(message).substring(0,2),
                         icon: name,
                     });
                     Vue.nextTick(() =>{
@@ -514,7 +534,8 @@ var apiService = {
                 var index = Math.floor(Math.random() * (this.dummySentences.length - 1));
                     var name = "Anonymous User";
                     found.push({
-                        text: this.dummySentences[index],
+                        deleted: false,
+                        message: this.dummySentences[index],
                         name: name,
                         initials: this.buildAcronym(name),
                         icon: name,
@@ -525,6 +546,19 @@ var apiService = {
                 container.scrollTo({ top: 0, behavior: "smooth" });
                 this.dummyCont = 0;
             },
+            deleteMessage(msg){
+                if(!this.user || this.user.isDummy){
+                    // Debug UI without a user
+                    msg.deleted = true;
+                }
+                apiService.postData("https://vmie.org:5000/api/chat/remove", {id: msg.id}, this.messageDeleted);
+            },
+            messageDeleted(msg){
+                msg = this.messages.find(p=>p.id = msg.id);
+                if(msg){
+                    msg.deleted = true;
+                }
+            },
             // Messenger
             deleteConversations()
             {
@@ -532,43 +566,40 @@ var apiService = {
             },
             setMessageLife(lifetime)
             {
-                apiService.postData("https://vmie.org:5000/api/chat/erase", {seconds: lifetime}, this.deleteConversationsCompleted);
+                apiService.postData("https://vmie.org:5000/api/chat/life", {seconds: lifetime}, this.deleteConversationsCompleted);
             },
             deleteConversationsCompleted(){
                 this.warning = "Your conversations have been deleted. You can continue using chat."
             },
             countCharacters(){
-                this.msg.charactesLeft = 255 - (this.msg.text ? this.msg.text.length : 0);
+                this.msg.charactesLeft = 255 - (this.msg.message ? this.msg.message.length : 0);
                 if(this.msg.charactesLeft < 0){
-                    this.msg.text = this.msg.text.substring(0, 255);
+                    this.msg.message = this.msg.message.substring(0, 255);
                 }
             },
             sendMessage(){
-                if(!this.user && !this.simulate){
-                    this.msg.text = "Please login!";
-                    return;
-                }
-                else{
+                if(!this.user                           ){
                     this.user = {
-                        name: "Florin Cumpanasu",
+                        name: "Visitor " + Math.floor(Math.random() * 1000),
+                        isDummy: true,
                     }
                 }
-                var text = this.msg.text.trim();
+                var message = this.msg.message.trim();
                 var initials = this.user.name ? this.buildAcronym(this.user.name) : "AU";
-                var data = { message: text, initials: initials };
+                var data = { message: message, initials: initials, deleted: false };
                 if(this.simulate){
                     this.messageSent();
                 }
                 else{
-                    apiService.postData("https://vmie.org:5000/api/chat/send", data, this.messageSent);
+                    apiService.postData("https://vmie.org:5000/api/chat/send", data, this.messageSent, this.messageNotSent);
                 }
                 this.msg.sending = true;
             },
-            messageSent(){   
-                this.msg.sending = false;  
-                var text = this.msg.text.trim();          
+            messageNotSent(){ 
+                this.msg.sending = false;      
                 this.messages.push({
-                    text: text,
+                    deleted: false,
+                    message: "Unable to send your message",
                     name: this.user.name ? this.user.name : "Anonymous User",
                     initials: this.user.name ? this.buildAcronym(this.user.name) : "AU",
                     icon: this.user ? this.user.avatarUrl : null,
@@ -577,17 +608,37 @@ var apiService = {
                     const container = document.querySelector("#messages");
                     container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
                 });
-                this.msg.text = null;
+            },
+            messageSent(){   
+                this.msg.sending = false;  
+                var message = this.msg.message.trim();          
+                this.messages.push({
+                    message: message,
+                    name: this.user.name ? this.user.name : "Anonymous User",
+                    initials: this.user.name ? this.buildAcronym(this.user.name) : "AU",
+                    icon: this.user ? this.user.avatarUrl : null,
+                    deleted: false,
+                });
+                Vue.nextTick(() =>{
+                    const container = document.querySelector("#messages");
+                    container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+                });
+                this.msg.message = null;
             },
             buildAcronym(str){
                 var matches = str.match(/\b(\w)/g); // ['J','S','O','N']
                 return matches.join('').toUpperCase();
             },
             loadMessages(){
-                apiService.postData("https://vmie.org:5000/api/messages/list", { take: 50 }, this.messagesListReceived);
+                apiService.postData("https://vmie.org:5000/api/chat/list", { take: 50 }, this.messagesListReceived);
             },
             messagesListReceived(messages){
+                messages.forEach(p=>p.deleted = false);
                 this.messages = messages;
+                    Vue.nextTick(() =>{
+                        const container = document.querySelector("#messages");
+                        container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+                    });
             },
 
 
@@ -634,7 +685,10 @@ var apiService = {
                 this.getUserInfo();
             },
             getUserInfo(){
-                apiService.getData("https://localhost:5000/api/user/info", this.userInfoReceived);
+                apiService.getData("https://vmie.org:5000/api/user/info", this.userInfoReceived, this.noUserInfoReceived);
+            },
+            noUserInfoReceived(data){
+                user = null;;
             },
             userInfoReceived(user){
                 this.simulate = false;
@@ -642,15 +696,20 @@ var apiService = {
                 if(user && user.name == 'DELETED'){
                     this.showUserProfile = false;
                     this.showUserDeleted = true;
+                    return;
                 }
-                this.user = user;
+                this.loadUsers();
                 this.loadMessages();
+                this.user = user;
             },
             showProfile(){
                 this.showUserProfile = true;
             },
             updateAccount(){
                 apiService.postData("https://vmie.org:5000/api/user/info", this.user, this.userInfoReceived);
+            },
+            updateAccountPrivacy(){
+                apiService.postData("https://vmie.org:5000/api/user/privacy/agreement/" + this.user.privacyAgreed ? 'true':'false', null, this.userInfoReceived);
             },
             deleteAccount(){
                 apiService.postData("https://vmie.org:5000/api/user/delete", this.user, this.userInfoReceived);
@@ -780,4 +839,20 @@ var apiService = {
         cursor: text;
         resize: none;
     }
+.actions{
+display: none;
+}
+.message-item:hover .actions{
+display: inline;
+}
+.bin{
+display: inline-block;
+    height: 16px;
+    width: 16px;
+fill: silver;
+}
+.bin:hover{
+fill: red;
+width: 22px;
+}
 </style>
