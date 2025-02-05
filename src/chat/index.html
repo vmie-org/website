@@ -301,63 +301,9 @@
 </body>
 </html>
 
-<script>
-
-
-    
-var apiService = {
-        jwt: null,
-		postData(url, payload, handler, failHandler){
-			var context = this;
-			$.ajax({
-				headers: {
-					"Authorization": "Bearer "  + this.jwt,
-				},
-				url: url,
-				contentType: "application/json; charset=utf-8",
-				dataType: "json",
-				type: "POST",
-				data: JSON.stringify(payload)
-			}).done(function (data) {
-				handler(data);
-			}).fail(function (data) {
-                		if(failHandler)
-				failHandler(data);
-			});
-		},
-		getData(url, handler, failHandler){
-			var context = this;
-			$.ajax({
-				headers: {
-					"Authorization": "Bearer "  + this.jwt,
-				},
-				url: url,
-				contentType: "application/json; charset=utf-8",
-				dataType: "json",
-				type: "GET"
-			}).done(function (data) {
-				handler(data);
-			}).fail(function (data) {
-                	if(failHandler)
-				failHandler(data);
-			});
-		},
-		getText(url, handler){
-			var context = this;
-			$.ajax({
-				headers: {
-					"Authorization": "Bearer "  + this.jwt,
-				},
-				url: url,
-				contentType: "application/text; charset=utf-8",
-                dataType: "text",
-				type: "GET"
-			}).done(function (data) {
-				handler(data);
-			}).fail(function (data) {
-			});
-		}
-	};
+<script type="module">
+    import { vmieData } from "./../services/vmieService.js";
+    import { apiService } from "./../services/apiService.js";
 
 	var userService = {
 		apiService: apiService,
@@ -382,56 +328,7 @@ var apiService = {
             apiService: apiService,
             htmlContent: null,
             selectedPage: null,
-            websitePages: [
-                {
-                    id: "Welcome",
-                    title: "Our Mission",
-                    url: "./content/index.txt",
-                    isSelected: false,
-                },
-                {
-                    id: "Compatibility",
-                    title: "Compatibility check",
-                    url: "./content/compatibility.txt",
-                    isSelected: false,
-                },
-                {
-                    id: "Security",
-                    title: "Information and Security",
-                    url: "./content/security.txt",
-                    isSelected: false,
-                },
-                {
-                    id: "Architecture",
-                    title: "Software Architecture",
-                    url: "./content/architecture.txt",
-                    isSelected: false,
-                },
-                {
-                    id: "Join",
-                    title: "Join our Data Exchange Programm",
-                    url: "./content/applications.txt",
-                    isSelected: false,
-                },
-                {
-                    id: "Decisions",
-                    title:  "Decision Board",
-                    url: "./content/decisions.txt",
-                    isSelected: false,
-                },
-                {
-                    id: "Chat",
-                    title:  "Public chat space",
-                    url: "./content/chat.txt",
-                    isSelected: false,
-                },
-                {
-                    id: "Privacy",
-                    title: "Terms & Privacy",
-                    url: "./content/privacy.txt",
-                    isSelected: false,
-                },
-            ],
+            websitePages: [],
 
             // user management
             user: null,
@@ -478,6 +375,7 @@ var apiService = {
             dummyCont: 30,
         },
         mounted: function () {
+            this.websitePages = vmieData.websitePages;
 
             let hrefPage = this.websitePages.find(p=> p.id == "Chat");
             if(hrefPage){

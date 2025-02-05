@@ -41,7 +41,6 @@
             <h1>Veterinary Medicine Information Exchange</h1>
             <p>Non-Profit Organization for providing standards on vmie.org</p>
           </header>
-          
       <!-- banner start -->
       <div id="banner">
         <span id="logo"></span>
@@ -254,61 +253,9 @@
 </body>
 </html>
 
-<script>
-
-
-    
-var apiService = {
-        jwt: null,
-		postData(url, payload, handler){
-			var context = this;
-			$.ajax({
-				headers: {
-					"Authorization": "Bearer "  + this.jwt,
-				},
-				url: url,
-				contentType: "application/json; charset=utf-8",
-				dataType: "json",
-				type: "POST",
-				data: JSON.stringify(payload)
-			}).done(function (data) {
-				handler(data);
-			}).fail(function (data) {
-			});
-		},
-		getData(url, handler, failHandler){
-			var context = this;
-			$.ajax({
-				headers: {
-					"Authorization": "Bearer "  + this.jwt,
-				},
-				url: url,
-				contentType: "application/json; charset=utf-8",
-				dataType: "json",
-				type: "GET"
-			}).done(function (data) {
-				handler(data);
-			}).fail(function (data) {
-                if(failHandler)
-				failHandler(data);
-			});
-		},
-		getText(url, handler){
-			var context = this;
-			$.ajax({
-				headers: {
-					"Authorization": "Bearer "  + this.jwt,
-				},
-				url: url,
-				contentType: "application/text; charset=utf-8",
-                dataType: "text",
-				type: "GET"
-			}).done(function (data) {
-				handler(data);
-			}).fail(function (data) {
-			});
-		}
-	};
+<script type="module">
+import { vmieData } from "./services/vmieService.js";
+import { apiService } from "./services/apiService.js";
 
 	var userService = {
 		apiService: apiService,
@@ -319,67 +266,14 @@ var apiService = {
     var app = new Vue({
         el: '#app',
         data: {
+            apiService: apiService,
+
             loggedIn: false,
             loginText: 'Login',
             isMobile: false,
-            apiService: apiService,
             htmlContent: null,
             selectedPage: null,
-            websitePages: [
-                {
-                    id: "Welcome",
-                    title: "Our Mission",
-                    url: "./content/index.txt",
-                    hideOnMobile: true,
-                    isSelected: false,
-                },
-                {
-                    id: "Compatibility",
-                    title: "Compatibility check",
-                    url: "./content/compatibility.txt",
-                    hideOnMobile: true,
-                    isSelected: false,
-                },
-                {
-                    id: "Security",
-                    title: "Information and Security",
-                    url: "./content/security.txt",
-                    isSelected: false,
-                },
-                {
-                    id: "Architecture",
-                    title: "Software Architecture",
-                    url: "./content/architecture.txt",
-                    isSelected: false,
-                },
-                {
-                    id: "Join",
-                    title: "Join our Data Exchange Programm",
-                    url: "./content/applications.txt",
-                    hideOnMobile: true,
-                    isSelected: false,
-                },
-                {
-                    id: "Decisions",
-                    title:  "Decision Board",
-                    url: "./content/decisions.txt",
-                    hideOnMobile: true,
-                    isSelected: false,
-                },
-                {
-                    id: "Chat",
-                    title:  "Public chat space",
-                    url: "./content/decisions.txt",
-                    hideOnMobile: true,
-                    isSelected: false,
-                },
-                {
-                    id: "Privacy",
-                    title: "Terms & Privacy",
-                    url: "./content/privacy.txt",
-                    isSelected: false,
-                },
-            ],
+            websitePages: [],
 
             // user management
             user: null,
@@ -390,6 +284,7 @@ var apiService = {
             users: [],
         },
         mounted: function () {
+            this.websitePages = vmieData.websitePages;
             this.isMobile = window.screen.width < 500;
             let page = this.websitePages[0];
             let pageId = this.findGetParameter('page');
@@ -471,7 +366,7 @@ var apiService = {
                 apiService.getData("https://vmie.org:5000/api/user/info", this.userInfoReceived, this.noUserInfoReceived);
             },
             noUserInfoReceived(data){
-                user = null;
+                this.user = null;
                 this.logout();
             },
             userInfoReceived(user){
@@ -501,7 +396,7 @@ var apiService = {
                 }
                 apiService.getText(page.url, this.parseContent);
                 page.isSelected = true;
-                selectedPage = page;
+                this.selectedPage = page;
             },
             parseContent(content){
                 let lines = content.split('\n');
