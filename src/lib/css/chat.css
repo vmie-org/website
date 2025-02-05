@@ -1,0 +1,61 @@
+
+.messages-resume{
+    display: inline-block;
+    border: 1px solid rgb(208, 208, 208);
+    background-color: rgb(236, 236, 236);
+    border-radius: 10px;
+    margin: 0px 10px 0px 5px;
+    padding: 0px 10px;
+    color: #1200ff;
+    font-weight: bold;
+}
+.message-area{
+    border: 1px solid rgb(208, 208, 208);
+    background-color: rgb(236, 236, 236);
+    border-radius: 10px;
+    margin: 5px;
+    height: 40px;
+}
+.messages-area{
+    border-radius: 2px;
+    max-height: 400px;
+    overflow-y: scroll;
+}
+.message-item{
+margin: 5px;
+padding: 2px 10px;
+border-radius: 5px;
+background-color: #e1e1e1;
+}
+.message-name{
+    color: gray;
+    font-style: italic; 
+}
+.mine {
+    font-weight: bold; 
+}
+.message-text{
+    margin: 3px;
+    padding: 2px 10px;
+    border-radius: 5px;
+    background-color: #f1f1f1;
+}
+
+.message-box{
+    height: 32px;
+    width: 91%;
+    background: rgb(255, 255, 255);
+    border: 0px solid rgb(255, 255, 255);
+    border-radius: 10px;
+    padding: 3px 10px;
+    outline: 0;
+    margin: 3px;
+    cursor: text;
+    resize: none;
+}
+.actions{
+display: none;
+}
+.message-item:hover .actions{
+display: inline;
+}
