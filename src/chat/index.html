@@ -82,12 +82,12 @@
 
             <div style="margin-bottom: 15px;">
                 <span v-if="dummyCont <= 0" @click="dummyCont = 20" class="messages-resume">Continue</span>
-                <span style="float: right; border-radius: 5px;">
-                    Search: <input v-on:keyup.enter="searchMessages()" v-model="search"/>
+                <span style="float: right; border-radius: 5px; color: gray;">
+                    Search for: <input v-on:keyup.enter="searchMessages()" v-model="search"/>
                 </span>
                 <br>
             </div>
-            <div class="messages-area" id="messages">
+            <div v-if="user" class="messages-area" id="messages">
                 <div v-for="msg in messages" v-if="!msg.deleted">
                     <div class="message-item">
                         <span class="message-name" :class="user && msg.userId == user.id ? 'mine':''" :title="msg.name">{{msg.initials}}:</span>
@@ -100,8 +100,17 @@
                     </div>
                 </div>
             </div>
+            <div v-else class="alert alert-warning">
+                <center>
+                    <div>You are not logged in</div>
+                    <a v-if="!user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="loginText = 'Login with Linkedin'" style="text-decoration: none; color: white; background-color: rgb(86, 145, 255) ;border: 1px solid gray; padding: 4px 10px 4px 5px; margin: 5px 5px 5px 10px; display: inline-block; border-radius: 5px;;" >
+                        <strong><span style="color: rgb(255, 255, 255); font-family: Sans; border: 1px solid blue; border-radius: 2px; padding: 0px 5px">in</span>
+                        Login with LinkedIn</strong>
+                    </a>
+                </center>
+            </div>
             <div class="message-area">
-                <textarea :disabled="msg.sending" :placeholder="user ? 'Type your toughts' : 'Please login!'" v-on:keyup.enter="sendMessage()" @click="if(user && !user.privacyAgreed) showProfile()" @keyup="countCharacters()" v-model="msg.message" class="message-box"></textarea>
+                <textarea :disabled="msg.sending" :placeholder="user ? 'Type your toughts' : 'Please login!'" v-on:keyup.enter="sendMessage()" @click="checkPrivacyAgreement()" @keyup="countCharacters()" v-model="msg.message" class="message-box"></textarea>
                 <span @click="sendMessage()" style="float: right; display: block; width: 32px; border-radius: 5px;">
                     <div>
                         <svg width="48" height="48" viewBox="450 1070 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -111,7 +120,7 @@
                 </span>
             </div>
             <div>
-                <small @click="showUserProfile = true" v-if="msg.charactesLeft >= 0" class="text-secondary">{{msg.charactesLeft}} charactes left.</small>
+                <small @click="showUserProfile = true" v-if="user && msg.charactesLeft >= 0" class="text-secondary">{{msg.charactesLeft}} charactes left.</small>
                 <small v-if="msg.charactesLeft < 0" class="text-danger">Your message was too long</small>
                 <small v-if="false" @click="showProfile()" class="text-secondary float-right">Manage your privacy</small>
             
@@ -198,8 +207,8 @@
                     <small style="color: gray">Messages that are pinned or voted by other members will not auto-hide. We will continue to periodically process messages even while they are hiddden.</small>                        
                 </div>
                 <div v-if="user" class="alert alert-warning">
-                    <div class="btn float-right" :class="user.privacyAgreed ? 'btn-light':'btn-secondary'" v-on:click="updateAccountPrivacy()" 
-                    title="I agree privacy policy"><input type="checkbox" v-model="user.privacyAgreed" id="privacyPolicy"> <label style="margin-bottom: 0" for="privacyPolicy">I agree</label></div>
+                    <div class="btn float-right" :class="user.privacyAgreed ? 'btn-light':'btn-secondary'"  
+                    title="I agree privacy policy"><input type="checkbox" v-on:change="updateAccountPrivacy()" v-model="user.privacyAgreed" id="privacyPolicy"> <label style="margin-bottom: 0" for="privacyPolicy">I agree</label></div>
                 
                     <div>Interacting with vmie requires you to agree our <a href="https://vmie.org?page=Privacy">Privacy policy</a> and <a href="https://vmie.org?page=Privacy">Terms and conditions</a></div>
                     <small v-if="!user.privacyAgreed" style="color: gray">You haven't agreed our privacy policy yet.</small>                        
@@ -512,7 +521,7 @@ var apiService = {
                     var name = "Anonymous User";
                     var message = this.dummySentences[index];
                     this.messages.push({
-                        deleted: false,
+                        deleted: 0,
                         message: message,
                         name: name,
                         initials: this.buildAcronym(message).substring(0,2),
@@ -534,7 +543,7 @@ var apiService = {
                 var index = Math.floor(Math.random() * (this.dummySentences.length - 1));
                     var name = "Anonymous User";
                     found.push({
-                        deleted: false,
+                        deleted: 0,
                         message: this.dummySentences[index],
                         name: name,
                         initials: this.buildAcronym(name),
@@ -571,6 +580,11 @@ var apiService = {
             deleteConversationsCompleted(){
                 this.warning = "Your conversations have been deleted. You can continue using chat."
             },
+            checkPrivacyAgreement(){
+                if(this.user && !this.user.privacyAgreed) {
+                    this.showProfile();
+                }
+            },
             countCharacters(){
                 this.msg.charactesLeft = 255 - (this.msg.message ? this.msg.message.length : 0);
                 if(this.msg.charactesLeft < 0){
@@ -586,7 +600,7 @@ var apiService = {
                 }
                 var message = this.msg.message.trim();
                 var initials = this.user.name ? this.buildAcronym(this.user.name) : "AU";
-                var data = { message: message, initials: initials, deleted: false };
+                var data = { message: message, initials: initials, deleted: 0 };
                 if(this.simulate){
                     this.messageSent();
                 }
@@ -598,7 +612,7 @@ var apiService = {
             messageNotSent(){ 
                 this.msg.sending = false;      
                 this.messages.push({
-                    deleted: false,
+                    deleted: 0,
                     message: "Unable to send your message",
                     name: this.user.name ? this.user.name : "Anonymous User",
                     initials: this.user.name ? this.buildAcronym(this.user.name) : "AU",
@@ -633,12 +647,14 @@ var apiService = {
                 apiService.postData("https://vmie.org:5000/api/chat/list", { take: 50 }, this.messagesListReceived);
             },
             messagesListReceived(messages){
-                messages.forEach(p=>p.deleted = false);
+                messages.forEach(p => { 
+                    p.deleted = 0;
+                });
                 this.messages = messages;
-                    Vue.nextTick(() =>{
-                        const container = document.querySelector("#messages");
-                        container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
-                    });
+                Vue.nextTick(() =>{
+                    const container = document.querySelector("#messages");
+                    container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+                });
             },
 
 
@@ -709,7 +725,7 @@ var apiService = {
                 apiService.postData("https://vmie.org:5000/api/user/info", this.user, this.userInfoReceived);
             },
             updateAccountPrivacy(){
-                apiService.postData("https://vmie.org:5000/api/user/privacy/agreement/" + this.user.privacyAgreed ? 'true':'false', null, this.userInfoReceived);
+                apiService.postData("https://vmie.org:5000/api/user/privacy/agreement/" + (this.user.privacyAgreed ? 'true':'false'), null, this.userInfoReceived);
             },
             deleteAccount(){
                 apiService.postData("https://vmie.org:5000/api/user/delete", this.user, this.userInfoReceived);
