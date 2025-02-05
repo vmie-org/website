@@ -44,7 +44,7 @@ export const vmieData = {
         {
             id: "Chat",
             title:  "Chat",
-            url: "./content/decisions.txt",
+            url: "./content/chat.txt",
             hideOnMobile: true,
             isSelected: false,
         },

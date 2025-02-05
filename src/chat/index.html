@@ -35,6 +35,7 @@
     <link rel="stylesheet" href="./../lib/css/modal.css" />
     <link rel="stylesheet" href="./../lib/css/chat.css" />
     <link rel="stylesheet" href="./../lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./../services/accountService.js" />
 </head>
 <body>
     <div id="app">
@@ -47,20 +48,20 @@
       <div id="banner">
         <span id="logo"></span>
 
-        <a v-if="!user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="loginText = 'Login with Linkedin'" class="button fork">
+        <a v-if="!accountService.user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="loginText = 'Login with Linkedin'" class="button fork">
             <strong>
                 <span style="color: blue; font-family: Sans; border: 1px solid blue; border-radius: 2px; padding: 0px 5px">in</span>
                 {{loginText}}
             </strong>
         </a>
-        <a v-if="user" @click="showProfile()" class="button fork">
+        <a v-if="accountService.user" @click="accountService.showProfile()" class="button fork">
             <strong>
-                <img :src="user.avatarUrl" height="18" width="18" style="margin-right: 5px; border: 1px solid white;"/> {{user.name}}
+                <img :src="accountService.user.avatarUrl" height="18" width="18" style="margin-right: 5px; border: 1px solid white;"/> {{accountService.user.name}}
             </strong>
         </a>     
         
         <div class="downloads">
-            <span v-if="!isMobile">Free:</span>
+            <span v-if="!isMobile">vmie:</span>
             <ul>
                 <li v-if="!isMobile"><a href=".." class="button">Home</a></li>
                 <li>
@@ -88,10 +89,10 @@
                 </span>
                 <br>
             </div>
-            <div v-if="user" class="messages-area" id="messages">
+            <div v-if="accountService.user" class="messages-area" id="messages">
                 <div v-for="msg in messages" v-if="!msg.deleted">
                     <div class="message-item">
-                        <span class="message-name" :class="user && msg.userId == user.id ? 'mine':''" :title="msg.name">{{msg.initials}}:</span>
+                        <span class="message-name" :class="accountService.user && msg.userId == accountService.user.id ? 'mine':''" :title="msg.name">{{msg.initials}}:</span>
                         <span class="message-text">
 {{msg.message}}
 <span class="actions">
@@ -104,14 +105,14 @@
             <div v-else class="alert alert-warning">
                 <center>
                     <div>You are not logged in</div>
-                    <a v-if="!user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="loginText = 'Login with Linkedin'" style="text-decoration: none; color: white; background-color: rgb(86, 145, 255) ;border: 1px solid gray; padding: 4px 10px 4px 5px; margin: 5px 5px 5px 10px; display: inline-block; border-radius: 5px;;" >
+                    <a v-if="!accountService.user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="loginText = 'Login with Linkedin'" style="text-decoration: none; color: white; background-color: rgb(86, 145, 255) ;border: 1px solid gray; padding: 4px 10px 4px 5px; margin: 5px 5px 5px 10px; display: inline-block; border-radius: 5px;;" >
                         <strong><span style="color: rgb(255, 255, 255); font-family: Sans; border: 1px solid blue; border-radius: 2px; padding: 0px 5px">in</span>
                         Login with LinkedIn</strong>
                     </a>
                 </center>
             </div>
             <div class="message-area">
-                <textarea :disabled="msg.sending" :placeholder="user ? 'Type your toughts' : 'Please login!'" v-on:keyup.enter="sendMessage()" @click="checkPrivacyAgreement()" @keyup="countCharacters()" v-model="msg.message" class="message-box"></textarea>
+                <textarea :disabled="msg.sending" :placeholder="accountService.user ? 'Type your toughts' : 'Please login!'" v-on:keyup.enter="sendMessage()" @click="checkPrivacyAgreement()" @keyup="countCharacters()" v-model="msg.message" class="message-box"></textarea>
                 <span @click="sendMessage()" style="float: right; display: block; width: 32px; border-radius: 5px;">
                     <div>
                         <svg width="48" height="48" viewBox="450 1070 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -121,22 +122,22 @@
                 </span>
             </div>
             <div>
-                <small @click="showUserProfile = true" v-if="user && msg.charactesLeft >= 0" class="text-secondary">{{msg.charactesLeft}} charactes left.</small>
+                <small @click="accountService.showUserProfile = true" v-if="accountService.user && msg.charactesLeft >= 0" class="text-secondary">{{msg.charactesLeft}} charactes left.</small>
                 <small v-if="msg.charactesLeft < 0" class="text-danger">Your message was too long</small>
-                <small v-if="false" @click="showProfile()" class="text-secondary float-right">Manage your privacy</small>
+                <small v-if="false" @click="accountService.showProfile()" class="text-secondary float-right">Manage your privacy</small>
             
                 <span v-if="chatService.dummyCont <= 0" @click="chatService.dummyCont = 20" class="messages-resume float-right">Continue</span></div>
-                <div class="float-right"><a href="https://vmie.org?page=Privacy">Privacy policy</a> <span v-if="user && user.privacyAgreed" @click="showProfile()"> agreed by you</span></div>
+                <div class="float-right"><a href="https://vmie.org?page=Privacy">Privacy policy</a> <span v-if="accountService.user && accountService.user.privacyAgreed" @click="showProfile()"> agreed by you</span></div>
         </section>
 
         <div class="float-right">
-            <a v-if="!user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="loginText = 'Login with Linkedin'" class="button fork">
+            <a v-if="!accountService.user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="loginText = 'Login with Linkedin'" class="button fork">
                 <strong><span style="color: blue; font-family: Sans; border: 1px solid blue; border-radius: 2px; padding: 0px 5px">in</span>
                 {{loginText}}</strong>
             </a>
-            <a v-if="user" @click="showProfile()" class="button fork">
+            <a v-if="accountService.user" @click="accountService.showProfile()" class="button fork">
                 Manage your privacy: <strong>
-                    {{user.name}}
+                    {{accountService.user.name}}
                 </strong>
             </a>
             <br>
@@ -179,133 +180,10 @@
         </p>
     </footer>
 
-  <!-- USER MODAL -->
+<!-- USER MODALS -->
+<profile-component :parent="accountService"></profile-component>
+<!-- USER MODALS -->
    
-  <transition name="modal">
-    <div class="modal-mask" v-if="user && showUserProfile">
-        <div class="modal-wrapper">
-            <div class="modal-container" :class="isMobile?'mobile':'w600'" :style="isMobile?'max-height:'+window.innerHeight+'px':''">
-                
-<div>
-    <div class="card" style="background-color: #F8F8F8;">
-        <div class="card-header">
-                <span class="card-title">
-                    <span class="btn btn-primary" @click="logout()">Logout</span>
-                </span>
-                <div class="float-right">
-                    <div class="btn btn-light" v-on:click="showUserProfile = false" >
-                        x
-                    </div>                    
-                </div>
-        </div>
-        <div class="card-body">
-            <p>
-                Messenger Privacy
-                <div v-if="false" class="alert alert-warning">
-                    <div class="btn btn-light" v-on:click="deleteConversations()" title="Delete all my conversations from vmie">Autohide my messages after <div class="btn btn-light">1 day</div> <div class="btn btn-light">7 days</div> <div class="btn btn-primary">30 days</div></div>
-                
-                    <div>We can <b>auto-hide</b> your your messages on an expiration policy.</div>
-                    <small style="color: gray">Messages that are pinned or voted by other members will not auto-hide. We will continue to periodically process messages even while they are hiddden.</small>                        
-                </div>
-                <div v-if="user" class="alert alert-warning">
-                    <div class="btn float-right" :class="user.privacyAgreed ? 'btn-light':'btn-secondary'"  
-                    title="I agree privacy policy"><input type="checkbox" v-on:change="updateAccountPrivacy()" v-model="user.privacyAgreed" id="privacyPolicy"> <label style="margin-bottom: 0" for="privacyPolicy">I agree</label></div>
-                
-                    <div>Interacting with vmie requires you to agree our <a href="https://vmie.org?page=Privacy">Privacy policy</a> and <a href="https://vmie.org?page=Privacy">Terms and conditions</a></div>
-                    <small v-if="!user.privacyAgreed" style="color: gray">You haven't agreed our privacy policy yet.</small>                        
-                    <small v-if="user.privacyAgreed" style="color: gray">You agreed our privacy policy.</small>                        
-                </div>
-
-                <div class="alert alert-warning">
-                    <div class="btn btn-danger float-right" v-on:click="deleteConversations()" title="Delete all my conversations from vmie">delete all my conversations</div>
-                
-                    <div>You can <b>delete all</b> your conversations from vmie.</div>
-                    <small style="color: gray">We periodically process conversations to build knoekedge and support decisions. Do not include sensitive information in your messsages.</small>                        
-                </div>
-
-                Overall Privacy
-            </p>
-            <p>
-                <div class="alert alert-warning">
-                    <div class="btn btn-secondary float-right" v-on:click="user.nameVisibility = 1; updateAccount()" v-if="!user.nameVisibility" title="Make your name public">show my Name</div>
-                    <div class="btn btn-secondary float-right" v-on:click="user.nameVisibility = 0; updateAccount()" v-if="user.nameVisibility" title="Make your name private">hide my Name</div>
-                
-                    <div>Your avatar is now <b v-if="user.nameVisibility">visible</b><b v-if="! user.nameVisibility" style="color: red; font-weight: bold;">not visible</b> to all users.</div>
-                    <small style="color: gray">Collected at signin from Linkedin.</small>                        
-                </div>
-                <div class="alert alert-warning">
-                    <div class="btn btn-secondary float-right" v-on:click="user.avatarVisibility = 1; updateAccount()" v-if="!user.avatarVisibility" title="Make your image public">show my Image</div>
-                    <div class="btn btn-secondary float-right" v-on:click="user.avatarVisibility = 0; updateAccount()" v-if="user.avatarVisibility" title="Make your image private">hide my Image</div>
-                
-                    <div>Your name is now <b v-if="user.avatarVisibility">visible</b><b v-if="!user.avatarVisibility" style="color: red; font-weight: bold;">not visible</b> to all users.</div>
-                    <small style="color: gray">Collected at signin from Linkedin.</small>  
-                </div>
-            </p>
-            
-            <p v-if="!user.nameVisibility || !user.avatarVisibility">
-                For transparecy of decisions, we advice you to keep your information public. If you hide your personal information from other members your influence in making decisions can be affected.
-            </p>
-
-            <div class="float-right"><a href="https://vmie.org?page=Privacy">Privacy policy</a></div>
-        </div>
-
-        <div class="card-footer">
-
-    <div class="float-left">
-        <div class="btn btn-danger" v-on:click="deleteAccount()">Delete my account</div>
-    </div>
-    <div class="float-right" >
-        <div class="btn btn-secondary" v-on:click="showUserProfile = false">Close</div>
-    </div>
-        </div>
-</div>
-            </div>
-        </div>
-        </div>
-    </div>
-</transition>
-
-
-
-
-
-   
-<transition name="modal">
-    <div class="modal-mask" v-if="user && showUserDeleted">
-        <div class="modal-wrapper">
-            <div class="modal-container" :class="isMobile?'mobile':'w600'" :style="isMobile?'max-height:'+window.innerHeight+'px':''">
-                
-<div>
-    <div class="card" style="background-color: #F8F8F8;">
-        <div class="card-header">
-            <span class="card-title">
-                <span>Account Deleted</span>
-            </span>
-                <div class="float-right">
-                    <div class="btn btn-light" v-on:click="showUserDeleted = false" >
-                        x
-                    </div>
-                </div>
-        </div>
-        <div class="card-body">
-            <p>
-            Your user has been deleted. <br>
-            You can login with LinkedIn to create a new account. 
-            </p>    
-        </div>
-
-        <div class="card-footer">
-    <div class="float-right" >
-        <div class="btn btn-secondary" v-on:click="showUserDeleted = false">Close</div>
-    </div>
-        </div>
-</div>
-            </div>
-        </div>
-        </div>
-    </div>
-</transition>
-<!-- USER MODAL -->
 
 </div>
 </body>
@@ -315,6 +193,7 @@
     import { vmieData } from "./../services/vmieService.js";
     import { apiService } from "./../services/apiService.js";
     import { chatService } from "./../services/chatService.js";
+    import { accountService, ModalProfileComponent } from "./../services/accountService.js";
 
 	var userService = {
 		apiService: apiService,
@@ -324,9 +203,13 @@
 
     var app = new Vue({
         el: '#app',
+        components: {
+            "profile-component":  ModalProfileComponent,
+        },
         data: {
             apiService: apiService,
             chatService: chatService,
+            accountService: accountService,
 
             msg: {
                 charactesLeft: 255,
@@ -343,15 +226,11 @@
             selectedPage: null,
             websitePages: [],
 
-            // user management
-            user: null,
-            showUserProfile: false,
-            showUserDeleted: false,
-
             // decisions
             users: [],
         },
         mounted: function () {
+            ModalProfileComponent.accountService = accountService;
             this.websitePages = vmieData.websitePages;
 
             let hrefPage = this.websitePages.find(p=> p.id == "Chat");
@@ -360,22 +239,8 @@
             }
             this.loadUsers();
             this.renderPage(hrefPage);
-
-            var session = localStorage.getItem('session');
-            if(session){
-                session = JSON.parse(session);
-                if(session){
-                    apiService.jwt = session.jwt;
-                    this.getUserInfo();
-                }
-            }
-            else if(!apiService.jwt){
-                let sessionId = this.findGetParameter('session');
-                if(sessionId){
-                    this.getUserSession(sessionId);
-                }
-            }
             chatService.initialize();
+            accountService.initialize(apiService, this.bus);
         },
         computed: {
         },
@@ -412,20 +277,9 @@
                 }
             },
             // Messenger
-            deleteConversations()
-            {
-                apiService.postData("https://vmie.org:5000/api/chat/erase", null, this.deleteConversationsCompleted);
-            },
-            setMessageLife(lifetime)
-            {
-                apiService.postData("https://vmie.org:5000/api/chat/life", {seconds: lifetime}, this.deleteConversationsCompleted);
-            },
-            deleteConversationsCompleted(){
-                this.warning = "Your conversations have been deleted. You can continue using chat."
-            },
             checkPrivacyAgreement(){
                 if(this.user && !this.user.privacyAgreed) {
-                    this.showProfile();
+                    accountService.showProfile();
                 }
             },
             countCharacters(){
@@ -526,52 +380,12 @@
                 this.users = users;
             },
 
-            // user management  
-            logout(){
-                this.apiService.getData("https://vmie.org:5000/api/logout");
-                this.user = null;
-            },
-            login(){
-                this.apiService.getData("https://vmie.org:5000/api/linkedin/login");
-                ///apiService.getData("https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=77uny28orqmlmv&redirect_uri=https://vmie.org:5000/api/linkedin/callback&scope=profile%20email%20openid&state=fabaecf3-288e-4c22-bc2c-c07208231f97");
-                //apiService.getData("https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=77uny28orqmlmv&redirect_uri=https://vmie.org:5000/api/linkedin/callback&scope=profile%20email%20openid&state=fabaecf3-288e-4c22-bc2c-c07208231f97");
-            },
-            getUserSession(sessionId){
-                apiService.getData("https://vmie.org:5000/api/user/session?session=" + sessionId, this.userSessionReceived);
-            },
-            userSessionReceived(session){
-                localStorage.setItem("session", JSON.stringify(session));
-                this.getUserInfo();
-            },
-            getUserInfo(){
-                apiService.getData("https://vmie.org:5000/api/user/info", this.userInfoReceived, this.noUserInfoReceived);
-            },
-            noUserInfoReceived(data){
-                user = null;;
-            },
-            userInfoReceived(user){
-                this.simulate = false;
-                this.messages = [];
-                if(user && user.name == 'DELETED'){
-                    this.showUserProfile = false;
-                    this.showUserDeleted = true;
-                    return;
+            // user management 
+            bus(event){
+                if(event == 'UserUpdated'){
+                    this.loadUsers();
+                    this.loadMessages();
                 }
-                this.loadUsers();
-                this.loadMessages();
-                this.user = user;
-            },
-            showProfile(){
-                this.showUserProfile = true;
-            },
-            updateAccount(){
-                apiService.postData("https://vmie.org:5000/api/user/info", this.user, this.userInfoReceived);
-            },
-            updateAccountPrivacy(){
-                apiService.postData("https://vmie.org:5000/api/user/privacy/agreement/" + (this.user.privacyAgreed ? 'true':'false'), null, this.userInfoReceived);
-            },
-            deleteAccount(){
-                apiService.postData("https://vmie.org:5000/api/user/delete", this.user, this.userInfoReceived);
             },
 
             // page utilities

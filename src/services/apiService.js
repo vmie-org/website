@@ -12,10 +12,14 @@ export const apiService = {
             type: "POST",
             data: JSON.stringify(payload)
         }).done(function (data) {
-            handler(data);
+            // if(handler)
+            {
+                handler(data);
+            }
         }).fail(function (data) {
-                    if(failHandler)
-            failHandler(data);
+            if(failHandler){
+                failHandler(data);
+            }
         });
     },
     getData(url, handler, failHandler){
@@ -29,10 +33,14 @@ export const apiService = {
             dataType: "json",
             type: "GET"
         }).done(function (data) {
-            handler(data);
+            // if(handler)
+            {
+                handler(data);
+            }
         }).fail(function (data) {
-                if(failHandler)
-            failHandler(data);
+            if(failHandler){
+                failHandler(data);
+            }
         });
     },
     getText(url, handler){
