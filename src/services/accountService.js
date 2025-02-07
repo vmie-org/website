@@ -70,7 +70,7 @@ export const ModalProfileComponent = {
                      <div v-if="parent.user" class="alert alert-warning">
                         <div class="btn float-right" :class="parent.user.privacyAgreed ? 'btn-light':'btn-secondary'"  
                            title="I agree privacy policy"><input type="checkbox" v-on:change="parent.updateAccountPrivacy()" v-model="parent.user.privacyAgreed" id="privacyPolicy"> <label style="margin-bottom: 0" for="privacyPolicy">I agree</label></div>
-                        <div>Interacting with vmie requires you to agree our <a href="https://vmie.org?page=Privacy">Privacy policy</a> and <a href="https://vmie.org?page=Privacy">Terms and conditions</a></div>
+                        <div>Interacting with vmie requires you to agree our <a href="../site?page=Privacy">Privacy policy</a> and <a href="../site?page=Privacy">Terms and conditions</a></div>
                         <small v-if="!parent.user.privacyAgreed" style="color: gray">You haven't agreed our privacy policy yet.</small>                        
                         <small v-if="parent.user.privacyAgreed" style="color: gray">You agreed our privacy policy.</small>                        
                      </div>
@@ -98,7 +98,7 @@ export const ModalProfileComponent = {
                      <p v-if="!parent.user.nameVisibility || !parent.user.avatarVisibility">
                         For transparecy of decisions, we advice you to keep your information public. If you hide your personal information from other members your influence in making decisions can be affected.
                      </p>
-                     <div class="float-right"><a href="https://vmie.org?page=Privacy">Privacy policy</a></div>
+                     <div class="float-right"><a href="../site?page=Privacy">Privacy policy</a></div>
                   </div>
                   <div class="card-footer">
                      <div class="float-left">
@@ -118,6 +118,7 @@ export const ModalProfileComponent = {
 `
 }
 
+let that = null;
 export const accountService = {
     simulate: location.hostname === "localhost",
     user: null,
@@ -133,6 +134,7 @@ export const accountService = {
         this.bus = bus;
         
         if(this.simulate){
+            that = this;
             this.userSessionReceived({jwt: "SIMUATION"});
         }
         
@@ -140,12 +142,13 @@ export const accountService = {
         if(session){
             session = JSON.parse(session);
             if(session){
+               that = this;
                 apiService.jwt = session.jwt;
                 accountService.getUserInfo();
             }
         }
         else if(!apiService.jwt){
-            let sessionId = this.findGetParameter('session');
+            let sessionId = this.apiService.findGetParameter('session');
             if(sessionId){
                 accountService.getUserSession(sessionId);
             }
@@ -175,11 +178,13 @@ export const accountService = {
         this.warning = "Your conversations have been deleted. You can continue using chat."
     },
     getUserSession(sessionId){
-        this.apiService.getData("https://vmie.org:5000/api/user/session?session=" + sessionId, this.userSessionReceived);
+      that = this;
+      this.apiService.getData("https://vmie.org:5000/api/user/session?session=" + sessionId, this.userSessionReceived);
     },
     userSessionReceived(session){
         localStorage.setItem("session", JSON.stringify(session));
-        this.getUserInfo();
+        that.apiService.jwt = session.jwt;
+        that.getUserInfo();
     },
     getUserInfo(){
         if(this.simulate){
@@ -189,14 +194,16 @@ export const accountService = {
             });
             return;
         }
+        that = this;
         this.apiService.getData("https://vmie.org:5000/api/user/info", this.userInfoReceived, this.noUserInfoReceived);
     },
     noUserInfoReceived(data){
-        this.user = null;
+        that.user = null;
     }, 
     logout(){
+         localStorage.removeItem('session');
+         this.user = null;
         this.apiService.getData("https://vmie.org:5000/api/logout");
-        this.user = null;
     },
     login(){
         this.apiService.getData("https://vmie.org:5000/api/linkedin/login");
@@ -205,14 +212,14 @@ export const accountService = {
     },
     userInfoReceived(user){
         // this.simulate = false;
-        this.messages = [];
+        // this.messages = [];
         if(user && user.name == 'DELETED'){
             this.showUserProfile = false;
             this.showUserDeleted = true;
             return;
         }
-        this.user = user;
-        this.bus("UserUpdated");
+        that.user = user;
+        that.bus("UserUpdated");
     },
 }
 

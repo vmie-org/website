@@ -1,0 +1,4 @@
+This is an <span style='color: red; font-weight: bold'>Experimantal Architecture</span> builder. 
+The design is driven by people preferences on privacy.
+Ww use AI to remodel the permissions system and prioritize company policies and individual options on privacy.
+<a href='../site'>What is the purpose of this site?</a>

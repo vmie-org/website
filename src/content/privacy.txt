@@ -21,7 +21,7 @@ You can delete all your conversations from vmie using the privacy form on your p
 
 If you are logged in, you can manage your privacy from your profile.
 To open the privacy form click your name (you have to be logged in).
-![User privacy options](./img/privacy.png "User privacy options")
+![User privacy options](../img/privacy.png "User privacy options")
 
 ### Browser
 

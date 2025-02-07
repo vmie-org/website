@@ -13,7 +13,7 @@ You can also use our self-assessment compatibility tool to remap model propertie
 
 Reducing development costs to achieve a higher compatibility class is an advantages that we consider to amount as an insentive to adopt reforms toward information exchange compatibility. 
 
-<a href="./poc">Self-assessment Compatibility Tool</a>
+<a href="../poc">Self-assessment Compatibility Tool</a>
 
 ### Certified assessment
 

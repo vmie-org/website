@@ -6,13 +6,13 @@
 
 An oversimplified ERD diagram is showing a potential visualization of the relations in the veterinary medicine space. There are no hard rules on defining the multiplicity between objects as there are rarely true one-to-one or one-to-many relations. However, from practical reasons most designs would avoid many-to-many relations as much as possible in favor of simplicity and performance over flexibility. One-way navigation can also be used with simmilar considerations and results.
 
-![Relations in Veterinary Medicine](./img/diagrams-ERD.png "Relations in Veterinary Medicine")
+![Relations in Veterinary Medicine](../img/diagrams-ERD.png "Relations in Veterinary Medicine")
 
 ### Actors in Veterinary Medicine
 
 Veterinary Medicine application can manage one or multiple use cases involving different actors. Among the most common actors we include Practice, Doctor, Lab, Pet Owner and Pharma.
 
-![Actors in Veterinary Medicine](./img/diagrams-UseCase.png "Actors in Veterinary Medicine")
+![Actors in Veterinary Medicine](../img/diagrams-UseCase.png "Actors in Veterinary Medicine")
 
 -----------
 <div style="text-align: right">Contact us at:<br>office@vmie.org</div>
