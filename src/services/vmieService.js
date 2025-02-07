@@ -42,6 +42,13 @@ export const vmieData = {
             isSelected: false,
         },
         {
+            id: "Builder",
+            title:  "Logic builder",
+            url: "./content/builder.txt",
+            hideOnMobile: true,
+            isSelected: false,
+        },
+        {
             id: "Chat",
             title:  "Chat",
             url: "./content/chat.txt",

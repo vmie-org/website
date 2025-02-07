@@ -63,7 +63,7 @@
         <div class="downloads">
             <span v-if="!isMobile">vmie:</span>
             <ul>
-                <li v-if="!isMobile"><a href="../builder" class="button">Home</a></li>
+                <li v-if="!isMobile"><a href="../chat" class="button">Chat</a></li>
                 <li>
                     <a @click="isMobile = !isMobile" class="button"><div style="display: inline-block;">
                         <div class="menu-bar"></div>
@@ -82,13 +82,55 @@
         <section style="height: auto; background-color: #fffcf7;">
             <p v-if="htmlContent" v-html="htmlContent"></p>
 
-            <div style="margin-bottom: 15px;">
-                <span v-if="chatService.dummyCont <= 0" @click="chatService.dummyCont = 20" class="messages-resume">Continue</span>
-                <span style="float: right; border-radius: 5px; color: gray;">
-                    Search for: <input v-on:keyup.enter="searchMessages()" v-model="search"/>
-                </span>
-                <br>
+            <div class="question-area" v-if="!questionsCompleted">
+                <div class="question-status">
+                    <span class="btn btn-light" @click="moveNext(-1)">Next question</span>
+                    <span class="btn btn-light float-right" @click="moveNext(+1)">Prew question</span>
+                </div>
+                <div class="question">
+                    <div class="question-text">
+                        {{question.text}}
+                    </div>
+                    <div class="question-info">
+                        {{question.info}}
+                    </div>
+                </div>
+                <div>
+                    <center >
+                        <span class="question-actions">
+                        <span class="btn btn-light">Not Agreed</span>
+                        <span :class="!question.response || question.response == 1 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 1)">1</span>
+                        <span :class="!question.response || question.response == 2 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 2)">2</span>
+                        <span :class="!question.response || question.response == 3 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 3)">3</span>
+                        <span :class="!question.response || question.response == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 4)">4</span>
+                        <span :class="!question.response || question.response == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 5)">5</span>
+                        <span class="btn btn-light">Totaly Agreed</span>
+                    </span>
+                </center>
+                </div>
             </div>
+            <div v-if="questionsCompleted">
+
+                <span class="btn btn-light float-right" @click="startOver()">Start over</span>
+                <br>
+                Your responses:
+                <br>
+
+                <div v-for="question in questions" style="margin-bottom: 5px;" v-if="!msg.deleted">
+                    <div class="question">
+                        <div class="question-text">
+                            {{question.text}}
+                        </div>
+                        <div class="text-secondary float-right">
+                            Your response: {{question.response}} / 5
+                        </div>
+                        <br>
+                    </div>
+                </div>
+            </div>
+
+            <br>
+            <span @click="showCreateQuestion = true">Conversation:</span>
             <div v-if="accountService.user" class="messages-area" id="messages">
                 <div v-for="msg in messages" v-if="!msg.deleted">
                     <div class="message-item">
@@ -102,17 +144,11 @@
                     </div>
                 </div>
             </div>
-            <div v-else class="alert alert-warning">
-                <center>
-                    <div>You are not logged in</div>
-                    <a v-if="!accountService.user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="loginText = 'Login with Linkedin'" style="text-decoration: none; color: white; background-color: rgb(86, 145, 255) ;border: 1px solid gray; padding: 4px 10px 4px 5px; margin: 5px 5px 5px 10px; display: inline-block; border-radius: 5px;;" >
-                        <strong><span style="color: rgb(255, 255, 255); font-family: Sans; border: 1px solid blue; border-radius: 2px; padding: 0px 5px">in</span>
-                        Login with LinkedIn</strong>
-                    </a>
-                </center>
-            </div>
             <div class="message-area">
-                <textarea :disabled="msg.sending" :placeholder="accountService.user ? 'Type your toughts' : 'Please login!'" v-on:keyup.enter="sendMessage()" @click="checkPrivacyAgreement()" @keyup="countCharacters()" v-model="msg.message" class="message-box"></textarea>
+                <textarea :disabled="msg.sending" 
+                :placeholder="accountService.user ? 'Type your toughts' : 'Please login!'" 
+                v-on:keyup.enter="sendMessage()" @click="checkPrivacyAgreement()" @keyup="countCharacters()" 
+                v-model="msg.message" class="message-box"></textarea>
                 <span @click="sendMessage()" style="float: right; display: block; width: 32px; border-radius: 5px;">
                     <div>
                         <svg width="48" height="48" viewBox="450 1070 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -126,8 +162,12 @@
                 <small v-if="msg.charactesLeft < 0" class="text-danger">Your message was too long</small>
                 <small v-if="false" @click="accountService.showProfile()" class="text-secondary float-right">Manage your privacy</small>
             
-                <span v-if="chatService.dummyCont <= 0" @click="chatService.dummyCont = 20" class="messages-resume float-right">Continue</span></div>
-                <div class="float-right"><a href="../site?page=Privacy">Privacy policy</a> <span v-if="accountService.user && accountService.user.privacyAgreed" @click="showProfile()"> agreed by you</span></div>
+                <span v-if="chatService.dummyCont <= 0" @click="chatService.dummyCont = 20" class="messages-resume float-right">Continue</span>
+            </div>
+                <div class="float-right">
+                    <a href="../site?page=Privacy">Privacy policy</a> 
+                    <span v-if="accountService.user && accountService.user.privacyAgreed" @click="showProfile()"> agreed by you</span>
+                </div>
         </section>
 
         <div class="float-right">
@@ -144,30 +184,6 @@
             <br>
         </div>
 
-        <div>
-            <div v-if="false" style="padding: 10px 0px 30px 0px;" v-if="users.length"> 
-                Decision board is under construction
-                <table class="blueTable">
-                    <tr>
-                        <td>Id</td>
-                        <td>User</td>
-                        <td>Col 1</td>
-                        <td>Col 2</td>
-                        <td>Col 3</td>
-                    </tr>
-                    <tr v-for="user in users">
-                        <td>{{user.id}}</td>
-                        <td>
-                            <img :src="user.avatarUrl" height="24" width="24"/>
-                            {{user.name}}
-                        </td>
-                        <td>col 1</td>
-                        <td>col 2</td>
-                        <td>col 3</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
     </div>
     <footer>
       
@@ -184,6 +200,58 @@
 <profile-component :parent="accountService"></profile-component>
 <!-- USER MODALS -->
    
+<!-- CREATE -->
+
+<transition name="modal">
+    <div class="modal-mask" v-if="accountService.user && showCreateQuestion">
+       <div class="modal-wrapper">
+          <div class="modal-container" :class="isMobile?'mobile':'w600'" :style="isMobile?'max-height:'+window.innerHeight+'px':''">
+             <div>
+                <div class="card" style="background-color: #F8F8F8;">
+                   <div class="card-header">
+                      <span class="card-title">
+                      <span>Create question</span>
+                      </span>
+                      <div class="float-right">
+                         <div class="btn btn-light" v-on:click="showCreateQuestion = false" >
+                            x
+                         </div>
+                      </div>
+                   </div>
+                   <div class="card-body">
+                      <p>
+                         Add tags
+                      </p>
+                      <hr>
+
+
+                      
+                Tags:
+                <div class="message-area">
+                <textarea :disabled="msg.sending" :placeholder="accountService.user ? 'Type your toughts' : 'Please login!'" v-on:keyup.enter="sendMessage()" @click="checkPrivacyAgreement()" @keyup="countCharacters()" v-model="msg.message" class="message-box"></textarea>
+                </span>
+            </div>
+            Question:
+                      
+            <div class="message-area">
+                <textarea :disabled="msg.sending" :placeholder="accountService.user ? 'Type your toughts' : 'Please login!'" v-on:keyup.enter="sendMessage()" @click="checkPrivacyAgreement()" @keyup="countCharacters()" v-model="msg.message" class="message-box"></textarea>
+            </div>
+                   </div>
+                   <div class="card-footer">
+                      <div class="float-right" >
+                        <div class="btn btn-secondary" v-on:click="showCreateQuestion = false">Close</div>
+                        <div class="btn btn-primary" v-on:click="showCreateQuestion = false">Save</div>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+ </transition>
+
+ <!-- CREATE -->
+  
 
 </div>
 </body>
@@ -217,6 +285,9 @@
                 sending: false,
             },
             messages: [],
+            questions: [],
+            questionIndex: 0,
+            question: {},
             search: null,
             
             loggedIn: false,
@@ -225,6 +296,8 @@
             htmlContent: null,
             selectedPage: null,
             websitePages: [],
+            showCreateQuestion: false,
+            questionsCompleted: false,
 
             // decisions
             users: [],
@@ -233,11 +306,11 @@
             ModalProfileComponent.accountService = accountService;
             this.websitePages = vmieData.websitePages;
 
-            let hrefPage = this.websitePages.find(p=> p.id == "Chat");
+            let hrefPage = this.websitePages.find(p=> p.id == "Builder");
             if(hrefPage){
                 this.selectedPage = hrefPage;
             }
-            this.loadUsers();
+            this.loadQuestions();
             this.renderPage(hrefPage);
             chatService.initialize();
             accountService.initialize(apiService, this.bus);
@@ -245,23 +318,26 @@
         computed: {
         },
         methods: {
-            searchMessages(){
-                var found = [];
-                for(var i =0; i<50;i++){
-                var index = Math.floor(Math.random() * (this.dummySentences.length - 1));
-                    var name = "Anonymous User";
-                    found.push({
-                        deleted: 0,
-                        message: this.dummySentences[index],
-                        name: name,
-                        initials: this.buildAcronym(name),
-                        icon: name,
-                    });
+            startOver(){
+                this.questions.forEach(p=>p.response = null);
+                this.questionIndex = 0;
+                this.questionsCompleted = false;
+                this.moveNext(0);
+            },
+            moveNext(offset){
+                if(!this.questions.find(p=>!p.response)){
+                    this.questionsCompleted = true;
+                    return;
                 }
-                this.messages = found;
-                const container = document.querySelector("#messages");
-                container.scrollTo({ top: 0, behavior: "smooth" });
-                chatService.dummyCont = 0;
+
+                this.questionIndex += offset;
+                if(this.questionIndex < 0){
+                    this.questionIndex = 0;
+                }
+                if(this.questionIndex >= this.questions.length){
+                    this.questionIndex = this.questions.length - 1;
+                }
+                this.question = this.questions[this.questionIndex];
             },
             deleteMessage(msg){
                 if(!this.user || this.user.isDummy){
@@ -271,7 +347,7 @@
                 apiService.postData("https://vmie.org:5000/api/chat/remove", {id: msg.id}, this.messageDeleted);
             },
             messageDeleted(msg){
-                msg = this.messages.find(p=>p.id = msg.id);
+                msg = this.questions.find(p=>p.id = msg.id);
                 if(msg){
                     msg.deleted = true;
                 }
@@ -288,72 +364,66 @@
                     this.msg.message = this.msg.message.substring(0, 255);
                 }
             },
-            sendMessage(){
-                if(!this.user                           ){
-                    this.user = {
-                        name: "Visitor " + Math.floor(Math.random() * 1000),
-                        isDummy: true,
-                    }
-                }
-                var message = this.msg.message.trim();
-                var initials = this.user.name ? this.buildAcronym(this.user.name) : "AU";
-                var data = { message: message, initials: initials, deleted: 0 };
-                if(this.simulate){
-                    this.messageSent();
-                }
-                else{
-                    apiService.postData("https://vmie.org:5000/api/chat/send", data, this.messageSent, this.messageNotSent);
-                }
-                this.msg.sending = true;
-            },
-            messageNotSent(){ 
-                this.msg.sending = false;      
-                this.messages.push({
-                    deleted: 0,
-                    message: "Unable to send your message",
-                    name: this.user.name ? this.user.name : "Anonymous User",
-                    initials: this.user.name ? this.buildAcronym(this.user.name) : "AU",
-                    icon: this.user ? this.user.avatarUrl : null,
-                });
-                Vue.nextTick(() =>{
-                    const container = document.querySelector("#messages");
-                    container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
-                });
-            },
-            messageSent(){   
-                this.msg.sending = false;  
-                var message = this.msg.message.trim();          
-                this.messages.push({
-                    message: message,
-                    name: this.user.name ? this.user.name : "Anonymous User",
-                    initials: this.user.name ? this.buildAcronym(this.user.name) : "AU",
-                    icon: this.user ? this.user.avatarUrl : null,
-                    deleted: false,
-                });
-                Vue.nextTick(() =>{
-                    const container = document.querySelector("#messages");
-                    container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
-                });
-                this.msg.message = null;
-            },
             buildAcronym(str){
                 var matches = str.match(/\b(\w)/g); // ['J','S','O','N']
                 return matches.join('').toUpperCase();
             },
-            loadMessages(){
-                apiService.postData("https://vmie.org:5000/api/chat/list", { take: 50 }, this.messagesListReceived);
+            loadQuestions(){
+                //  sw2if(accountService.simulate)
+                {
+                    this.questions = [
+                        {
+                            id: 1,
+                            text: "Who has the authority to approve or deny information exchange (the practice, the patient, or both)?",
+                            info: "Requires balancing patient autonomy with practice-level policies. Needs legal clarity on patient rights and practice obligations.",
+                            tags: ['pet', 'owners'],
+                            response: null,
+                        },
+                        {
+                            id: 2,
+                            text: "Can permissions be set at different levels (e.g., full record, specific sections, individual data points)?",
+                            info: "Increases administrative burden and system complexity. Requires a structured classification of record components.",
+                            tags: ['pet', 'owners'],
+                            response: null,
+                        },
+                        {
+                            id: 3,
+                            text: "How are permissions granted—explicit consent per exchange or predefined settings?",
+                            info: "Affects workflow efficiency. Explicit consent increases transparency but adds friction; predefined settings improve automation but require careful policy design.",
+                            tags: ['pet', 'owners'],
+                            response: null,
+                        },
+                        {
+                            id: 4,
+                            text: "Can permissions be changed retroactively (e.g., revoking access after approval)?",
+                            info: "Needs clear rules on handling already accessed/shared data. Legal and ethical considerations may vary by jurisdiction.",
+                            tags: ['pet', 'owners'],
+                            response: null,
+                        },
+                        {
+                            id: 5,
+                            text: "What happens when a practice or patient does not respond to an exchange request?",
+                            info: "Defines default behaviors (e.g., deny by default vs. allow non-sensitive data). Risk management needed for time-sensitive cases.",
+                            tags: ['pet', 'owners'],
+                            response: null,
+                        },
+                    ];
+                    this.question = this.questions[0];
+                    return;
+                }
+                apiService.postData("https://vmie.org:5000/api/chat/questions", { take: 50 }, this.questionsListReceived);
             },
-            messagesListReceived(messages){
-                messages.forEach(p => { 
+            questionsListReceived(questions){
+                questions.forEach(p => { 
+                    p.response = null,
                     p.deleted = 0;
                 });
-                this.messages = messages;
-                Vue.nextTick(() =>{
-                    const container = document.querySelector("#messages");
-                    container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
-                });
+                this.questions = questions;
             },
-
+            setResponse(question, response){
+                question.response = response;
+                setTimeout(this.moveNext, 500, 1);                
+            },
 
             getCookie(name) {
                 var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
@@ -373,9 +443,6 @@
             },
 
             // users listing
-            loadUsers(){
-                apiService.postData("https://vmie.org:5000/api/user/list", { take: 20 }, this.usesListeceived);
-            },
             usesListeceived(users){
                 this.users = users;
             },
@@ -383,8 +450,7 @@
             // user management 
             bus(event){
                 if(event == 'UserUpdated'){
-                    this.loadUsers();
-                    this.loadMessages();
+                    this.loadQuestions();
                 }
             },
 
@@ -467,5 +533,28 @@
 .bin:hover{
     fill: red;
     width: 22px;
+}
+
+.question-area{
+background-color: aliceblue;
+}
+.question{
+background-color: rgb(255, 253, 231);
+padding: 10px;
+border-radius: 10px;
+border: 1px solid gray;
+}
+.question-actions{
+    margin: 10px;
+    display: inline-block;
+padding: 5px 5px;
+border-radius: 10px;
+border: 1px solid silver;
+}
+.question-text{
+font-weight: bold;
+}
+.question-info{
+font-size: small;
 }
 </style>

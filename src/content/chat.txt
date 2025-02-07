@@ -3,4 +3,4 @@ DO NOT include sensitive content.
 DO NOT provide veterinary/medical advice using this chat.
 <b style='display: none'>If you see information that should not be public, 
 use the delete icon to hide it from public.</b>
-<a href='https://vmie.org/'>What is the purpose of this chat?</a>
+<a href='../site'>What is the purpose of this chat?</a>

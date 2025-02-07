@@ -8,7 +8,7 @@ Here is how applications vulnerabilities are mapped to existent regulations:
 | ***Data Loss and Leakage*** | ISO 17862 and HIPPA compliance. |
 | ***Account or Service Hijacking*** | There is no clear mapping in current regulations. |
 
-If you are looking for technical guidance check our <a href="https://vmie.org?page=Architecture">Software Architecture</a> page.
+If you are looking for technical guidance check our <a href="?page=Architecture">Software Architecture</a> page.
 
 ### Security challenges
 

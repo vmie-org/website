@@ -8,9 +8,9 @@
     src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
     crossorigin="anonymous"></script>
-    <script src="./lib/vue/vue.js" asp-append-version="true"></script>
+    <script src="./../lib/vue/vue.js" asp-append-version="true"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="./lib/css/theme.css">
+    <link rel="stylesheet" href="./../lib/css/theme.css">
     <!-- theme -->
     <meta property="og:title" content="Veterinary Medicine Information Exchange" />
     <meta property="og:locale" content="en_US" />
@@ -26,138 +26,13 @@
     {"@context":"https://schema.org","@type":"WebSite","description":"Leap Day is a theme for GitHub Pages.","headline":"Leap Day theme","name":"Leap Day theme","url":"https://pages-themes.github.io/leap-day/"}</script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-    
-    <link rel="stylesheet" href="./lib/data-tables/jquery.dataTables.min.css" />
-    <link rel="stylesheet" href="./lib/css/mobile.table.css"/>
-    <link rel="stylesheet" href="./lib/bootstrap/css/bootstrap-icons.css">
-
-    <link rel="stylesheet" href="./lib/css/table.css" />
-    <link rel="stylesheet" href="./lib/css/modal.css" />
-    <link rel="stylesheet" href="./lib/bootstrap/css/bootstrap.min.css" />
 </head>
-<body>
-    <div id="app">
-        <header>
-            <h1>Veterinary Medicine Information Exchange</h1>
-            <p>Non-Profit Organization for providing standards on vmie.org</p>
-          </header>
-      <!-- banner start -->
-      <div id="banner">
-        <span id="logo"></span>
-
-        <a v-if="!accountService.user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="loginText = 'Login with Linkedin'" class="button fork">
-            <strong>
-                <span style="color: blue; font-family: Sans; border: 1px solid blue; border-radius: 2px; padding: 0px 5px">in</span>
-                {{loginText}}
-            </strong>
-        </a>
-        <a v-if="accountService.user" @click="accountService.showProfile()" class="button fork">
-            <strong>
-                <img :src="accountService.user.avatarUrl" height="18" width="18" style="margin-right: 5px; border: 1px solid white;"/> {{accountService.user.name}}
-            </strong>
-        </a>       
-        
-        <div class="downloads">
-            <span v-if="!isMobile">vmie:</span>
-            <ul>
-                <li v-if="!isMobile"><a href="./chat" class="button">Chat</a></li>
-                <li>
-                    <a @click="isMobile = !isMobile" class="button"><div style="display: inline-block;">
-                        <div class="menu-bar"></div>
-                        <div class="menu-bar"></div>
-                        <div class="menu-bar"></div>
-                    </div>
-                    </a>
-                </li>
-            </ul>
-          </div>
-      </div>
-      <!-- banner end -->
-
-    <div class="wrapper">
-        <nav>
-            <ul>
-                <li v-for="page in websitePages" v-if="page.title" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)">
-                    <a :href="'?page=' + page.id">{{page.title}}</a>
-                </li>
-            </ul>
-        </nav>
-
-        <section style="height: auto;">
-
-        <div v-if="isMobile" style="display: inline-block; margin-left: 0px; left: 20px;">
-            <span v-for="(page, index) in websitePages" v-if="index > 0 && page.title " 
-                 @click="renderPage(page)"><a class="btn btn-light pagename" :class="page.isSelected ? 'active' : ''" :href="'?page=' + page.id">
-                {{page.id}}
-            </a></span>
-            <hr>
-        </div> 
-
-            <p v-if="htmlContent" v-html="htmlContent"></p>
-        </section>
-
-        <div class="float-right">
-            <a v-if="!accountService.user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="loginText = 'Login with Linkedin'" class="button fork">
-                <strong><span style="color: blue; font-family: Sans; border: 1px solid blue; border-radius: 2px; padding: 0px 5px">in</span>
-                {{loginText}}</strong>
-            </a>
-            <a v-if="accountService.user" @click="accountService.showProfile()" class="button fork">
-                Manage your privacy: <strong>
-                    {{accountService.user.name}}
-                </strong>
-            </a>
-            <br>
-            <br>
-        </div>
-
-        <div v-if="selectedPage && selectedPage.id == 'Decisions'">
-            <div style="padding: 10px 0px 30px 0px;" v-if="users.length"> 
-                Decision board is under construction
-                <table class="blueTable">
-                    <tr>
-                        <td>Id</td>
-                        <td>User</td>
-                        <td>Col 1</td>
-                        <td>Col 2</td>
-                        <td>Col 3</td>
-                    </tr>
-                    <tr v-for="user in users">
-                        <td>{{user.id}}</td>
-                        <td>
-                            <img :src="user.avatarUrl" height="24" width="24"/>
-                            {{user.name}}
-                        </td>
-                        <td>col 1</td>
-                        <td>col 2</td>
-                        <td>col 3</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-    </div>
-    <footer>
-      
-        <p>
-            <div><small>Code on <a href="https://github.com/vmie-org/website">GitHub</a></small></div>
-            <div><small>Hosted on <a href="https://vmie.org">vmie.org</a></small></div>
-            <div><small>Linkedin <a href="www.linkedin.com/in/vmie">@vmie</a></small></div>
-            <div><small>Slack <a href="https://vmie.slack.com">@vmie</a></small></div>
-            
-        </p>
-    </footer>
-
-<!-- USER MODALS -->
-<profile-component :parent="accountService"></profile-component>
-<!-- USER MODALS -->
-
-</div>
-</body>
+<div id="app"></div>
 </html>
 
 <script type="module">
-import { vmieData } from "./services/vmieService.js";
-import { apiService } from "./services/apiService.js";
-import { accountService, ModalProfileComponent } from "./services/accountService.js";
+    import { apiService } from "./services/apiService.js";
+    import { accountService, ModalProfileComponent } from "./../services/accountService.js";
 
 	var userService = {
 		apiService: apiService,
@@ -167,158 +42,22 @@ import { accountService, ModalProfileComponent } from "./services/accountService
 
     var app = new Vue({
         el: '#app',
-        components: {
-            "profile-component":  ModalProfileComponent,
-        },
         data: {
             apiService: apiService,
-            accountService: accountService,
-
-            loggedIn: false,
-            loginText: 'Login',
-            isMobile: false,
-            htmlContent: null,
-            selectedPage: null,
-            websitePages: [],
-
-            // user management
-            user: null,
-            showUserProfile: false,
-            showUserDeleted: false,
-
-            // decisions
-            users: [],
         },
-        mounted: function () {
+        mounted(){
             ModalProfileComponent.accountService = accountService;
-            this.websitePages = vmieData.websitePages;
-            
-            this.isMobile = window.screen.width < 500;
-            let page = this.websitePages[0];
-            let pageId = this.findGetParameter('page');
-            if(pageId){
-                let hrefPage = this.websitePages.find(p=> p.id == pageId);
-                if(hrefPage){
-                    page = hrefPage;
-                    this.selectedPage = page;
-                    if(page.id == 'Decisions'){
-                        this.loadUsers();
-                    }
-                }
-            }
-            this.renderPage(page);
             accountService.initialize(apiService, this.bus);
-        },
-        computed: {
+
+            // if()
+            {
+                // window.location.href = "./builder";
+            }
         },
         methods: {
             bus(){
-
-            },
-            getCookie(name) {
-                var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-                if (match) return match[2];
-            },
-            findGetParameter(parameterName) {
-                var result = null,
-                    tmp = [];
-                location.search
-                    .substr(1)
-                    .split("&")
-                    .forEach(function (item) {
-                    tmp = item.split("=");
-                    if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
-                    });
-                return result;
-            },
-
-            // users listing
-            loadUsers(){
-                apiService.postData("https://vmie.org:5000/api/user/list", { take: 20 }, this.usesListeceived);
-            },
-            usesListeceived(users){
-                this.users = users;
-            },
-
-            // page utilities
-            renderPage(page){
-                this.websitePages.forEach(page => {
-                    page.isSelected = false;
-                });
-                if(page.id == 'Chat'){
-                    window.location.href = "./chat";
-                }
-                apiService.getText(page.url, this.parseContent);
-                page.isSelected = true;
-                this.selectedPage = page;
-            },
-            parseContent(content){
-                let lines = content.split('\n');
-
-                lines = lines.map(line => line.trim());
-                var tableBuilder = null;
-
-                this.htmlContent = lines.map(line => {
-
-                    if(!line.length){
-                        if(tableBuilder){
-                            var table = tableBuilder + "</table></p><p>";
-                            tableBuilder = null;
-                            return table;
-                        }
-                        return "</p><p>";
-                    }
-
-                    if(line.indexOf('#### ') === 0){
-                        return `<h4>${line.substring(5)}</h4>`;
-                    }
-                    if(line.indexOf('### ') === 0){
-                        return `<h3>${line.substring(4)}</h3>`;
-                    }
-                    else if(line.indexOf('## ') === 0){
-                        return `<h2>${line.substring(3)}</h2>`;
-                    }
-                    else if(line.indexOf('# ') === 0){
-                        return `<h1>${line.substring(2)}</h1>`;
-                    }
-                    else if(line.indexOf('![') === 0){
-                        let img = line.substring(line.indexOf('(')+1);
-                        let imgSource = img.split(' ')[0];
-                        let imgAlt = img.substring(imgSource.length + 2);
-                        imgAlt = imgAlt.substring(0, imgAlt.length-2);
-                        return `<center style='color: silver; border: 1px solid #ddd'><img src='${imgSource}' alt='${imgAlt}' /><br>${imgAlt}</center>`;
-                    }
-                    if(line.indexOf('***') >= 0){
-                        line = line.replace(/\*\*\*(.*?)\*\*\*/g, '<b><i>$1</i></b>')
-                    }
-                    else if(line.indexOf('**') >= 0){
-                        line = line.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-                    }
-                 
-                    if(line.indexOf('| ') === 0 && line.lastIndexOf(' |') == line.length-2){
-                        if(!tableBuilder){
-                            tableBuilder = "<table>";
-                        }
-                        tableBuilder += "<tr><td>" + line.substring(1, line.length-3).split(" | ").join("</td><td>") + "</td></tr>";
-                        return null;
-                    }
-
-                    if(line.indexOf('-----------') == 0){
-                        return '<hr>';
-                    }
-                    return `${line}<br/>`;
-                }).join('');
-            },
-		}
+                window.location.href = "./builder";
+            }
+        }
     });
-
 </script>
-<style>
-    .pagename{
-        border: 1px solid silver;
-        border-radius: 3px;
-        padding: 5px 10px;
-        color: black;
-        margin: 5px;
-    }
-</style>
