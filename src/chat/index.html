@@ -45,7 +45,7 @@
           </header>
           
       <!-- banner start -->
-      <div id="banner">
+      <div id="banner" @mouseenter="accountService.showComplex = true">
         <span id="logo"></span>
 
         <a v-if="!accountService.user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="loginText = 'Login with Linkedin'" class="button fork">
@@ -78,8 +78,24 @@
       <!-- banner end -->
 
     <div class="wrapper">
+        <nav v-if="accountService.showComplex">
+            <ul>
+                <li v-for="page in websitePages" v-if="page.title" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)">
+                    <a :href="'./../'+ page.url +'?page=' + page.id">{{page.title}}</a>
+                </li>
+            </ul>
+        </nav>
 
         <section style="height: auto; background-color: #fffcf7;">
+
+            <div v-if="isMobile" style="display: inline-block; margin-left: 0px; left: 20px;">
+                <span v-for="(page, index) in websitePages" v-if="index > 0 && page.title " 
+                     @click="renderPage(page)"><a class="btn btn-light pagename" :class="page.isSelected ? 'active' : ''" :href="'./../'+ page.url +'?page=' + page.id">
+                    {{page.id}}
+                </a></span>
+                <hr>
+            </div> 
+
             <p v-if="htmlContent" v-html="htmlContent"></p>
 
             <div style="margin-bottom: 15px;">
@@ -144,30 +160,10 @@
             <br>
         </div>
 
-        <div>
-            <div v-if="false" style="padding: 10px 0px 30px 0px;" v-if="users.length"> 
-                Decision board is under construction
-                <table class="blueTable">
-                    <tr>
-                        <td>Id</td>
-                        <td>User</td>
-                        <td>Col 1</td>
-                        <td>Col 2</td>
-                        <td>Col 3</td>
-                    </tr>
-                    <tr v-for="user in users">
-                        <td>{{user.id}}</td>
-                        <td>
-                            <img :src="user.avatarUrl" height="24" width="24"/>
-                            {{user.name}}
-                        </td>
-                        <td>col 1</td>
-                        <td>col 2</td>
-                        <td>col 3</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
+        <section style="margin-top: 60px;">
+            <users-component :parent="usersService"></users-component>
+        </section>
+
     </div>
     <footer>
       
@@ -182,6 +178,7 @@
 
 <!-- USER MODALS -->
 <profile-component :parent="accountService"></profile-component>
+
 <!-- USER MODALS -->
    
 
@@ -193,23 +190,20 @@
     import { vmieData } from "./../services/vmieService.js";
     import { apiService } from "./../services/apiService.js";
     import { chatService } from "./../services/chatService.js";
+    import { usersService, UsersComponent } from "./../services/usersService.js";
     import { accountService, ModalProfileComponent } from "./../services/accountService.js";
-
-	var userService = {
-		apiService: apiService,
-		loginUser(user, loginUserHandler){
-		},
-	};
 
     var app = new Vue({
         el: '#app',
         components: {
             "profile-component":  ModalProfileComponent,
+            "users-component": UsersComponent,
         },
         data: {
             apiService: apiService,
             chatService: chatService,
             accountService: accountService,
+            usersService: usersService,
 
             msg: {
                 charactesLeft: 255,
@@ -225,21 +219,19 @@
             htmlContent: null,
             selectedPage: null,
             websitePages: [],
-
-            // decisions
-            users: [],
         },
         mounted: function () {
             ModalProfileComponent.accountService = accountService;
+            UsersComponent.usersService = usersService;
             this.websitePages = vmieData.websitePages;
 
             let hrefPage = this.websitePages.find(p=> p.id == "Chat");
             if(hrefPage){
                 this.selectedPage = hrefPage;
             }
-            this.loadUsers();
             this.renderPage(hrefPage);
             chatService.initialize();
+            usersService.initialize(apiService, this.bus);
             accountService.initialize(apiService, this.bus);
         },
         computed: {
@@ -264,7 +256,7 @@
                 chatService.dummyCont = 0;
             },
             deleteMessage(msg){
-                if(!this.user || this.user.isDummy){
+                if(!this.accountService.user || this.accountService.user.isDummy){
                     // Debug UI without a user
                     msg.deleted = true;
                 }
@@ -278,7 +270,7 @@
             },
             // Messenger
             checkPrivacyAgreement(){
-                if(this.user && !this.user.privacyAgreed) {
+                if(this.user && !this.accountService.user.privacyAgreed) {
                     accountService.showProfile();
                 }
             },
@@ -296,7 +288,7 @@
                     }
                 }
                 var message = this.msg.message.trim();
-                var initials = this.user.name ? this.buildAcronym(this.user.name) : "AU";
+                var initials = this.accountService.user.name ? this.buildAcronym(this.accountService.user.name) : "AU";
                 var data = { message: message, initials: initials, deleted: 0 };
                 if(this.simulate){
                     this.messageSent();
@@ -311,9 +303,9 @@
                 this.messages.push({
                     deleted: 0,
                     message: "Unable to send your message",
-                    name: this.user.name ? this.user.name : "Anonymous User",
-                    initials: this.user.name ? this.buildAcronym(this.user.name) : "AU",
-                    icon: this.user ? this.user.avatarUrl : null,
+                    name: this.accountService.user.name ? this.accountService.user.name : "Anonymous User",
+                    initials: this.accountService.user.name ? this.buildAcronym(this.accountService.user.name) : "AU",
+                    icon: this.user ? this.accountService.user.avatarUrl : null,
                 });
                 Vue.nextTick(() =>{
                     const container = document.querySelector("#messages");
@@ -325,9 +317,9 @@
                 var message = this.msg.message.trim();          
                 this.messages.push({
                     message: message,
-                    name: this.user.name ? this.user.name : "Anonymous User",
-                    initials: this.user.name ? this.buildAcronym(this.user.name) : "AU",
-                    icon: this.user ? this.user.avatarUrl : null,
+                    name: this.accountService.user.name ? this.accountService.user.name : "Anonymous User",
+                    initials: this.accountService.user.name ? this.buildAcronym(this.accountService.user.name) : "AU",
+                    icon: this.user ? this.accountService.user.avatarUrl : null,
                     deleted: false,
                 });
                 Vue.nextTick(() =>{
@@ -372,19 +364,13 @@
                 return result;
             },
 
-            // users listing
-            loadUsers(){
-                apiService.postData("https://vmie.org:5000/api/user/list", { take: 20 }, this.usesListeceived);
-            },
-            usesListeceived(users){
-                this.users = users;
-            },
-
             // user management 
             bus(event){
                 if(event == 'UserUpdated'){
-                    this.loadUsers();
-                    this.loadMessages();
+                    usersService.loadUsers();
+                    if(accountService.user){
+                        this.loadMessages();
+                    }
                 }
             },
 
@@ -393,7 +379,7 @@
                 this.websitePages.forEach(page => {
                     page.isSelected = false;
                 });
-                apiService.getText("./." + page.url, this.parseContent);
+                apiService.getText("./." + page.contentUrl, this.parseContent);
                 page.isSelected = true;
             },
             parseContent(content){

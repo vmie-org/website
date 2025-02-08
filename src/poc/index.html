@@ -302,7 +302,7 @@
                 <transition name="modal">
                     <div class="modal-mask"  v-if="selectedPractice">
                         <div class="modal-wrapper">
-                            <div class="modal-container" :class="isMobile?'mobile':'w1200'" :style="isMobile?'max-height:'+window.innerHeight+'px':''">
+                            <div class="modal-container" :class="isMobile?'mobile':'w1200'" :style="accountService.isMobile?'max-height:'+window.innerHeight+'px':''">
                                 
                 <div v-if="selectedPractice">
                     <div class="card" style="background-color: #F8F8F8;">

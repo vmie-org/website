@@ -114,31 +114,50 @@
                 <div>
                     <center >
                         <span class="question-actions">
-                        <span class="btn btn-light">Priority</span>
+                        <span class="btn btn-light">Not Agreed</span>
                         <span :class="!question.response || question.response == 1 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 1)">1</span>
                         <span :class="!question.response || question.response == 2 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 2)">2</span>
                         <span :class="!question.response || question.response == 3 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 3)">3</span>
                         <span :class="!question.response || question.response == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 4)">4</span>
                         <span :class="!question.response || question.response == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 5)">5</span>
+                        <span class="btn btn-light">Totaly Agreed</span>
                     </span>
                 </center>
                 </div>
             </div>
             <div v-if="questionsCompleted">
 
-                <span class="btn btn-light float-right" @click="startOver()">Start over</span>
+                <span class="btn btn-light float-right" @click="startOver()">Start voting</span>
                 <br>
-                Your responses:
+                Features status:
                 <br>
 
                 <div v-for="question in questions" style="margin-bottom: 5px;" v-if="!msg.deleted">
                     <div class="question">
                         <div class="question-text">
-                            {{question.text}}
+                            {{question.text}} <small class="text-secondary"><span v-if="question.status">See on: <a :href="question.git" style="color: gray; text-decoration: underline;">GitHub</a></span></small>
                         </div>
+                        <div class="question-info">
+                            {{question.info}} 
+                            <span v-if="!question.readMore" @click="question.readMore = true" class="text-secondary" style="text-decoration: underline;">read more</span>
+                            <div v-if="question.readMore"> {{question.details}}</div>
+                        </div>
+
+                    <div v-if="false">
+                        <center >
+                            <span class="float-right">
+                                <span class="btn btn-light">Priority: </span>
+                                <span :class="!question.response || question.response == 1 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 1)">1</span>
+                                <span :class="!question.response || question.response == 2 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 2)">2</span>
+                                <span :class="!question.response || question.response == 3 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 3)">3</span>
+                                <span :class="!question.response || question.response == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 4)">4</span>
+                                <span :class="!question.response || question.response == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 5)">5</span>
+                            </span>
+                        </center>
                         <div class="text-secondary float-right">
                             Your response: {{question.response}} / 5
                         </div>
+                    </div>
                         <br>
                     </div>
                 </div>
@@ -306,7 +325,7 @@
             selectedPage: null,
             websitePages: [],
             showCreateQuestion: false,
-            questionsCompleted: false,
+            questionsCompleted: true,
 
             // decisions
             users: [],
@@ -315,7 +334,7 @@
             ModalProfileComponent.accountService = accountService;
             this.websitePages = vmieData.websitePages;
 
-            let hrefPage = this.websitePages.find(p=> p.id == "Builder");
+            let hrefPage = this.websitePages.find(p=> p.id == "Board");
             if(hrefPage){
                 this.selectedPage = hrefPage;
             }
@@ -363,7 +382,7 @@
             },
             // Messenger
             checkPrivacyAgreement(){
-                if(this.user && !this.accountService.user.privacyAgreed) {
+                if(this.accountService.user && !this.accountService.user.privacyAgreed) {
                     accountService.showProfile();
                 }
             },
@@ -380,52 +399,67 @@
             loadQuestions(){
                 //  sw2if(accountService.simulate)
                 {
-                    this.questions = [
+                    let questions = [
                         {
                             id: 1,
-                            text: "Who has the authority to approve or deny information exchange (the practice, the patient, or both)?",
-                            info: "Requires balancing patient autonomy with practice-level policies. Needs legal clarity on patient rights and practice obligations.",
+                            text: "Chat feature",
+                            info: "Allow users to chat and vote on features priorities.",
+                            details: "This is essential for our community-driven featrues. Is also allowing users to input feedback or contribut to different features.",
+                            status: "in progress",
+                            git: "https://github.com/vmie-org/website/tree/main/src/chat",
                             tags: ['pet', 'owners'],
                             response: null,
                         },
                         {
-                            id: 2,
-                            text: "Can permissions be set at different levels (e.g., full record, specific sections, individual data points)?",
-                            info: "Increases administrative burden and system complexity. Requires a structured classification of record components.",
+                            id: 1,
+                            text: "People's page",
+                            info: "Listing users and interests for better communication.",
+                            details: "A list of people interested in or contributing to our initiatives. Volunteers of any background are welcomed.",
+                            status: "in progress",
+                            git: "https://github.com/vmie-org/website/tree/main/src/board",
                             tags: ['pet', 'owners'],
                             response: null,
                         },
                         {
                             id: 3,
-                            text: "How are permissions granted—explicit consent per exchange or predefined settings?",
-                            info: "Affects workflow efficiency. Explicit consent increases transparency but adds friction; predefined settings improve automation but require careful policy design.",
+                            text: "Architecture builder",
+                            info: "Community driven architecture as an experimantal festure.",
+                            details: "Instruments to collect feedback from community and instruments to define exchange rules.",
+                            status: "in progress",
+                            git: "https://github.com/vmie-org/website/tree/main/src/builder",
                             tags: ['pet', 'owners'],
                             response: null,
                         },
                         {
                             id: 4,
-                            text: "Can permissions be changed retroactively (e.g., revoking access after approval)?",
-                            info: "Needs clear rules on handling already accessed/shared data. Legal and ethical considerations may vary by jurisdiction.",
+                            text: "Data APIs",
+                            info: "Getting data from authorized sources, necessary for apps and logic.",
+                            details: "At the begining, we need to partner with drug companies and ingest reliable data. We can use this data to drive logic and to provide an free API for other apps.",
+                            git: "https://github.com/vmie-org/website/tree/main/src/data",
                             tags: ['pet', 'owners'],
                             response: null,
                         },
                         {
                             id: 5,
-                            text: "What happens when a practice or patient does not respond to an exchange request?",
-                            info: "Defines default behaviors (e.g., deny by default vs. allow non-sensitive data). Risk management needed for time-sensitive cases.",
+                            text: "Finance",
+                            info: "Transpacency of contributions is a priority.",
+                            details: "We need to list all contributions and spendings from contributions. At the moment, all the infrastructure is provided by the author.",
+                            git: "https://github.com/vmie-org/website/tree/main/src/finance",
                             tags: ['pet', 'owners'],
                             response: null,
                         },
                     ];
                     this.question = this.questions[0];
+                    this.questionsListReceived(questions);
                     return;
                 }
                 apiService.postData("https://vmie.org:5000/api/chat/questions", { take: 50 }, this.questionsListReceived);
             },
             questionsListReceived(questions){
                 questions.forEach(p => { 
-                    p.response = null,
+                    p.response = null;
                     p.deleted = 0;
+                    p.readMore = false;
                 });
                 this.questions = questions;
             },

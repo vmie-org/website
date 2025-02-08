@@ -7,7 +7,7 @@ export const ModalProfileComponent = {
 <transition name="modal">
    <div class="modal-mask" v-if="parent.user && parent.showUserDeleted">
       <div class="modal-wrapper">
-         <div class="modal-container" :class="isMobile?'mobile':'w600'" :style="isMobile?'max-height:'+window.innerHeight+'px':''">
+         <div class="modal-container" :class="parent.isMobile?'mobile':'w600'" :style="parent.isMobile?'max-height:'+parent.innerHeight+'px':''">
             <div>
                <div class="card" style="background-color: #F8F8F8;">
                   <div class="card-header">
@@ -41,7 +41,7 @@ export const ModalProfileComponent = {
 <transition name="modal">
    <div class="modal-mask" v-if="parent.user && parent.showUserProfile">
       <div class="modal-wrapper">
-         <div class="modal-container" :class="parent.isMobile?'mobile':'w600'" :style="parent.isMobile?'max-height:'+window.innerHeight+'px':''">
+         <div class="modal-container" :class="parent.isMobile?'mobile':'w600'" :style="parent.isMobile?'max-height:'+parent.innerHeight+'px':''">
             <div>
                <div class="card" style="background-color: #F8F8F8;">
                   <div class="card-header">
@@ -85,13 +85,13 @@ export const ModalProfileComponent = {
                      <div class="alert alert-warning">
                         <div class="btn btn-secondary float-right" v-on:click="parent.user.nameVisibility = 1; parent.updateAccount()" v-if="!parent.user.nameVisibility" title="Make your name public">show my Name</div>
                         <div class="btn btn-secondary float-right" v-on:click="parent.user.nameVisibility = 0; parent.updateAccount()" v-if="parent.user.nameVisibility" title="Make your name private">hide my Name</div>
-                        <div>Your avatar is now <b v-if="parent.user.nameVisibility">visible</b><b v-if="!parent.user.nameVisibility" style="color: red; font-weight: bold;">not visible</b> to all users.</div>
+                        <div>Your name is now <b v-if="parent.user.nameVisibility">visible</b><b v-if="!parent.user.nameVisibility" style="color: red; font-weight: bold;">not visible</b> to all users.</div>
                         <small style="color: gray">Collected at signin from Linkedin.</small>                        
                      </div>
                      <div class="alert alert-warning">
                         <div class="btn btn-secondary float-right" v-on:click="parent.user.avatarVisibility = 1; parent.updateAccount()" v-if="!parent.user.avatarVisibility" title="Make your image public">show my Image</div>
                         <div class="btn btn-secondary float-right" v-on:click="parent.user.avatarVisibility = 0; parent.updateAccount()" v-if="parent.user.avatarVisibility" title="Make your image private">hide my Image</div>
-                        <div>Your name is now <b v-if="parent.user.avatarVisibility">visible</b><b v-if="!parent.user.avatarVisibility" style="color: red; font-weight: bold;">not visible</b> to all users.</div>
+                        <div>Your avatar is now <b v-if="parent.user.avatarVisibility">visible</b><b v-if="!parent.user.avatarVisibility" style="color: red; font-weight: bold;">not visible</b> to all users.</div>
                         <small style="color: gray">Collected at signin from Linkedin.</small>  
                      </div>
                      </p>
@@ -124,9 +124,11 @@ export const accountService = {
     user: null,
     showUserProfile: false,
     showUserDeleted: false,
-    isMobile: false,
+    isMobile: window.screen.width < 500,
     apiService: null,
     bus: null,
+    showComplex: false,
+    innerHeight: window.innerHeight,
     
 
     initialize(apiService, bus){
@@ -152,6 +154,10 @@ export const accountService = {
             if(sessionId){
                 accountService.getUserSession(sessionId);
             }
+            else{
+               that = this;
+               this.noUserInfoReceived();
+            }
         }
     },    
     showProfile(){
@@ -161,7 +167,7 @@ export const accountService = {
         this.apiService.postData("https://vmie.org:5000/api/user/info", this.user, this.userInfoReceived);
     },
     updateAccountPrivacy(){
-        this.apiService.postData("https://vmie.org:5000/api/user/privacy/agreement/" + (this.user.privacyAgreed ? 'true':'false'), null, this.userInfoReceived);
+        this.apiService.postData("https://vmie.org:5000/api/user/privacy/agreement/" + (this.accountService.user.privacyAgreed ? 'true':'false'), null, this.userInfoReceived);
     },
     deleteAccount(){
         this.apiService.postData("https://vmie.org:5000/api/user/delete", this.user, this.userInfoReceived);
@@ -199,6 +205,7 @@ export const accountService = {
     },
     noUserInfoReceived(data){
         that.user = null;
+        that.bus("MissingUser");
     }, 
     logout(){
          localStorage.removeItem('session');
@@ -214,8 +221,8 @@ export const accountService = {
         // this.simulate = false;
         // this.messages = [];
         if(user && user.name == 'DELETED'){
-            this.showUserProfile = false;
-            this.showUserDeleted = true;
+            that.showUserProfile = false;
+            that.showUserDeleted = true;
             return;
         }
         that.user = user;

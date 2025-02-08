@@ -55,7 +55,7 @@
             <strong>
                 <img :src="accountService.user.avatarUrl" height="18" width="18" style="margin-right: 5px; border: 1px solid white;"/> {{accountService.user.name}}
             </strong>
-        </a>       
+        </a>
         
         <div class="downloads">
             <span v-if="!isMobile">vmie:</span>
@@ -78,7 +78,7 @@
         <nav>
             <ul>
                 <li v-for="page in websitePages" v-if="page.title" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)">
-                    <a :href="'?page=' + page.id">{{page.title}}</a>
+                    <a :href="'./../'+ page.url +'?page=' + page.id">{{page.title}}</a>
                 </li>
             </ul>
         </nav>
@@ -87,7 +87,7 @@
 
         <div v-if="isMobile" style="display: inline-block; margin-left: 0px; left: 20px;">
             <span v-for="(page, index) in websitePages" v-if="index > 0 && page.title " 
-                 @click="renderPage(page)"><a class="btn btn-light pagename" :class="page.isSelected ? 'active' : ''" :href="'?page=' + page.id">
+                 @click="renderPage(page)"><a class="btn btn-light pagename" :class="page.isSelected ? 'active' : ''" :href="'./../'+ page.url +'?page=' + page.id">
                 {{page.id}}
             </a></span>
             <hr>
@@ -159,11 +159,6 @@ import { vmieData } from "./../services/vmieService.js";
 import { apiService } from "./../services/apiService.js";
 import { accountService, ModalProfileComponent } from "./../services/accountService.js";
 
-	var userService = {
-		apiService: apiService,
-		loginUser(user, loginUserHandler){
-		},
-	};
 
     var app = new Vue({
         el: '#app',
@@ -245,10 +240,7 @@ import { accountService, ModalProfileComponent } from "./../services/accountServ
                 this.websitePages.forEach(page => {
                     page.isSelected = false;
                 });
-                if(page.id == 'Chat'){
-                    window.location.href = "./../chat";
-                }
-                apiService.getText("../" + page.url, this.parseContent);
+                apiService.getText("../" + page.contentUrl, this.parseContent);
                 page.isSelected = true;
                 this.selectedPage = page;
             },
