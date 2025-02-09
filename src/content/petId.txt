@@ -1,0 +1,36 @@
+### ePetId
+<a class="float-right text-link" href="?page=Board">Go to Projects</a>
+
+#### What ePetId is not
+- is not a replacement of the official identification that is required by your jurisdiction, like a microchip. Please see the UK regulations: <a href="https://www.gov.uk/get-your-dog-cat-microchipped">Get your dog or cat microchipped</a>
+- is not a proof of property/ownership.
+- is not enforced or regulated
+
+### What is ePetId
+- a generated on-demand number to be used in data exchange applications that align with vmie open standards in Veterinary Medicine Information Exchange
+- is not bounded to a jurisdiction and therefore can be used anywhere
+- is free and easy to manage
+
+### How it works?
+A pet owner requests a **ePetId** from vmie. The **ePetId** is provided as text and as QR. No requirements at this step.
+Anyone can scan a QR to visit the coresponding pet profile.
+By default, no information is publicaly available on a pet profile. It is the owner that can define what information is visible by who, including the anonymised information.
+Pet owners can receive requests to share some information, but never their personal details.
+From GDPR point of view, with enough effort the data can be traiced back to the user, so the user has to understand the risks.
+
+### Privacy Profiles
+Like many other agreements in life, humand are not always checking the full content of agreements and even if they do, they might be not aware at the time of the consequences.
+That's why, for complex scenarios like the management of privacy, standards are evolving to provide safe choices for people.
+Weith the help of community, we are developing and standardize privacy profiles for pets. 
+This will make the management of privacy easier to navigate and as safe as the community requires. 
+
+### Privacy risks mitigation
+The user will only add non-sensitive information about the pet, never as free text, always as selection from a valid range of options.
+When numeric values are required, the valid values will not make a continuous domain. Valid values will be discrete over their domain. This is to ensure that users, for their own security, are limited in the values they can insert.
+
+### Data reliability
+<span style='color: red'>Since the data is provided by the pet owners, it is not verified and can be misleading. The use of anonymised data has to be accompanied by this disclaimer and should not be accepted as relevant.</span>
+However, in multiple cases, unofficial data is useful for pre-tests, especially when official data is not available.
+
+### Developer volunteers
+If you can code, and you like to contribute to our MIT-licensed non-profit open-source projects you can <a href="../board/?page=Developers" class="text-secondary text-link">register as vmie contributor</a>

@@ -33,7 +33,16 @@
 
     <link rel="stylesheet" href="./../lib/css/table.css" />
     <link rel="stylesheet" href="./../lib/css/modal.css" />
-    <link rel="stylesheet" href="./../lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./../lib/bootstrap/css/bootstrap.min.css" /><!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-V2CY4R09SB"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-V2CY4R09SB');
+    </script>
+    <script src="./../lib/moment/moment.min.js"></script>
 </head>
 <body>
     <div id="app">
@@ -55,12 +64,12 @@
             <strong>
                 <img :src="accountService.user.avatarUrl" height="18" width="18" style="margin-right: 5px; border: 1px solid white;"/> {{accountService.user.name}}
             </strong>
-        </a>       
+        </a>
         
         <div class="downloads">
             <span v-if="!isMobile">vmie:</span>
             <ul>
-                <li v-if="!isMobile"><a href="./../chat" class="button">Chat</a></li>
+                <li v-if="!isMobile"><a href="./../board?page=Projects" class="button">Projects</a></li>
                 <li>
                     <a @click="isMobile = !isMobile" class="button"><div style="display: inline-block;">
                         <div class="menu-bar"></div>
@@ -78,7 +87,7 @@
         <nav>
             <ul>
                 <li v-for="page in websitePages" v-if="page.title" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)">
-                    <a :href="'?page=' + page.id">{{page.title}}</a>
+                    <a :href="'./../'+ page.url +'?page=' + page.id">{{page.title}}</a>
                 </li>
             </ul>
         </nav>
@@ -87,7 +96,7 @@
 
         <div v-if="isMobile" style="display: inline-block; margin-left: 0px; left: 20px;">
             <span v-for="(page, index) in websitePages" v-if="index > 0 && page.title " 
-                 @click="renderPage(page)"><a class="btn btn-light pagename" :class="page.isSelected ? 'active' : ''" :href="'?page=' + page.id">
+                 @click="renderPage(page)"><a class="btn btn-light pagename" :class="page.isSelected ? 'active' : ''" :href="'./../'+ page.url +'?page=' + page.id">
                 {{page.id}}
             </a></span>
             <hr>
@@ -97,9 +106,9 @@
         </section>
 
         <div class="float-right">
-            <a v-if="!accountService.user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="loginText = 'Login with Linkedin'" class="button fork">
+            <a v-if="!accountService.user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="accountService.loginText = 'Login with Linkedin'" class="button fork">
                 <strong><span style="color: blue; font-family: Sans; border: 1px solid blue; border-radius: 2px; padding: 0px 5px">in</span>
-                {{loginText}}</strong>
+                {{accountService.loginText}}</strong>
             </a>
             <a v-if="accountService.user" @click="accountService.showProfile()" class="button fork">
                 Manage your privacy: <strong>
@@ -110,9 +119,9 @@
             <br>
         </div>
 
-        <div v-if="selectedPage && selectedPage.id == 'Decisions'">
+        <div v-if="selectedPage && selectedPage.id == 'Board'">
             <div style="padding: 10px 0px 30px 0px;" v-if="users.length"> 
-                Decision board is under construction
+                Contributions is under construction
                 <table class="blueTable">
                     <tr>
                         <td>Id</td>
@@ -157,25 +166,22 @@
 <script type="module">
 import { vmieData } from "./../services/vmieService.js";
 import { apiService } from "./../services/apiService.js";
+import { chatService, ChatComponent } from "./../services/chatService.js";
 import { accountService, ModalProfileComponent } from "./../services/accountService.js";
 
-	var userService = {
-		apiService: apiService,
-		loginUser(user, loginUserHandler){
-		},
-	};
 
     var app = new Vue({
         el: '#app',
         components: {
             "profile-component":  ModalProfileComponent,
+            "chat-component":  ChatComponent,
         },
         data: {
             apiService: apiService,
+            chatService: chatService,
             accountService: accountService,
 
             loggedIn: false,
-            loginText: 'Login',
             isMobile: false,
             htmlContent: null,
             selectedPage: null,
@@ -195,19 +201,20 @@ import { accountService, ModalProfileComponent } from "./../services/accountServ
             
             this.isMobile = window.screen.width < 500;
             let page = this.websitePages[0];
-            let pageId = this.findGetParameter('page');
+            let pageId = this.apiService.findGetParameter('page');
             if(pageId){
                 let hrefPage = this.websitePages.find(p=> p.id == pageId);
                 if(hrefPage){
                     page = hrefPage;
                     this.selectedPage = page;
-                    if(page.id == 'Decisions'){
+                    if(page.id == 'Board'){
                         this.loadUsers();
                     }
                 }
             }
             this.renderPage(page);
-            accountService.initialize(apiService, this.bus);
+            chatService.initialize(apiService, accountService, this.bus, 0);
+            accountService.initialize(apiService, this.chat, this.bus);
         },
         computed: {
         },
@@ -215,21 +222,8 @@ import { accountService, ModalProfileComponent } from "./../services/accountServ
             bus(){
 
             },
-            getCookie(name) {
-                var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-                if (match) return match[2];
-            },
-            findGetParameter(parameterName) {
-                var result = null,
-                    tmp = [];
-                location.search
-                    .substr(1)
-                    .split("&")
-                    .forEach(function (item) {
-                    tmp = item.split("=");
-                    if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
-                    });
-                return result;
+            chat(messsage){
+                chatService.receivedMessages(messsage);
             },
 
             // users listing
@@ -245,10 +239,7 @@ import { accountService, ModalProfileComponent } from "./../services/accountServ
                 this.websitePages.forEach(page => {
                     page.isSelected = false;
                 });
-                if(page.id == 'Chat'){
-                    window.location.href = "./../chat";
-                }
-                apiService.getText("../" + page.url, this.parseContent);
+                apiService.getText("../" + page.contentUrl, this.parseContent);
                 page.isSelected = true;
                 this.selectedPage = page;
             },

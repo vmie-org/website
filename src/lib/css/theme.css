@@ -901,3 +901,15 @@ footer {
         #width: auto
     }
 }
+
+.align-center{
+    text-align: center;
+}
+
+.clear-table table tr td{
+    border: none;
+}
+
+.text-link{
+    text-decoration: underline;
+}

@@ -1,0 +1,9 @@
+### Information Exchange Profiles
+<a class="float-right text-link" href="?page=Board">Go to Projects</a>
+
+#### To be defined
+This page is under construction.
+We are building the tools to allow the commmunity to influence how the exchange profiles are defined.
+
+### Developer volunteers
+If you can code, and you like to contribute to our MIT-licensed non-profit open-source projects you can <a href="../board/?page=Developers" class="text-secondary text-link">register as vmie contributor</a>

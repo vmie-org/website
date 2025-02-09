@@ -34,12 +34,6 @@
     import { apiService } from "./services/apiService.js";
     import { accountService, ModalProfileComponent } from "./../services/accountService.js";
 
-	var userService = {
-		apiService: apiService,
-		loginUser(user, loginUserHandler){
-		},
-	};
-
     var app = new Vue({
         el: '#app',
         data: {
@@ -47,7 +41,7 @@
         },
         mounted(){
             ModalProfileComponent.accountService = accountService;
-            accountService.initialize(apiService, this.bus);
+            accountService.initialize(apiService, this.chat, this.bus);
 
             // if()
             {
@@ -56,8 +50,10 @@
         },
         methods: {
             bus(){
-                window.location.href = "./builder";
-            }
+                window.location.href = "./board?page=Projects";
+            },
+            chat(messsage){
+            },
         }
     });
 </script>
