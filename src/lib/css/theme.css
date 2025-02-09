@@ -909,3 +909,7 @@ footer {
 .clear-table table tr td{
     border: none;
 }
+
+.text-link{
+    text-decoration: underline;
+}

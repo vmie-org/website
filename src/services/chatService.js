@@ -40,7 +40,7 @@ export const ChatComponent = {
                 </div>
             </span>
         </div>
-        <small v-if="chatService.msg && accountService.user && chatService.msg.charactesLeft >= 0" class="text-secondary">{{chatService.msg.charactesLeft}} charactes left.</small>
+        <small v-if="chatService.msg && accountService.user && chatService.msg.message && chatService.msg.message.length && chatService.msg.charactesLeft >= 0" class="text-secondary">{{chatService.msg.charactesLeft}} charactes left.</small>
         <small v-if="chatService.msg.charactesLeft < 0" class="text-danger">Your message was too long</small>
         <span v-if="chatService.dummyCont <= 0" @click="chatService.dummyCont = 20" class="messages-resume float-right">Continue</span></div>
 

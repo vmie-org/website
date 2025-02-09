@@ -269,9 +269,13 @@ export const accountService = {
     noUserInfoReceived(data){
         that.user = null;
         that.bus("MissingUser");
+        if(data.status = 401){
+            localStorage.removeItem("session");
+            that.apiService.jwt = session.jwt;
+        }
     }, 
     logout(){
-         localStorage.removeItem('session');
+         localStorage.removeItem("session");
          this.user = null;
         this.apiService.getData("https://vmie.org:5000/api/logout");
     },

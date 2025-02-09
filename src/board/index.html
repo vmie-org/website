@@ -107,41 +107,13 @@
 
             <p v-if="htmlContent" v-html="htmlContent"></p>
 
-            <div class="question-area" v-if="!questionsCompleted">
-                <div class="question-status">
-                    <span class="btn btn-light" @click="moveNext(-1)">Next question</span>
-                    <span class="btn btn-light float-right" @click="moveNext(+1)">Prew question</span>
-                </div>
-                <div class="question">
-                    <div class="question-text">
-                        {{question.text}}
+            <a v-if="selectedPage && selectedPage.id !== 'Board'" class="btn btn-light float-right" href="?page=Board">Go Back</a>
+            <div v-if="!selectedPage || selectedPage.id == 'Board'">
+                <div class="question-area" v-if="!questionsCompleted">
+                    <div class="question-status">
+                        <span class="btn btn-light" @click="moveNext(-1)">Prev question</span>
+                        <span class="btn btn-light float-right" @click="moveNext(+1)">Next question</span>
                     </div>
-                    <div class="question-info">
-                        {{question.info}}
-                    </div>
-                </div>
-                <div>
-                    <center >
-                        <span class="question-actions">
-                        <span class="btn btn-light">Not Agreed</span>
-                        <span :class="!question.response || question.response == 1 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 1)">1</span>
-                        <span :class="!question.response || question.response == 2 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 2)">2</span>
-                        <span :class="!question.response || question.response == 3 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 3)">3</span>
-                        <span :class="!question.response || question.response == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 4)">4</span>
-                        <span :class="!question.response || question.response == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 5)">5</span>
-                        <span class="btn btn-light">Totaly Agreed</span>
-                    </span>
-                </center>
-                </div>
-            </div>
-            <div v-if="questionsCompleted">
-
-                <span class="btn btn-light float-right" @click="startOver()">Start voting</span>
-                <br>
-                Features status:
-                <br>
-
-                <div v-for="question in questions" style="margin-bottom: 5px;" v-if="!question.deleted">
                     <div class="question">
                         <div class="question-text">
                             {{question.text}} <small class="text-secondary"><span v-if="question.status">See on: <a :href="question.git" style="color: gray; text-decoration: underline;">GitHub</a></span></small>
@@ -151,23 +123,55 @@
                             <span v-if="!question.readMore" @click="question.readMore = true" class="text-secondary" style="text-decoration: underline;">read more</span>
                             <div v-if="question.readMore"> {{question.details}}</div>
                         </div>
-
-                    <div v-if="false">
-                        <center >
-                            <span class="float-right">
-                                <span class="btn btn-light">Priority: </span>
-                                <span :class="!question.response || question.response == 1 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 1)">1</span>
-                                <span :class="!question.response || question.response == 2 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 2)">2</span>
-                                <span :class="!question.response || question.response == 3 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 3)">3</span>
-                                <span :class="!question.response || question.response == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 4)">4</span>
-                                <span :class="!question.response || question.response == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 5)">5</span>
-                            </span>
-                        </center>
-                        <div class="text-secondary float-right">
-                            Your response: {{question.response}} / 5
-                        </div>
                     </div>
-                        <br>
+                    <div>
+                        <center >
+                            <span class="question-actions">
+                            <span class="btn btn-light">Set priority: </span>
+                            <span :class="!question.response || question.response == 1 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 1)">1</span>
+                            <span :class="!question.response || question.response == 2 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 2)">2</span>
+                            <span :class="!question.response || question.response == 3 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 3)">3</span>
+                            <span :class="!question.response || question.response == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 4)">4</span>
+                            <span :class="!question.response || question.response == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 5)">5</span>
+                        </span>
+                    </center>
+                    </div>
+                </div>
+                <div v-if="questionsCompleted">
+
+                    <span class="btn btn-light float-right" @click="startOver()">Start voting</span>
+                    <br>
+                    Features status:
+                    <br>
+
+                    <div v-for="question in questions" style="margin-bottom: 5px;" v-if="!question.deleted">
+                        <div class="question">
+                            <div class="question-text">
+                                {{question.text}} <small class="text-secondary"><span v-if="question.status">See on: <a :href="question.git" style="color: gray; text-decoration: underline;">GitHub</a></span></small>
+                            </div>
+                            <div class="question-info">
+                                {{question.info}} 
+                                <span v-if="!question.readMore" @click="question.readMore = true" class="text-secondary" style="text-decoration: underline;">read more</span>
+                                <div v-if="question.readMore"> {{question.details}}</div>
+                            </div>
+
+                        <div v-if="false">
+                            <center >
+                                <span class="float-right">
+                                    <span class="btn btn-light">Priority: </span>
+                                    <span :class="!question.response || question.response == 1 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 1)">1</span>
+                                    <span :class="!question.response || question.response == 2 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 2)">2</span>
+                                    <span :class="!question.response || question.response == 3 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 3)">3</span>
+                                    <span :class="!question.response || question.response == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 4)">4</span>
+                                    <span :class="!question.response || question.response == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 5)">5</span>
+                                </span>
+                            </center>
+                            <div class="text-secondary float-right">
+                                Your response: {{question.response}} / 5
+                            </div>
+                        </div>
+                            <br>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -296,12 +300,21 @@
             ChatComponent.accountService = accountService;
             this.websitePages = vmieData.websitePages;
 
-            let hrefPage = this.websitePages.find(p=> p.id == "Board");
-            if(hrefPage){
-                this.selectedPage = hrefPage;
+
+            let page = this.websitePages[0];
+            let pageId = this.apiService.findGetParameter('page');
+            if(pageId){
+                let hrefPage = this.websitePages.find(p=> p.id == pageId);
+                if(hrefPage){
+                    page = hrefPage;
+                    this.selectedPage = page;
+                    if(page.id == 'Board'){
+                    }
+                }
             }
+
             this.loadQuestions();
-            this.renderPage(hrefPage);
+            this.renderPage(page);
             chatService.initialize(apiService, accountService, this.bus, 2);
             accountService.initialize(apiService, this.chat, this.bus);
         },
