@@ -35,7 +35,16 @@
     <link rel="stylesheet" href="./../lib/css/modal.css" />
     <link rel="stylesheet" href="./../lib/css/chat.css" />
     <link rel="stylesheet" href="./../lib/bootstrap/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="./../services/accountService.js" />
+    <link rel="stylesheet" href="./../services/accountService.js" /><!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-V2CY4R09SB"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-V2CY4R09SB');
+    </script>
+    <script src="./../lib/moment/moment.min.js"></script>
 </head>
 <body>
     <div id="app">
@@ -48,10 +57,10 @@
       <div id="banner" @mouseenter="accountService.showComplex = true">
         <span id="logo"></span>
 
-        <a v-if="!accountService.user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="loginText = 'Login with Linkedin'" class="button fork">
+        <a v-if="!accountService.user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="accountService.loginText = 'Login with Linkedin'" class="button fork">
             <strong>
                 <span style="color: blue; font-family: Sans; border: 1px solid blue; border-radius: 2px; padding: 0px 5px">in</span>
-                {{loginText}}
+                {{accountService.loginText}}
             </strong>
         </a>
         <a v-if="accountService.user" @click="accountService.showProfile()" class="button fork">
@@ -131,7 +140,7 @@
                 Your responses:
                 <br>
 
-                <div v-for="question in questions" style="margin-bottom: 5px;" v-if="!msg.deleted">
+                <div v-for="question in questions" style="margin-bottom: 5px;" v-if="!question.deleted">
                     <div class="question">
                         <div class="question-text">
                             {{question.text}}
@@ -146,49 +155,13 @@
 
             <br>
             <span @click="showCreateQuestion = true">Conversation:</span>
-            <div v-if="accountService.user" class="messages-area" id="messages">
-                <div v-for="msg in messages" v-if="!msg.deleted">
-                    <div class="message-item">
-                        <span class="message-name" :class="accountService.user && msg.userId == accountService.user.id ? 'mine':''" :title="msg.name">{{msg.initials}}:</span>
-                        <span class="message-text">
-{{msg.message}}
-<span class="actions">
-<span class="float-right bin" @click="deleteMessage(msg)"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M3 6H21M5 6V20C5 21.1046 5.89543 22 7 22H17C18.1046 22 19 21.1046 19 20V6M8 6V4C8 2.89543 8.89543 2 10 2H14C15.1046 2 16 2.89543 16 4V6" stroke="gray" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M14 11V17" stroke="gray" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M10 11V17" stroke="gray" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></span>
-</span>
-</span>
-                    </div>
-                </div>
-            </div>
-            <div class="message-area">
-                <textarea :disabled="msg.sending" 
-                :placeholder="accountService.user ? 'Type your toughts' : 'Please login!'" 
-                v-on:keyup.enter="sendMessage()" @click="checkPrivacyAgreement()" @keyup="countCharacters()" 
-                v-model="msg.message" class="message-box"></textarea>
-                <span @click="sendMessage()" style="float: right; display: block; width: 32px; border-radius: 5px;">
-                    <div>
-                        <svg width="48" height="48" viewBox="450 1070 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke="black" fill="gray" d="m458.371 1079.75-6.633.375a.243.243 0 0 0-.22.17l-.964 3.255c-.13.418-.024.886.305 1.175a1.08 1.08 0 0 0 1.205.158l8.836-4.413c.428-.214.669-.677.583-1.167-.06-.346-.303-.633-.617-.79l-8.802-4.396a1.073 1.073 0 0 0-1.183.14c-.345.288-.458.77-.325 1.198l.963 3.25c.03.097.118.165.22.17l6.632.375s.254 0 .254.25-.254.25-.254.25" stroke-width="0.5"/>
-                        </svg>
-                    </div>
-                </span>
-            </div>
-            <div>
-                <small @click="accountService.showUserProfile = true" v-if="accountService.user && msg.charactesLeft >= 0" class="text-secondary">{{msg.charactesLeft}} charactes left.</small>
-                <small v-if="msg.charactesLeft < 0" class="text-danger">Your message was too long</small>
-                <small v-if="false" @click="accountService.showProfile()" class="text-secondary float-right">Manage your privacy</small>
-            
-                <span v-if="chatService.dummyCont <= 0" @click="chatService.dummyCont = 20" class="messages-resume float-right">Continue</span>
-            </div>
-                <div class="float-right">
-                    <a href="../site?page=Privacy">Privacy policy</a> 
-                    <span v-if="accountService.user && accountService.user.privacyAgreed" @click="showProfile()"> agreed by you</span>
-                </div>
+            <chat-component :chat-service="chatService" :account-service="accountService" :take="5" :scope-id="3"></chat-component>
         </section>
 
         <div class="float-right">
-            <a v-if="!accountService.user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="loginText = 'Login with Linkedin'" class="button fork">
+            <a v-if="!accountService.user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="accountService.loginText = 'Login with Linkedin'" class="button fork">
                 <strong><span style="color: blue; font-family: Sans; border: 1px solid blue; border-radius: 2px; padding: 0px 5px">in</span>
-                {{loginText}}</strong>
+                {{accountService.loginText}}</strong>
             </a>
             <a v-if="accountService.user" @click="accountService.showProfile()" class="button fork">
                 Manage your privacy: <strong>
@@ -217,7 +190,7 @@
    
 <!-- CREATE -->
 
-<transition name="modal">
+<transition name="modal" v-cloak>
     <div class="modal-mask" v-if="accountService.user && showCreateQuestion">
        <div class="modal-wrapper">
           <div class="modal-container" :class="accountService.isMobile?'mobile':'w600'" :style="accountService.isMobile?'max-height:'+window.innerHeight+'px':''">
@@ -243,14 +216,10 @@
                       
                 Tags:
                 <div class="message-area">
-                <textarea :disabled="msg.sending" :placeholder="accountService.user ? 'Type your toughts' : 'Please login!'" v-on:keyup.enter="sendMessage()" @click="checkPrivacyAgreement()" @keyup="countCharacters()" v-model="msg.message" class="message-box"></textarea>
                 </span>
             </div>
             Question:
                       
-            <div class="message-area">
-                <textarea :disabled="msg.sending" :placeholder="accountService.user ? 'Type your toughts' : 'Please login!'" v-on:keyup.enter="sendMessage()" @click="checkPrivacyAgreement()" @keyup="countCharacters()" v-model="msg.message" class="message-box"></textarea>
-            </div>
                    </div>
                    <div class="card-footer">
                       <div class="float-right" >
@@ -275,32 +244,26 @@
 <script type="module">
     import { vmieData } from "./../services/vmieService.js";
     import { apiService } from "./../services/apiService.js";
-    import { chatService } from "./../services/chatService.js";
+    import { chatService, ChatComponent } from "./../services/chatService.js";
     import { accountService, ModalProfileComponent } from "./../services/accountService.js";
 
     var app = new Vue({
         el: '#app',
         components: {
             "profile-component":  ModalProfileComponent,
+            "chat-component":  ChatComponent,
         },
         data: {
             apiService: apiService,
             chatService: chatService,
             accountService: accountService,
 
-            msg: {
-                charactesLeft: 255,
-                text: null,
-                sending: false,
-            },
-            messages: [],
             questions: [],
             questionIndex: 0,
             question: {},
             search: null,
             
             loggedIn: false,
-            loginText: 'Login',
             isMobile: false,
             htmlContent: null,
             selectedPage: null,
@@ -321,8 +284,8 @@
             }
             this.loadQuestions();
             this.renderPage(hrefPage);
-            chatService.initialize();
-            accountService.initialize(apiService, this.bus);
+            chatService.initialize(apiService, accountService, this.bus, 3);
+            accountService.initialize(apiService, this.chat, this.bus);
         },
         computed: {
         },
@@ -348,35 +311,7 @@
                 }
                 this.question = this.questions[this.questionIndex];
             },
-            deleteMessage(msg){
-                if(!this.accountService.user || this.accountService.user.isDummy){
-                    // Debug UI without a user
-                    msg.deleted = true;
-                }
-                apiService.postData("https://vmie.org:5000/api/chat/remove", {id: msg.id}, this.messageDeleted);
-            },
-            messageDeleted(msg){
-                msg = this.questions.find(p=>p.id = msg.id);
-                if(msg){
-                    msg.deleted = true;
-                }
-            },
             // Messenger
-            checkPrivacyAgreement(){
-                if(this.user && !this.accountService.user.privacyAgreed) {
-                    accountService.showProfile();
-                }
-            },
-            countCharacters(){
-                this.msg.charactesLeft = 255 - (this.msg.message ? this.msg.message.length : 0);
-                if(this.msg.charactesLeft < 0){
-                    this.msg.message = this.msg.message.substring(0, 255);
-                }
-            },
-            buildAcronym(str){
-                var matches = str.match(/\b(\w)/g); // ['J','S','O','N']
-                return matches.join('').toUpperCase();
-            },
             loadQuestions(){
                 //  sw2if(accountService.simulate)
                 {
@@ -443,8 +378,13 @@
             bus(event){
                 if(event == 'UserUpdated'){
                     this.loadQuestions();
+                    chatService.loadMessages();
                 }
             },
+            chat(messsage){
+                chatService.receivedMessages(messsage);
+            },
+
 
             // page utilities
             renderPage(page){

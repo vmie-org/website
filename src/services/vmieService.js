@@ -40,7 +40,7 @@ export const vmieData = {
             isSelected: false,
         },
         {
-            id: "Decisions",
+            id: "Board",
             title:  "Decision Board",
             contentUrl: "./content/decisions.txt",
             url: "board",
@@ -74,7 +74,6 @@ export const vmieData = {
 }
 
 export const vmieService = {
-
 }
 
 export default {

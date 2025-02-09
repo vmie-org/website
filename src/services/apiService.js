@@ -58,33 +58,21 @@ export const apiService = {
         }).fail(function (data) {
         });
     },
-    findGetParameter(parameterName) {
-        var result = null,
-            tmp = [];
-        location.search
-            .substr(1)
-            .split("&")
-            .forEach(function (item) {
-            tmp = item.split("=");
-            if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
-            });
-        return result;
-    },
-restoreJwt(){
-    var userString = localStorage.getItem("user");
-    if(userString)
-    {
-        var user = JSON.parse(userString);
-        if(user){
-            apiService.jwt = user.jwt;
+    restoreJwt(){
+        var userString = localStorage.getItem("user");
+        if(userString)
+        {
+            var user = JSON.parse(userString);
+            if(user){
+                apiService.jwt = user.jwt;
+            }
         }
-    }
-},
-post(url, payload, success, error) {
-    if(apiService.jwt == null)
-    {
-        apiService.restoreJwt();
-    }
+    },
+    post(url, payload, success, error) {
+        if(apiService.jwt == null)
+        {
+            apiService.restoreJwt();
+        }
 
     $.ajax({
         headers: {
@@ -112,7 +100,23 @@ post(url, payload, success, error) {
             error("Unable to execute.");
         }
     });
-},
+    },
+    getCookie(name) {
+        var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        if (match) return match[2];
+    },
+    findGetParameter(parameterName) {
+        var result = null,
+            tmp = [];
+        location.search
+            .substr(1)
+            .split("&")
+            .forEach(function (item) {
+            tmp = item.split("=");
+            if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+            });
+        return result;
+    },
 endpoints:{
     saveDoctor: "https://localhost:4133/api/doctor/save",
     saveDrug: "https://localhost:4133/api/drug/save",

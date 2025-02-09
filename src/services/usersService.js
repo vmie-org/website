@@ -1,5 +1,3 @@
-
-
 export const UsersComponent = {
     props: ["parent", "bus"],
     template: `
@@ -31,8 +29,7 @@ export const usersService = {
    
    initialize(apiService, bus){
         this.apiService = apiService;
-        this.bus = bus;
-        
+        this.bus = bus;        
     },
     loadUsers(){
       if(!this.apiService.jwt || this.simulate){

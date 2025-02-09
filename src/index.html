@@ -41,7 +41,7 @@
         },
         mounted(){
             ModalProfileComponent.accountService = accountService;
-            accountService.initialize(apiService, this.bus);
+            accountService.initialize(apiService, this.chat, this.bus);
 
             // if()
             {
@@ -51,7 +51,9 @@
         methods: {
             bus(){
                 window.location.href = "./builder";
-            }
+            },
+            chat(messsage){
+            },
         }
     });
 </script>
