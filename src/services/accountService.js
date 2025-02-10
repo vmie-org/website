@@ -56,7 +56,7 @@ export const ModalProfileComponent = {
                   </div>
                   <div class="card-body">
 
-                  <div @click="parent.showCustomPrivacy = !parent.showCustomPrivacy; parent.showOnlyPrivacyAgreement = false">Describe yourself <span class="text-secondary" v-if="!parent.showCustomPrivacy || parent.showOnlyPrivacyAgreement">expand</span></div>
+                  <div @click="parent.showCustomPrivacy = !parent.showCustomPrivacy; parent.showOnlyPrivacyAgreement = false">Subscription lists: <span class="text-secondary" v-if="!parent.showCustomPrivacy || parent.showOnlyPrivacyAgreement">expand</span></div>
                   <div v-if="parent.showCustomPrivacy && !parent.showOnlyPrivacyAgreement">
                    <div>
                      <div v-for="(user, index) in parent.profileTypes" @click="user.selected = !user.selected"
@@ -68,6 +68,7 @@ export const ModalProfileComponent = {
                              
                               <b><input type="checkbox" v-model="user.selected"> {{( user.name ? user.name :'Visitor')}}</b>
                      </div>
+                     <a class="btn btn-success float-right" href="./../profile?page=Developer">Contribute as Developer</a>
                      </div>
                      </div>
 
@@ -92,7 +93,7 @@ export const ModalProfileComponent = {
                            <small v-if="parent.user.privacyAgreed" style="color: gray">You agreed our privacy policy.</small>                        
                         </div>
                         <div class="alert alert-warning" v-if="!parent.showOnlyPrivacyAgreement">
-                           <div class="btn btn-danger float-right" v-on:click="parent.deleteConversations()" title="Delete all my conversations from vmie">delete all my conversations</div>
+                           <div class="btn btn-danger float-right" v-on:click="parent.deleteConversations()" title="Delete all my conversations from vmie">Delete all my conversations</div>
                            <div>You can <b>delete all</b> your conversations from vmie.</div>
                            <small style="color: gray">We periodically process conversations to build knoekedge and support decisions. Do not include sensitive information in your messsages.</small>                        
                         </div>
@@ -141,6 +142,7 @@ export const ModalProfileComponent = {
 
 let that = null;
 export const accountService = {
+    disclaimer: "pending registration as non-profit",
     simulate: location.hostname === "localhost",
     user: null,
     showUserProfile: false,

@@ -1,0 +1,17 @@
+### GDPR
+<a class="float-right text-link" href="?page=Board">Go to Projects</a>
+
+#### Privacy is our core value
+At <a href="https://vmie.org">vmie.org</a> we value users privacy
+Allow users to configure mailing subscriptions.
+Allow users to unsubscribe all subscriptions with one-click from emails.
+
+### Tasks
+Download user data
+Download user data stored on vmie
+Will include developer contributions
+Will include all pet profiles created by the user
+Will include all personal information used for login and chat
+
+### Developer volunteers
+If you can code, and you like to contribute to our MIT-licensed non-profit open-source projects you can <a href="../board/?page=Developers" class="text-secondary text-link">register as vmie contributor</a>

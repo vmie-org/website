@@ -48,7 +48,8 @@
 </head>
 <body>
     <div id="app">
-        <header>
+        <header style="padding: 0px">
+            <div class="disclaimer-banner">{{accountService.disclaimer}}</div>
             <h1>Veterinary Medicine Information Exchange</h1>
             <p>Non-Profit Organization for providing standards on vmie.org</p>
           </header>
@@ -89,7 +90,10 @@
     <div class="wrapper">
         <nav v-if="accountService.showComplex">
             <ul>
-                <li v-for="page in websitePages" v-if="page.title" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)">
+                <li v-for="page in websitePages" 
+                v-if="page.title && !page.alwaysHide" 
+                :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'"
+                @click="renderPage(page)">
                     <a :href="'../'+ page.url +'?page=' + page.id">{{page.title}}</a>
                 </li>
             </ul>
@@ -105,6 +109,7 @@
                 <hr>
             </div> 
 
+            <a class="btn btn-success float-right" href="./../profile?page=Developer">Contribute as Developer</a>
             <p v-if="htmlContent" v-html="htmlContent"></p>
 
             <a v-if="selectedPage && selectedPage.id !== 'Board'" class="btn btn-light float-right" href="?page=Board">Go Back</a>
@@ -275,6 +280,7 @@
             "chat-component":  ChatComponent,
         },
         data: {
+            messengerScopeId: 2,
             apiService: apiService,
             chatService: chatService,
             accountService: accountService,
@@ -301,7 +307,7 @@
             this.websitePages = vmieData.websitePages;
 
 
-            let page = this.websitePages[0];
+            let page = this.websitePages.find(p=> p.id == 'Board');
             let pageId = this.apiService.findGetParameter('page');
             if(pageId){
                 let hrefPage = this.websitePages.find(p=> p.id == pageId);
@@ -315,7 +321,7 @@
 
             this.loadQuestions();
             this.renderPage(page);
-            chatService.initialize(apiService, accountService, this.bus, 2);
+            chatService.initialize(apiService, accountService, this.bus, this.messengerScopeId);
             accountService.initialize(apiService, this.chat, this.bus);
         },
         computed: {
@@ -440,12 +446,23 @@
                 page.isSelected = true;
             },
             parseContent(content){
-                let lines = content.split('\n');
+                let originalLines = content.split('\n');
 
-                lines = lines.map(line => line.trim());
+                let lines = originalLines.map(line => line.trim());
                 var tableBuilder = null;
+                let isPre = false;
 
-                this.htmlContent = lines.map(line => {
+                this.htmlContent = lines.map((line, index) => {
+
+                    if(line.indexOf('<pre') === 0){
+                        isPre = true;
+                    }
+                    else if(line.indexOf('</pre') === 0){
+                        isPre = false;
+                    }
+                    if(isPre){
+                        return originalLines[index] + "<br>";
+                    }
 
                     if(!line.length){
                         if(tableBuilder){

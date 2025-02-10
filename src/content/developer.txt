@@ -1,0 +1,9 @@
+### Your profile as developer
+<a class="float-right text-link" href="?page=Board">Go to Projects</a>
+Use this page to setup your volunteer developer profile and self-assign tasks that you think you can contribute to.
+All public projects are MIT license on <a href="https://github.com/vmie-org/website">GitHub</a>
+
+<a href='../site'>What is the purpose of this site?</a>
+
+**Veterinary Medicine Information Exchange**
+Non-Profit Organization for providing standards on vmie.org

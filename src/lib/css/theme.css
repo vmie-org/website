@@ -913,3 +913,12 @@ footer {
 .text-link{
     text-decoration: underline;
 }
+
+.disclaimer-banner{
+    z-index: 20000;
+    display: fixed;
+    margin-top: 0px;
+    top: 0px;
+    background-color: rgb(255, 246, 220);
+    color: red;
+}
