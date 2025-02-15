@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-    <title>Veterinary Medicine Information Exchange</title>
+    <title>vmie.org - site</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <script
@@ -46,7 +46,8 @@
 </head>
 <body>
     <div id="app">
-        <header>
+        <header style="padding: 0px">
+            <div class="disclaimer-banner">{{accountService.disclaimer}}</div>
             <h1>Veterinary Medicine Information Exchange</h1>
             <p>Non-Profit Organization for providing standards on vmie.org</p>
           </header>
@@ -86,7 +87,10 @@
     <div class="wrapper">
         <nav>
             <ul>
-                <li v-for="page in websitePages" v-if="page.title" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)">
+                <li v-for="page in websitePages" 
+                v-if="page.title && !page.alwaysHide" 
+                :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'"
+                @click="renderPage(page)">
                     <a :href="'./../'+ page.url +'?page=' + page.id">{{page.title}}</a>
                 </li>
             </ul>

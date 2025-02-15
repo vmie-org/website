@@ -1,0 +1,21 @@
+### Mailing System
+<a class="float-right text-link" href="?page=Board">Go to Projects</a>
+
+#### How it works?
+Users are defining their mailing subscriptions.
+A background worker is building emails using templates.
+The task scheduler is orchestrating when the emails are generated and when they are send.
+Auditing what type of emails where send and when has to be possible.
+
+### Tasks
+Create email template for available tasks
+Mailing weekly tasks availibility will help developers keep in touch when they are less active.
+
+Manage subscriptions
+Create the page where users can manage their mailing subscriptions.
+
+Tasks scheduler 
+Build a simple scheduler that is using the user's mailing preferences to send emails.
+
+### Developer volunteers
+If you can code, and you like to contribute to our MIT-licensed non-profit open-source projects you can <a href="../board/?page=Developers" class="text-secondary text-link">register as vmie contributor</a>

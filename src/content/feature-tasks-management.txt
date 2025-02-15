@@ -1,0 +1,21 @@
+### Tasks Management
+<a class="float-right text-link" href="?page=Board">Go to Projects</a>
+
+#### Is GitHub not enough?
+For most projects it is.
+But is not designed for community driven feedback.
+
+### Tasks
+Projects - Create new project 
+We need to create new projects
+Projects - Delete existent project 
+Projects - Edit a project
+Tasks - Create new task
+Tasks - Delete existent task
+Tasks - Edit a task
+Tasks - Email template for available tasks 
+Tasks - Manage subscriptions
+Tasks - Tasks scheduler
+
+### Developer volunteers
+If you can code, and you like to contribute to our MIT-licensed non-profit open-source projects you can <a href="../board/?page=Developers" class="text-secondary text-link">register as vmie contributor</a>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-    <title>Veterinary Medicine Information Exchange</title>
+    <title>vmie.org - chat</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <script
@@ -48,7 +48,8 @@
 </head>
 <body>
     <div id="app">
-        <header>
+        <header style="padding: 0px">
+            <div class="disclaimer-banner">{{accountService.disclaimer}}</div>
             <h1>Veterinary Medicine Information Exchange</h1>
             <p>Non-Profit Organization for providing standards on vmie.org</p>
           </header>
@@ -72,7 +73,7 @@
         <div class="downloads">
             <span v-if="!isMobile">vmie:</span>
             <ul>
-                <li v-if="!isMobile"><a href="../builder" class="button">Home</a></li>
+                <li v-if="!isMobile"><a href="../profile" class="button">Home</a></li>
                 <li>
                     <a @click="isMobile = !isMobile" class="button"><div style="display: inline-block;">
                         <div class="menu-bar"></div>
@@ -89,7 +90,10 @@
     <div class="wrapper">
         <nav v-if="accountService.showComplex">
             <ul>
-                <li v-for="page in websitePages" v-if="page.title" :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'" @click="renderPage(page)">
+                <li v-for="page in websitePages" 
+                v-if="page.title && !page.alwaysHide" 
+                :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'"
+                @click="renderPage(page)">
                     <a :href="'./../'+ page.url +'?page=' + page.id">{{page.title}}</a>
                 </li>
             </ul>
@@ -106,7 +110,7 @@
             </div> 
 
             <p v-if="htmlContent" v-html="htmlContent"></p>
-            <chat-component :chat-service="chatService" :account-service="accountService" :take="5" :scope-id="1"></chat-component>
+            <chat-component :chat-service="chatService" :account-service="accountService" :take="5" :scope-id="messengerScopeId"></chat-component>
         </section>
 
         <div class="float-right">
@@ -164,6 +168,7 @@
             "chat-component":  ChatComponent,
         },
         data: {
+            messengerScopeId: 1,
             apiService: apiService,
             chatService: chatService,
             accountService: accountService,
@@ -187,7 +192,7 @@
             }
             this.renderPage(hrefPage);
             usersService.initialize(apiService, this.bus);
-            chatService.initialize(apiService, accountService, this.bus, 1);
+            chatService.initialize(apiService, accountService, this.bus, this.messengerScopeId);
             accountService.initialize(apiService, this.chat, this.bus);
         },
         computed: {

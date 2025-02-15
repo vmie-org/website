@@ -1,0 +1,47 @@
+### GDPR
+<a class="float-right text-link" href="?page=Board">Go to Projects</a>
+
+#### User Experience
+
+<pre style='background: #f5f5f5'>
+Header
+    User Profile
+        If logged in will open User Privacy modal
+        If not logged-in will open LinkedIn for login
+    Quick Buttons
+    Hamburger Icon
+        On mobile will switch between Quick Buttons and Page Buttons
+        On browser will only hide the action nubbons
+    User Privacy modal
+        Logout button
+        Subscription lists
+            Mailing lists: 
+                Veterinary
+                Software
+                Owner
+                Company
+                Visitor
+            Contribute as Developer button
+        Messenger Privacy
+            "I agree" button
+            "Delete all my conversations" button
+        Overall Privacy
+            Show-Hide my name - switch user's nname
+            Show-Hide my Image - switch user's avatar
+    Chat component
+        Messages Area
+            Message Items with Bin (delete) option
+        Compose Message
+            Input fiels
+            Send Button (plane icon)
+            Remaining characters
+    Footer
+        Code on GitHub
+        Hosted on vmie.org
+        Linkedin @vmie
+        Slack @vmie
+        Manage your privacy - will open User Privacy modal
+</pre>
+
+### Developer volunteers
+If you can code, and you like to contribute to our MIT-licensed non-profit open-source projects you can <a href="../board/?page=Developers" class="text-secondary text-link">register as vmie contributor</a>
