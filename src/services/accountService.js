@@ -249,7 +249,7 @@ export const accountService = {
     },
     getUserSession(sessionId){
       that = this;
-      this.apiService.getData("https://vmie.org:5000/api/user/session?session=" + sessionId, this.userSessionReceived);
+      this.apiService.getData("https://vmie.org:5000/api/user/session?session=" + sessionId, this.userSessionReceived, this.noUserInfoReceived);
     },
     userSessionReceived(session){
         localStorage.setItem("session", JSON.stringify(session));
