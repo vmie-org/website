@@ -1,0 +1,5 @@
+### Noticeable Repos
+<a class="float-right text-link" href="?page=Board">Go to Projects</a>
+
+<span style='color: red'>Disclaimer:</span>
+<a href='https://vmie.org'>vmie.org</a> has no affiliation with the maintainers of the repositories listed below and assumes no responsability for the use of them. They are only provided as examples of other veterinary medicine related public repos.

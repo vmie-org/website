@@ -111,10 +111,11 @@
 
             <p v-if="htmlContent" v-html="htmlContent"></p>
 
+            
             <div class="question-area" v-if="!questionsCompleted">
                 <div class="question-status">
-                    <span class="btn btn-light" @click="moveNext(-1)">Next task</span>
-                    <span class="btn btn-light float-right" @click="moveNext(+1)">Prew task</span>
+                    <span class="btn btn-light" @click="moveNext(-1)">Next repo</span>
+                    <span class="btn btn-light float-right" @click="moveNext(+1)">Prew repo</span>
                 </div>
                 <div class="question">
                     <div class="question-text">
@@ -145,7 +146,7 @@
 
                 <span class="btn btn-light float-right" @click="startOver()">Does it fit?</span>
                 <br>
-                Available tasks:
+                Public repos:
                 <br>
 
                 <div v-for="question in questions" style="margin-bottom: 5px;" v-if="!question.deleted">
@@ -155,15 +156,22 @@
                             <label :for="'task_' + question.id" style="margin-bottom: 0">I like this</label>
                         </div>
                         <div class="question-text">
-                            {{question.text}}
+                            <a :href="question.git" style="font-weight: bold; color: black;">{{question.text}}</a>
                             <small v-for="skill in question.skills"><span class="skill">{{skill}}</span></small>
                             <small v-for="tag in question.tags"><a :href="getProjectUrlByTitle(tag)" class="tag">{{tag}}</a></small>
                         </div>
                         <div class="text-secondary"> {{question.info}} <small class="text-primary"><span @click="question.readMore = !question.readMore" v-if="question.status">read more</span></small></div>
-                        <div v-if="question.readMore"> {{question.details}}</div>
+                        <div v-if="question.readMore"> 
+                            {{question.details}}
+                            <div style="color: gray">
+                                <div v-for="link in question.links"><a :href="question.git" style="font-weight: bold; color: black;">{{link.title}}</a> {{link.info}}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <b>If you wish to use or contribute please check with the maintainers via GitHub.</b>
 
             <br>
             <span @click="showCreateQuestion = true">Conversation:</span>
@@ -362,23 +370,19 @@
                     let tasks = [
                         {
                             id: 1,
-                            text: "Create new project",
-                            info: "We need to create new projects.",
-                            details: "Project objects will be defined as: { projectId: 11, coordinatorId: 23, tasks: [], dueDate: 'March-2025' }",
-                            tags: ['Tasks Management'],
-                            skills: ['frontend'],
-                            status: 1,
-                            follow: 0,
-                            readMore: false,
-                            response: null,
-                        },
-                        {
-                            id: 3,
-                            text: "Delete existent project",
-                            info: "We have to be able to delete a project.",
-                            details: "Project objects will be defined as: { projectId: 11, coordinatorId: 23, tasks: [], dueDate: 'March-2025' }",
-                            tags: ['Tasks Management'],
-                            skills: ['frontend'],
+                            text: "sourmash",
+                            info: "Quickly search, compare, and analyze genomic and metagenomic data sets.",
+                            git: "https://github.com/sourmash-bio/sourmash",
+                            links: [
+                                {
+                                    title: "joss",
+                                    info: "The Journal of Open Source Software",
+                                    link: "https://joss.theoj.org/papers/10.21105/joss.06830"
+                                }
+                            ],
+                            details: null,
+                            tags: ['Python', 'Rust'],
+                            skills: ['analyze', 'genetics'],
                             status: 1,
                             follow: 0,
                             readMore: false,
@@ -386,11 +390,44 @@
                         },
                         {
                             id: 2,
-                            text: "Edit a project",
-                            info: "On the project page we need to update projects.",
-                            details: "Project objects will be defined as: { projectId: 11, coordinatorId: 23, tasks: [], dueDate: 'March-2025' }",
-                            tags: ['Tasks Management'],
-                            skills: ['frontend'],
+                            text: "VeterinaryMedicineReminder",
+                            info: "A fuctional Android/Kotlin app for uploading pet or patient info and serting reminders to administer medicine",
+                            git: "https://github.com/Isonomic/VeterinaryMedicineReminder",
+                            links: [
+                            ],
+                            details: null,
+                            tags: ['Kotlin'],
+                            skills: ['app', 'planning'],
+                            status: 1,
+                            follow: 0,
+                            readMore: false,
+                            response: null,
+                        },
+                        {
+                            id: 3,
+                            text: "VeterinaryMedicineReminder",
+                            info: "A fuctional Android/Kotlin app for uploading pet or patient info and serting reminders to administer medicine",
+                            git: "https://github.com/Isonomic/VeterinaryMedicineReminder",
+                            links: [
+                            ],
+                            details: null,
+                            tags: ['Kotlin'],
+                            skills: ['app', 'planning'],
+                            status: 1,
+                            follow: 0,
+                            readMore: false,
+                            response: null,
+                        },
+                        {
+                            id: 3,
+                            text: "Vet-Application",
+                            info: "Vet-Application for ENSF607 Final Project",
+                            git: "https://github.com/B-Attai/Vet-Application",
+                            links: [
+                            ],
+                            details: null,
+                            tags: ['JavaScript', 'Java', 'MySQL'],
+                            skills: ['app', 'demo'],
                             status: 1,
                             follow: 0,
                             readMore: false,
@@ -398,11 +435,14 @@
                         },
                         {
                             id: 4,
-                            text: "Create new task",
-                            info: "Once a project is created, we need to define tasks.",
-                            details: "Task objects will be defined as: { taskId: 11, parentTask: 2, coordinatorId: 23, requiredSkills: [ { name: 'vueJs', complexity: 'medium', estimate: '2 days' } ] }",
-                            tags: ['Tasks Management'],
-                            skills: ['frontend'],
+                            text: "ProKlaue",
+                            info: "ProKlaue is a biomechanic research project at the Faculty of Veterinary Medicine of the University of Leipzig (Saxony, Germany). The primary goal is to be able to align bone models in a repeatable and deterministic way, as well as to export comparable measures of each bone model over a whole animation for further analysis.",
+                            git: "https://github.com/EnReich/ProKlaue",
+                            links: [
+                            ],
+                            details: null,
+                            tags: ['JavaScript', 'Java', 'MySQL'],
+                            skills: ['Python', 'R', 'Maya'],
                             status: 1,
                             follow: 0,
                             readMore: false,
@@ -410,11 +450,14 @@
                         },
                         {
                             id: 5,
-                            text: "Delete existent task",
-                            info: "We have to be able to delete a task.",
-                            details: "Task objects will be defined as: { taskId: 11, parentTask: 2, coordinatorId: 23, requiredSkills: [ { name: 'vueJs', complexity: 'medium', estimate: '2 days' } ] }",
-                            tags: ['Tasks Management'],
-                            skills: ['frontend'],
+                            text: "vet-specs-ai",
+                            info: "Web application using machine learning & artificial intelligence to automatically score ulcerative dermatitis in mice.",
+                            git: "https://github.com/EnReich/ProKlaue",
+                            links: [
+                            ],
+                            details: null,
+                            tags: ['ai', 'imaging'],
+                            skills: ['ai'],
                             status: 1,
                             follow: 0,
                             readMore: false,
@@ -422,11 +465,14 @@
                         },
                         {
                             id: 6,
-                            text: "Edit a task",
-                            info: "On the project page we need to manage tasks. One action is to split tasks. Options: overwrite / save as new.",
-                            details: "Task objects will be defined as: { taskId: 11, parentTask: 2, coordinatorId: 23, requiredSkills: [ { name: 'vueJs', complexity: 'medium', estimate: '2 days' } ] }",
-                            tags: ['Tasks Management'],
-                            skills: ['frontend'],
+                            text: "MedicineCalculator-Android",
+                            info: "This application is a utility for easily calculating the cost of prescription medications for veterinary clinics. By inputting the type of medication, dosage frequency, and duration, you can calculate the total cost and unit price of the prescribed medication.",
+                            git: "https://github.com/koukemo/MedicineCalculator-Android",
+                            links: [
+                            ],
+                            details: null,
+                            tags: ['app', 'calculator'],
+                            skills: ['Kotlin'],
                             status: 1,
                             follow: 0,
                             readMore: false,
@@ -434,10 +480,14 @@
                         },
                         {
                             id: 7,
-                            text: "Email template for available tasks",
-                            info: "Mailing weekly tasks availibility will help developers keep in touch when they are less active.",
-                            details: "Create a list like this one into an email template.",
-                            tags: ['Mailing System'],
+                            text: "VetMedData.NET",
+                            info: "A .NET Core class library for obtaining structured data on UK-licensed Veterinary Medicines.",
+                            git: "https://github.com/Jongmassey/VetMedData.NET",
+                            links: [
+                            ],
+                            details: null,
+                            tags: ['app', 'drug'],
+                            skills: ['html'],
                             status: 1,
                             follow: 0,
                             readMore: false,
@@ -445,11 +495,14 @@
                         },
                         {
                             id: 8,
-                            text: "Manage subscriptions",
-                            info: "Create the page where users can manage their mailing subscriptions",
-                            details: "Mailing options objects will be defined as: { userId: 11, email: 'developer@vmie.com', maxFrequency: 'monthly', subscriptions: [ { name: 'development', selected: true } ] }",
-                            tags: ['Mailing System'],
-                            skills: ['frontend'],
+                            text: "AxExpress",
+                            info: "AxExpress generates a patient anesthetic protocols for small animal veterinary medicine. By incorporating certain variables declared as 'risks' in this program, a patients drug protocol may be adjusted appropriately based on whether a patient has an anesthetic risk or not.",
+                            git: "https://github.com/logan-baker/AxExpress",
+                            links: [
+                            ],
+                            details: null,
+                            tags: ['app', 'calculator'],
+                            skills: ['Ruby', 'html'],
                             status: 1,
                             follow: 0,
                             readMore: false,
@@ -457,11 +510,14 @@
                         },
                         {
                             id: 9,
-                            text: "Tasks scheduler",
-                            info: "Build a simple scheduler that is using the user's mailing preferences to send emails.",
-                            details: "Assume that the email onjects exists and the mailing service exists. Mailing options objects will be defined as: { userId: 11, email: 'developer@vmie.com', maxFrequency: 'monthly', subscriptions: [ { name: 'development', selected: true } ] }",
-                            tags: ['Mailing System'],
-                            skills: ['backend'],
+                            text: "VetMedQuiz",
+                            info: "A quiz application for veterinary medicine using Unity C#",
+                            git: "https://github.com/SaikoPsyche/VetMedQuiz",
+                            links: [
+                            ],
+                            details: null,
+                            tags: ['knowledge', 'quiz'],
+                            skills: ['C#'],
                             status: 1,
                             follow: 0,
                             readMore: false,
@@ -469,11 +525,44 @@
                         },
                         {
                             id: 10,
-                            text: "Download user data",
-                            info: "Allow users to download their private data stored on vmie",
-                            details: "Will include developer contributions and pet profiles.",
-                            tags: ['GDPR'],
-                            skills: ['backend'],
+                            text: "UKVetMedicinesDataStandards",
+                            info: "UK Veterinary Medicines Data Standards",
+                            git: "https://github.com/biospi/UKVetMedicinesDataStandards",
+                            links: [
+                            ],
+                            details: null,
+                            tags: ['data', 'standards'],
+                            skills: ['doc', 'json'],
+                            status: 1,
+                            follow: 0,
+                            readMore: false,
+                            response: null,
+                        },
+                        {
+                            id: 10,
+                            text: "VeterinaryManager",
+                            info: "The project was conceived as a total solution for the university's veterinary medicine, where the only method to schedule a cat or dog castration was by calling. When we presented this solution, the veterinary sector liked and approved the idea, so we managed to have a solution to a social problem.",
+                            git: "https://github.com/molinaiago/VeterinaryManager",
+                            links: [
+                            ],
+                            details: null,
+                            tags: ['data', 'management'],
+                            skills: ['Kotlin'],
+                            status: 1,
+                            follow: 0,
+                            readMore: false,
+                            response: null,
+                        },
+                        {
+                            id: 221,
+                            text: "VetDataHub",
+                            info: "VetDataHub is an opensource veterinary datasets repository dedicated to advancing veterinary medicine through the sharing and exchange of diverse datasets. The project aims to make opensource veterinary data available to veterinary professionals, researchers, and data scientists from around the world to contribute, discover, and utilize valuable datasets for research, diagnosis, and decision-making in animal health.",
+                            git: "https://github.com/Vetdatahub/VetDataHub",
+                            links: [
+                            ],
+                            details: null,
+                            tags: ['Python', 'Rust'],
+                            skills: ['analyze', 'genetics'],
                             status: 1,
                             follow: 0,
                             readMore: false,

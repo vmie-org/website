@@ -2,6 +2,7 @@
 <a class="float-right text-link" href="?page=Board">Go to Projects</a>
 Use this page to setup your volunteer developer profile and self-assign tasks that you think you can contribute to.
 All public projects are MIT license on <a href="https://github.com/vmie-org/website">GitHub</a>
+For veterinary-related repos from other maintainers go to: <a href="../repos?page=Repos">Other Repos</a>
 
 <a href='../site'>What is the purpose of this site?</a>
 

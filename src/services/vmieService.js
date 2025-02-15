@@ -81,6 +81,15 @@ export const vmieData = {
             isSelected: false,
         },
         {
+            id: "Repos",
+            title:  "Other Repos",
+            contentUrl: "./content/feature-repos.txt",
+            url: "board",
+            hideOnMobile: true,
+            alwaysHide: true,
+            isSelected: false,
+        },
+        {
             id: "PetId",
             title:  "PetId (project)",
             contentUrl: "./content/petId.txt",
