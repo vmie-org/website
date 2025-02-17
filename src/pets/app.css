@@ -1,0 +1,98 @@
+.App {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vw;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body{
+  margin: 0%;
+  padding: 0%;
+}
+
+.header{
+  flex:30%;
+  background-color: tomato;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.header .inputContainer{
+  display:flex;
+  flex-direction: column;
+}
+
+.header input{
+  width: 200px;
+  height: 40px;
+  border: none;
+  border-bottom-left-radius: 8px;
+  border-top-left-radius: 8px;
+  padding-left: 10px;
+  font-size: 17px;
+  border: 1px solid grey;
+}
+
+.header button {
+  width: 70px;
+  height: 87px;
+  border: none;
+  border-bottom-right-radius: 8px;
+  border-top-right-radius: 8px;
+  padding-left: 10px;
+  cursor: pointer;
+}
+
+.todoList {
+  flex: 70%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding-top: 50px;
+  flex-direction: column;
+}
+
+
+.task button{
+  flex: 20%;
+  height: 100%;
+  border: none;
+  background-color: lightseagreen;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  color: white;
+  cursor: pointer;
+}
+
+.headerArea {
+  background-color: white;
+  width: 100%;
+  text-align: center;
+
+  .filterArea {
+    color: gray;
+    padding: 5px 10px;
+    .filterInput{
+      text-align: left;
+      border: 1px solid gray;
+      font-size: x-large;
+      font-weight: bold;
+      color: #282c34;
+      max-width: 150px;
+    }
+
+    .itemsCounter {
+      color: gray;
+      padding: 0px 10px;
+    }
+  }
+}
+
+.create-task-button{
+  display: inline-block;
+}
+

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-    <title>vmie.org - jobs</title>
+    <title>vmie.org - profile</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <script
@@ -73,7 +73,7 @@
         <div class="downloads">
             <span v-if="!isMobile">vmie:</span>
             <ul>
-                <li v-if="!isMobile"><a href="../chat" class="button">Chat</a></li>
+                <li v-if="!isMobile"><a href="../site/?page=Architecture" class="button">Docs</a></li>
                 <li>
                     <a @click="isMobile = !isMobile" class="button"><div style="display: inline-block;">
                         <div class="menu-bar"></div>
@@ -91,6 +91,8 @@
         <side-menu-component :account-service="accountService" :parent="this"></side-menu-component>
 
         <section style="height: auto; background-color: #fffcf7;">
+            <pet-header-component :pet-service="petService" :account-service="accountService"></pet-header-component>
+            <pet-editor-component :pet-service="petService" :account-service="accountService"></pet-editor-component>
 
             <div v-if="isMobile" style="display: inline-block; margin-left: 0px; left: 20px;">
                 <span v-for="(page, index) in websitePages" v-if="index > 0 && page.title " 
@@ -100,73 +102,109 @@
                 <hr>
             </div> 
 
-            <a class="btn btn-success float-right" href="./../developer?page=Developer">Contribute as Developer</a>
             <p v-if="htmlContent" v-html="htmlContent"></p>
 
-            <a v-if="selectedPage && selectedPage.id !== 'Jobs'" class="btn btn-light float-right" href="?page=Jobs">Go Back</a>
-            <div v-if="!selectedPage || selectedPage.id == 'Jobs'">
-                <div class="question-area" v-if="!questionsCompleted">
-                    <div class="question-status">
-                        <span class="btn btn-light" @click="moveNext(-1)">Prev question</span>
-                        <span class="btn btn-light float-right" @click="moveNext(+1)">Next question</span>
+            <div class="question-area" v-if="!questionsCompleted">
+                <div class="question-status">
+                    <span class="btn btn-light" @click="moveNext(-1)">Next pet</span>
+                    <span class="btn btn-light float-right" @click="moveNext(+1)">Prew pet</span>
+                </div>
+                <div class="question">
+                    <div class="question-text">
+                        {{question.text}}
                     </div>
-                    <div class="question">
-                        <div class="question-text">
-                            {{question.text}} <small class="text-secondary"><span v-if="question.status">See on: <a :href="question.git" style="color: gray; text-decoration: underline;">GitHub</a></span></small>
-                        </div>
-                        <div class="question-info">
-                            {{question.info}} 
-                            <span v-if="!question.readMore" @click="question.readMore = true" class="text-secondary" style="text-decoration: underline;">read more</span>
-                            <div v-if="question.readMore"> {{question.details}}</div>
-                        </div>
-                    </div>
-                    <div>
-                        <center >
-                            <span class="question-actions">
-                            <span class="btn btn-light">Set priority: </span>
-                            <span :class="!question.response || question.response == 1 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 1)">1</span>
-                            <span :class="!question.response || question.response == 2 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 2)">2</span>
-                            <span :class="!question.response || question.response == 3 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 3)">3</span>
-                            <span :class="!question.response || question.response == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 4)">4</span>
-                            <span :class="!question.response || question.response == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 5)">5</span>
-                        </span>
-                    </center>
+                    <div class="question-info">
+                        {{question.info}}
                     </div>
                 </div>
-                <div v-if="false && questionsCompleted">
-
-                    <span class="btn btn-light float-right" @click="startOver()">Start voting</span>
-                    <br>
-                    Features status:
-                    <br>
-
-                    <div v-for="question in questions" style="margin-bottom: 5px;" v-if="!question.deleted">
-                        <div class="question">
-                            <div class="question-text">
-                                {{question.text}} <small class="text-secondary"><span v-if="question.status">See on: <a :href="question.git" style="color: gray; text-decoration: underline;">GitHub</a></span></small>
+                <div>
+                    <center >
+                        Self assesement of healthy state
+                        <div style="color: gray">use your own perception, no medical evidence is needed</div>
+                        <span class="question-actions">
+                        <span class="text-secondary">Health degree: </span>
+                        <span :class="!question.response || question.response == 1 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 1)">1</span>
+                        <span :class="!question.response || question.response == 2 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 2)">2</span>
+                        <span :class="!question.response || question.response == 3 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 3)">3</span>
+                        <span :class="!question.response || question.response == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 4)">4</span>
+                        <span :class="!question.response || question.response == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 5)">5</span>
+                            <div>
+                                <hr class="slim"/>
+                                <small class="text-secondary">1 means really sick, 5 means really healthy</small>
                             </div>
-                            <div class="question-info">
-                                {{question.info}} 
-                                <span v-if="!question.readMore" @click="question.readMore = true" class="text-secondary" style="text-decoration: underline;">read more</span>
-                                <div v-if="question.readMore"> {{question.details}}</div>
-                            </div>
+                    </span>
+                </center>
+                </div>
+            </div>
+            <div v-if="questionsCompleted">
 
-                        <div v-if="false">
+                <span class="btn btn-light float-right" @click="startOver()">Quiz</span>
+                <br>
+                Available pets:
+                <br>
+
+                <div v-for="pet in questions" style="margin-bottom: 5px;" v-if="!pet.deleted">
+                    <div class="question" @click="pet.editState = !pet.editState">
+                        <div class="btn btn-light float-right" @click="selectTask(pet)">
+                            <span style="margin-bottom: 0; color: black">View profile</span>
+                        </div>
+                        <div class="question-text">
+                            {{pet.text}}
+                            <small v-for="skill in pet.skills"><span class="skill">{{skill}}</span></small>
+                            <small v-for="tag in pet.tags"><a :href="getProjectUrlByTitle(tag)" class="tag">{{tag}}</a></small>
+                        </div>
+                        <div class="text-secondary"> {{pet.info}} <small class="text-primary"><span @click.stop="pet.readMore = !pet.readMore" v-if="pet.status">Settings</span></small></div>
+                        <div v-if="pet.readMore"> 
+                            <div class="btn btn-danger float-right" @click="deletePet(pet)">Delete this pet forever</div>
+                            <br>
+                            <br>
+                        </div>
+                        <div @click.stop="" v-if="pet.editState" style="background-color: white; border-radius: 10px; border: 1px solid silver;">
                             <center >
-                                <span class="float-right">
-                                    <span class="btn btn-light">Priority: </span>
-                                    <span :class="!question.response || question.response == 1 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 1)">1</span>
-                                    <span :class="!question.response || question.response == 2 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 2)">2</span>
-                                    <span :class="!question.response || question.response == 3 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 3)">3</span>
-                                    <span :class="!question.response || question.response == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 4)">4</span>
-                                    <span :class="!question.response || question.response == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 5)">5</span>
+                                <span class="question-actions">
+                                <div class="text-secondary">Healthy-ness degree: </div>
+                                <span :class="!pet.responses[0] || pet.responses[0] == 1 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(pet, 1, 0)">1</span>
+                                <span :class="!pet.responses[0] || pet.responses[0] == 2 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(pet, 2, 0)">2</span>
+                                <span :class="!pet.responses[0] || pet.responses[0] == 3 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(pet, 3, 0)">3</span>
+                                <span :class="!pet.responses[0] || pet.responses[0] == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(pet, 4, 0)">4</span>
+                                <span :class="!pet.responses[0] || pet.responses[0] == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(pet, 5, 0)">5</span>
+                                    <div>
+                                        <hr class="slim"/>
+                                        <div style="color: gray"><small>use your own perception, no medical evidence is needed</small></div>
+                                        <small class="text-secondary">1 means really sick, 5 means really healthy</small>
+                                    </div>
                                 </span>
                             </center>
-                            <div class="text-secondary float-right">
-                                Your response: {{question.response}} / 5
-                            </div>
-                        </div>
-                            <br>
+                            <center >
+                                <span class="question-actions">
+                                <div class="text-secondary">Happy-ness degree: </div>
+                                <span :class="!pet.responses[1] || pet.responses[1] == 1 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(pet, 1, 1)">1</span>
+                                <span :class="!pet.responses[1] || pet.responses[1] == 2 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(pet, 2, 1)">2</span>
+                                <span :class="!pet.responses[1] || pet.responses[1] == 3 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(pet, 3, 1)">3</span>
+                                <span :class="!pet.responses[1] || pet.responses[1] == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(pet, 4, 1)">4</span>
+                                <span :class="!pet.responses[1] || pet.responses[1] == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(pet, 5, 1)">5</span>
+                                    <div>
+                                        <hr class="slim"/>
+                                        <div style="color: gray"><small>use your own perception, no medical evidence is needed</small></div>
+                                        <small class="text-secondary">1 means really happy, 5 means really unhappy</small>
+                                    </div>
+                                </span>
+                            </center>
+                            <center >
+                                <span class="question-actions">
+                                <div class="text-secondary">Smart-ness degree: </div>
+                                <span :class="!pet.responses[2] || pet.responses[2] == 1 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(pet, 1, 2)">1</span>
+                                <span :class="!pet.responses[2] || pet.responses[2] == 2 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(pet, 2, 2)">2</span>
+                                <span :class="!pet.responses[2] || pet.responses[2] == 3 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(pet, 3, 2)">3</span>
+                                <span :class="!pet.responses[2] || pet.responses[2] == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(pet, 4, 2)">4</span>
+                                <span :class="!pet.responses[2] || pet.responses[2] == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(pet, 5, 2)">5</span>
+                                    <div>
+                                        <hr class="slim"/>
+                                        <div style="color: gray"><small>use your own perception, no medical evidence is needed</small></div>
+                                        <small class="text-secondary">1 means really not-smart, 5 means really smart</small>
+                                    </div>
+                                </span>
+                            </center>
                         </div>
                     </div>
                 </div>
@@ -235,9 +273,11 @@
 
                       
                 Tags:
+                <div class="message-area">
                 </span>
             </div>
             Question:
+                      
                    </div>
                    <div class="card-footer">
                       <div class="float-right" >
@@ -253,7 +293,7 @@
  </transition>
 
  <!-- CREATE -->
-  
+  {{index}}
 
 </div>
 </body>
@@ -261,6 +301,7 @@
 
 <script type="module">
     import { vmieData } from "./../services/vmieService.js";
+    import { petService, PetHeaderComponent, PetEditorComponent } from "./../services/petService.js";
     import { apiService } from "./../services/apiService.js";
     import { chatService, ChatComponent } from "./../services/chatService.js";
     import { accountService, ModalProfileComponent, SideMenuCompoonent } from "./../services/accountService.js";
@@ -271,12 +312,16 @@
             "profile-component":  ModalProfileComponent,
             "chat-component":  ChatComponent,
             "side-menu-component": SideMenuCompoonent,
+            "pet-header-component":  PetHeaderComponent,
+            "pet-editor-component":  PetEditorComponent,
         },
         data: {
-            messengerScopeId: 5,
+            messengerScopeId: 4,
+            taskUsers: [],
             apiService: apiService,
             chatService: chatService,
             accountService: accountService,
+            petService: petService,
 
             questions: [],
             questionIndex: 0,
@@ -293,33 +338,40 @@
 
             // decisions
             users: [],
+            index:0,
+
         },
         mounted: function () {
             ModalProfileComponent.accountService = accountService;
-            ChatComponent.accountService = accountService;
             this.websitePages = vmieData.websitePages;
 
-
-            let page = this.websitePages.find(p=> p.id == 'Jobs');
+            let page = this.websitePages.find(p=> p.id == 'Developer');
             let pageId = this.apiService.findGetParameter('page');
             if(pageId){
                 let hrefPage = this.websitePages.find(p=> p.id == pageId);
                 if(hrefPage){
                     page = hrefPage;
                     this.selectedPage = page;
-                    if(page.id == 'Jobs'){
+                    if(page.id == 'Board'){
                     }
                 }
             }
 
-            this.loadQuestions();
-            this.renderPage(page);
+            this.loadProjects();
+            this.renderPage(this.selectedPage);
             chatService.initialize(apiService, accountService, this.bus, this.messengerScopeId);
             accountService.initialize(apiService, this.chat, this.bus);
         },
         computed: {
         },
         methods: {
+            selectTask(task){
+                task.follow = !task.follow;
+                this.apiService.postData("https://vmie.org:5000/api/tasks/" + task.id + "/subscribe/" + (task.follow ? 'true':'false'), null, this.taskSubscribed);
+            },
+            taskSubscribed(taskSubscription){
+
+            },
             startOver(){
                 this.questions.forEach(p=>p.response = null);
                 this.questionIndex = 0;
@@ -341,62 +393,57 @@
                 }
                 this.question = this.questions[this.questionIndex];
             },
-            // Messenger
-            loadQuestions(){
+            getProjectUrlByTitle(title){
+                var page = this.websitePages.find(p=> p.title == title);
+                return page ? '../'+ page.url +'?page=' + page.id : '?';
+            },
+            loadTasks(){
+                apiService.getData("https://vmie.org:5000/api/tasks/list", this.tasksListReceived);
+            },
+            tasksListReceived(tasks){
+                this.tasks = tasks;
+                tasks.forEach(p=>{
+                    let task = this.questions.find(task=>task.id == p.taskId);
+                    if(task){
+                        task.follow = p.follow;
+                    }
+                });
+            },
+            loadProjects(){
                 //  sw2if(accountService.simulate)
                 {
-                    let questions = [
+                    let tasks = [
                         {
                             id: 1,
-                            text: "Chat feature",
-                            info: "Allow users to chat and vote on features priorities.",
-                            details: "This is essential for our community-driven featrues. Is also allowing users to input feedback or contribut to different features.",
-                            status: "in progress",
-                            git: "https://github.com/vmie-org/website/tree/main/src/chat",
-                            tags: ['pet', 'owners'],
+                            text: "Coco",
+                            info: "",
+                            details: "",
+                            tags: ['Dog, 23 yesrs old, sterilized'],
+                            skills: ['no data'],
+                            status: 1,
+                            follow: 0,
+                            editState: false,
+                            readMore: false,
                             response: null,
-                        },
-                        {
-                            id: 1,
-                            text: "People's page",
-                            info: "Listing users and interests for better communication.",
-                            details: "A list of people interested in or contributing to our initiatives. Volunteers of any background are welcomed.",
-                            status: "in progress",
-                            git: "https://github.com/vmie-org/website/tree/main/src/board",
-                            tags: ['pet', 'owners'],
-                            response: null,
+                            responses: [null, null, null],
                         },
                         {
                             id: 3,
-                            text: "Architecture builder",
-                            info: "Community driven architecture as an experimantal festure.",
-                            details: "Instruments to collect feedback from community and instruments to define exchange rules.",
-                            status: "in progress",
-                            git: "https://github.com/vmie-org/website/tree/main/src/builder",
-                            tags: ['pet', 'owners'],
+                            text: "Didi",
+                            info: "",
+                            details: "",
+                            tags: ['Cat, 2 years old, vaccinated'],
+                            skills: ['no data'],
+                            status: 1,
+                            follow: 0,
+                            editState: false,
+                            readMore: false,
                             response: null,
-                        },
-                        {
-                            id: 4,
-                            text: "Data APIs",
-                            info: "Getting data from authorized sources, necessary for apps and logic.",
-                            details: "At the begining, we need to partner with drug companies and ingest reliable data. We can use this data to drive logic and to provide an free API for other apps.",
-                            git: "https://github.com/vmie-org/website/tree/main/src/data",
-                            tags: ['pet', 'owners'],
-                            response: null,
-                        },
-                        {
-                            id: 5,
-                            text: "Finance",
-                            info: "Transpacency of contributions is a priority.",
-                            details: "We need to list all contributions and spendings from contributions. At the moment, all the infrastructure is provided by the author.",
-                            git: "https://github.com/vmie-org/website/tree/main/src/finance",
-                            tags: ['pet', 'owners'],
-                            response: null,
+                            responses: [null, null, null],
                         },
                     ];
-                    this.question = this.questions[0];
-                    this.questionsListReceived(questions);
+                    this.question = tasks[0];
+                    this.questionsListReceived(tasks);
                     return;
                 }
                 apiService.postData("https://vmie.org:5000/api/chat/questions", { take: 50 }, this.questionsListReceived);
@@ -409,8 +456,14 @@
                 });
                 this.questions = questions;
             },
-            setResponse(question, response){
-                question.response = response;
+            setResponse(question, response, position){
+                if(position >= 0){
+                    question.responses[position] = response;
+                    this.index++;
+                }
+                else{
+                    question.response = response;
+                }
                 setTimeout(this.moveNext, 500, 1);                
             },
 
@@ -422,13 +475,15 @@
             // user management 
             bus(event){
                 if(event == 'UserUpdated'){
-                    this.loadQuestions();
+                    this.loadProjects();
                     chatService.loadMessages();
+                    this.loadTasks();
                 }
             },
             chat(messsage){
                 chatService.receivedMessages(messsage);
             },
+
 
             // page utilities
             renderPage(page){
@@ -439,23 +494,12 @@
                 page.isSelected = true;
             },
             parseContent(content){
-                let originalLines = content.split('\n');
+                let lines = content.split('\n');
 
-                let lines = originalLines.map(line => line.trim());
+                lines = lines.map(line => line.trim());
                 var tableBuilder = null;
-                let isPre = false;
 
-                this.htmlContent = lines.map((line, index) => {
-
-                    if(line.indexOf('<pre') === 0){
-                        isPre = true;
-                    }
-                    else if(line.indexOf('</pre') === 0){
-                        isPre = false;
-                    }
-                    if(isPre){
-                        return originalLines[index] + "<br>";
-                    }
+                this.htmlContent = lines.map(line => {
 
                     if(!line.length){
                         if(tableBuilder){
@@ -511,36 +555,50 @@
 
 </script>
 <style>
-    .bin{
-        display: inline-block;
-        height: 16px;
-        width: 16px;
-        fill: silver;
-    }
-    .bin:hover{
-        fill: red;
-        width: 22px;
-    }
-    .question-area{
-        background-color: aliceblue;
-    }
-    .question{
-        background-color: rgb(255, 253, 231);
-        padding: 10px;
-        border-radius: 10px;
-        border: 1px solid gray;
-    }
-    .question-actions{
-        margin: 10px;
-        display: inline-block;
-        padding: 5px 5px;
-        border-radius: 10px;
-        border: 1px solid silver;
-    }
-    .question-text{
-        font-weight: bold;
-    }
-    .question-info{
-        font-size: small;
-    }
+.bin{
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+    fill: silver;
+}
+.bin:hover{
+    fill: red;
+    width: 22px;
+}
+
+.question-area{
+background-color: aliceblue;
+}
+.question{
+background-color: rgb(255, 253, 231);
+padding: 10px;
+border-radius: 10px;
+border: 1px solid gray;
+}
+.question-actions{
+    margin: 10px;
+    display: inline-block;
+padding: 5px 5px;
+border-radius: 10px;
+border: 1px solid silver;
+}
+.question-text{
+font-weight: bold;
+}
+.question-info{
+font-size: small;
+}
+.tag{
+    background-color: #fffcf7;
+    border-radius: 5px;
+    padding: 3px 5px;
+    color: red
+}
+.skill{
+    background-color: #fffcf7;
+    border-radius: 5px;
+    padding: 3px 5px;
+    font-weight: bold;
+    color: green
+}
 </style>

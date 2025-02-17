@@ -73,7 +73,7 @@
         <div class="downloads">
             <span v-if="!isMobile">vmie:</span>
             <ul>
-                <li v-if="!isMobile"><a href="../profile" class="button">Home</a></li>
+                <li v-if="!isMobile"><a href="../developer" class="button">Home</a></li>
                 <li>
                     <a @click="isMobile = !isMobile" class="button"><div style="display: inline-block;">
                         <div class="menu-bar"></div>
@@ -88,16 +88,7 @@
       <!-- banner end -->
 
     <div class="wrapper">
-        <nav v-if="accountService.showComplex">
-            <ul>
-                <li v-for="page in websitePages" 
-                v-if="page.title && !page.alwaysHide" 
-                :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'"
-                @click="renderPage(page)">
-                    <a :href="'./../'+ page.url +'?page=' + page.id">{{page.title}}</a>
-                </li>
-            </ul>
-        </nav>
+        <side-menu-component :account-service="accountService" :parent="this"></side-menu-component>
 
         <section style="height: auto; background-color: #fffcf7;">
 
@@ -159,7 +150,7 @@
     import { apiService } from "./../services/apiService.js";
     import { chatService, ChatComponent } from "./../services/chatService.js";
     import { usersService, UsersComponent } from "./../services/usersService.js";
-    import { accountService, ModalProfileComponent } from "./../services/accountService.js";
+    import { accountService, ModalProfileComponent, SideMenuCompoonent } from "./../services/accountService.js";
 
     var app = new Vue({
         el: '#app',
@@ -167,6 +158,7 @@
             "profile-component":  ModalProfileComponent,
             "users-component": UsersComponent,
             "chat-component":  ChatComponent,
+            "side-menu-component": SideMenuCompoonent,
         },
         data: {
             messengerScopeId: 1,
@@ -176,7 +168,6 @@
             usersService: usersService,
             
             loggedIn: false,
-            loginText: 'Login',
             isMobile: false,
             htmlContent: null,
             selectedPage: null,

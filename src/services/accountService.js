@@ -1,4 +1,24 @@
-
+export const SideMenuCompoonent = {
+   props: ["accountService", "parent", "bus"],
+   template: `
+<div>
+   <nav v-if="accountService.showComplex">
+      <ul>
+         <li v-for="page in parent.websitePages" 
+         v-if="page.title && !page.alwaysHide" 
+         :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'"
+         @click="parent.renderPage(page)">
+            <span v-if="!page.id">
+                <hr class="slim" style="width: 100px"/>
+                <span class="float-left text-primary"><small>{{page.title}}</small></span>
+            </span>
+            <a v-if="page.id" :href="'../'+ page.url +'?page=' + page.id">{{page.title}}</a>
+         </li>
+      </ul>
+   </nav>
+</div>
+   `
+}
 
 export const ModalProfileComponent = {
     props: ["parent", "bus"],
@@ -68,7 +88,7 @@ export const ModalProfileComponent = {
                              
                               <b><input type="checkbox" v-model="user.selected"> {{( user.name ? user.name :'Visitor')}}</b>
                      </div>
-                     <a class="btn btn-success float-right" href="./../profile?page=Developer">Contribute as Developer</a>
+                     <a class="btn btn-success float-right" href="./../developer?page=Developer">Contribute as Developer</a>
                      </div>
                      </div>
 
@@ -349,6 +369,7 @@ export const accountService = {
 }
 
 export default {
-    ModalProfileComponent,
-    accountService
+   accountService,
+   ModalProfileComponent,
+   SideMenuCompoonent
 }

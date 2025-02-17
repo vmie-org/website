@@ -52,13 +52,13 @@
             <p>Non-Profit Organization for providing standards on vmie.org</p>
           </header>
       <!-- banner start -->
-      <div id="banner">
+      <div id="banner" @mouseenter="accountService.showComplex = true">
         <span id="logo"></span>
 
-        <a v-if="!accountService.user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="loginText = 'Login with Linkedin'" class="button fork">
+        <a v-if="!accountService.user" href="https://vmie.org:5000/api/linkedin/login" @mouseenter="accountService.loginText = 'Login with Linkedin'" class="button fork">
             <strong>
                 <span style="color: blue; font-family: Sans; border: 1px solid blue; border-radius: 2px; padding: 0px 5px">in</span>
-                {{loginText}}
+                {{accountService.loginText}}
             </strong>
         </a>
         <a v-if="accountService.user" @click="accountService.showProfile()" class="button fork">
@@ -85,16 +85,7 @@
       <!-- banner end -->
 
     <div class="wrapper">
-        <nav>
-            <ul>
-                <li v-for="page in websitePages" 
-                v-if="page.title && !page.alwaysHide" 
-                :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'"
-                @click="renderPage(page)">
-                    <a :href="'./../'+ page.url +'?page=' + page.id">{{page.title}}</a>
-                </li>
-            </ul>
-        </nav>
+        <side-menu-component :account-service="accountService" :parent="this"></side-menu-component>
 
         <section style="height: auto;">
 
@@ -172,7 +163,7 @@
 import { vmieData } from "./../services/vmieService.js";
 import { apiService } from "./../services/apiService.js";
 import { chatService, ChatComponent } from "./../services/chatService.js";
-import { accountService, ModalProfileComponent } from "./../services/accountService.js";
+import { accountService, ModalProfileComponent, SideMenuCompoonent } from "./../services/accountService.js";
 
 
     var app = new Vue({
@@ -180,6 +171,7 @@ import { accountService, ModalProfileComponent } from "./../services/accountServ
         components: {
             "profile-component":  ModalProfileComponent,
             "chat-component":  ChatComponent,
+            "side-menu-component": SideMenuCompoonent,
         },
         data: {
             apiService: apiService,
