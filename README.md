@@ -56,11 +56,11 @@ Your pet's privacy has to be stronger than your own.
 
 Here's why: 
 
-- you or any of your family members can use pets info on bank security questions, or other security checks.
+- you or any of your family members can use pets info on bank <a href="https://slate.com/technology/2008/01/why-are-bank-security-questions-so-monstrously-stupid.html">security questions</a>, or other security checks.
 
-- someone close to you can become a victim of identity theft and impersonation.
+- someone close to you can become a victim of <a href="https://ico.org.uk/for-the-public/identity-theft">identity theft</a> and impersonation.
 
-- your pet name is personal information under GDPR.
+- your pet name is <a href="https://www.lexology.com/library/detail.aspx?g=d47403ad-b291-47e3-ba0b-f7bb846a2958">personal information</a> under GDPR.
 
 ### How it works?
 A pet owner requests a **ePetId** from vmie. The **ePetId** is provided as text and as QR. No requirements at this step.
