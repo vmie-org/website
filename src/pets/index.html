@@ -88,19 +88,11 @@
       <!-- banner end -->
 
     <div class="wrapper">
-        <nav v-if="accountService.showComplex">
-            <ul>
-                <li v-for="page in websitePages" 
-                v-if="page.title && !page.alwaysHide" 
-                :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'"
-                @click="renderPage(page)">
-                    <a :href="'../'+ page.url +'?page=' + page.id">{{page.title}}</a>
-                </li>
-            </ul>
-        </nav>
+        <side-menu-component :account-service="accountService" :parent="this"></side-menu-component>
 
         <section style="height: auto; background-color: #fffcf7;">
-
+            <pet-header-component :pet-service="petService" :account-service="accountService"></pet-header-component>
+        
             <div v-if="isMobile" style="display: inline-block; margin-left: 0px; left: 20px;">
                 <span v-for="(page, index) in websitePages" v-if="index > 0 && page.title " 
                      @click="renderPage(page)"><a class="btn btn-light pagename" :class="page.isSelected ? 'active' : ''" :href="'./../'+ page.url +'?page=' + page.id">
@@ -134,7 +126,7 @@
                         <span :class="!question.response || question.response == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 4)">4</span>
                         <span :class="!question.response || question.response == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 5)">5</span>
                             <div>
-                                <hr style="width: 2px; margin: 5px 0px 5px 0px; border: 1px solid #eee; width: 100%">
+                                <hr class="slim"/>
                                 <small class="text-secondary">1 means I love it, 5 means not for me</small>
                             </div>
                     </span>
@@ -145,7 +137,7 @@
 
                 <span class="btn btn-light float-right" @click="startOver()">Does it fit?</span>
                 <br>
-                Available tasks:
+                Available pets:
                 <br>
 
                 <div v-for="question in questions" style="margin-bottom: 5px;" v-if="!question.deleted">
@@ -192,6 +184,7 @@
             <div><small>Hosted on <a href="https://vmie.org">vmie.org</a></small></div>
             <div><small>Linkedin <a href="www.linkedin.com/in/vmie">@vmie</a></small></div>
             <div><small>Slack <a href="https://vmie.slack.com">@vmie</a></small></div>
+            <div><small>Dev.to <a href="https://dev.to/vmie">@vmie</a></small></div>
             
         </p>
     </footer>
@@ -255,15 +248,18 @@
 
 <script type="module">
     import { vmieData } from "./../services/vmieService.js";
+    import { petService, PetHeaderComponent } from "./../services/petService.js";
     import { apiService } from "./../services/apiService.js";
     import { chatService, ChatComponent } from "./../services/chatService.js";
-    import { accountService, ModalProfileComponent } from "./../services/accountService.js";
+    import { accountService, ModalProfileComponent, SideMenuCompoonent } from "./../services/accountService.js";
 
     var app = new Vue({
         el: '#app',
         components: {
             "profile-component":  ModalProfileComponent,
             "chat-component":  ChatComponent,
+            "side-menu-component": SideMenuCompoonent,
+            "pet-header-component":  PetHeaderComponent,
         },
         data: {
             messengerScopeId: 4,
@@ -271,6 +267,7 @@
             apiService: apiService,
             chatService: chatService,
             accountService: accountService,
+            petService: petService,
 
             questions: [],
             questionIndex: 0,
@@ -362,11 +359,11 @@
                     let tasks = [
                         {
                             id: 1,
-                            text: "Create new project",
-                            info: "We need to create new projects.",
+                            text: "Coco",
+                            info: "",
                             details: "Project objects will be defined as: { projectId: 11, coordinatorId: 23, tasks: [], dueDate: 'March-2025' }",
-                            tags: ['Tasks Management'],
-                            skills: ['frontend'],
+                            tags: ['Dog, 23 yesrs old, sterilized'],
+                            skills: ['no data'],
                             status: 1,
                             follow: 0,
                             readMore: false,
@@ -374,106 +371,11 @@
                         },
                         {
                             id: 3,
-                            text: "Delete existent project",
-                            info: "We have to be able to delete a project.",
+                            text: "Didi",
+                            info: "",
                             details: "Project objects will be defined as: { projectId: 11, coordinatorId: 23, tasks: [], dueDate: 'March-2025' }",
                             tags: ['Tasks Management'],
-                            skills: ['frontend'],
-                            status: 1,
-                            follow: 0,
-                            readMore: false,
-                            response: null,
-                        },
-                        {
-                            id: 2,
-                            text: "Edit a project",
-                            info: "On the project page we need to update projects.",
-                            details: "Project objects will be defined as: { projectId: 11, coordinatorId: 23, tasks: [], dueDate: 'March-2025' }",
-                            tags: ['Tasks Management'],
-                            skills: ['frontend'],
-                            status: 1,
-                            follow: 0,
-                            readMore: false,
-                            response: null,
-                        },
-                        {
-                            id: 4,
-                            text: "Create new task",
-                            info: "Once a project is created, we need to define tasks.",
-                            details: "Task objects will be defined as: { taskId: 11, parentTask: 2, coordinatorId: 23, requiredSkills: [ { name: 'vueJs', complexity: 'medium', estimate: '2 days' } ] }",
-                            tags: ['Tasks Management'],
-                            skills: ['frontend'],
-                            status: 1,
-                            follow: 0,
-                            readMore: false,
-                            response: null,
-                        },
-                        {
-                            id: 5,
-                            text: "Delete existent task",
-                            info: "We have to be able to delete a task.",
-                            details: "Task objects will be defined as: { taskId: 11, parentTask: 2, coordinatorId: 23, requiredSkills: [ { name: 'vueJs', complexity: 'medium', estimate: '2 days' } ] }",
-                            tags: ['Tasks Management'],
-                            skills: ['frontend'],
-                            status: 1,
-                            follow: 0,
-                            readMore: false,
-                            response: null,
-                        },
-                        {
-                            id: 6,
-                            text: "Edit a task",
-                            info: "On the project page we need to manage tasks. One action is to split tasks. Options: overwrite / save as new.",
-                            details: "Task objects will be defined as: { taskId: 11, parentTask: 2, coordinatorId: 23, requiredSkills: [ { name: 'vueJs', complexity: 'medium', estimate: '2 days' } ] }",
-                            tags: ['Tasks Management'],
-                            skills: ['frontend'],
-                            status: 1,
-                            follow: 0,
-                            readMore: false,
-                            response: null,
-                        },
-                        {
-                            id: 7,
-                            text: "Email template for available tasks",
-                            info: "Mailing weekly tasks availibility will help developers keep in touch when they are less active.",
-                            details: "Create a list like this one into an email template.",
-                            tags: ['Mailing System'],
-                            status: 1,
-                            follow: 0,
-                            readMore: false,
-                            response: null,
-                        },
-                        {
-                            id: 8,
-                            text: "Manage subscriptions",
-                            info: "Create the page where users can manage their mailing subscriptions",
-                            details: "Mailing options objects will be defined as: { userId: 11, email: 'developer@vmie.com', maxFrequency: 'monthly', subscriptions: [ { name: 'development', selected: true } ] }",
-                            tags: ['Mailing System'],
-                            skills: ['frontend'],
-                            status: 1,
-                            follow: 0,
-                            readMore: false,
-                            response: null,
-                        },
-                        {
-                            id: 9,
-                            text: "Tasks scheduler",
-                            info: "Build a simple scheduler that is using the user's mailing preferences to send emails.",
-                            details: "Assume that the email onjects exists and the mailing service exists. Mailing options objects will be defined as: { userId: 11, email: 'developer@vmie.com', maxFrequency: 'monthly', subscriptions: [ { name: 'development', selected: true } ] }",
-                            tags: ['Mailing System'],
-                            skills: ['backend'],
-                            status: 1,
-                            follow: 0,
-                            readMore: false,
-                            response: null,
-                        },
-                        {
-                            id: 10,
-                            text: "Download user data",
-                            info: "Allow users to download their private data stored on vmie",
-                            details: "Will include developer contributions and pet profiles.",
-                            tags: ['GDPR'],
-                            skills: ['backend'],
+                            skills: ['no data'],
                             status: 1,
                             follow: 0,
                             readMore: false,

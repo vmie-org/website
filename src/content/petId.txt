@@ -13,8 +13,8 @@
 
 ### How it works?
 A pet owner requests a **ePetId** from vmie. The **ePetId** is provided as text and as QR. No requirements at this step.
-Anyone can scan a QR to visit the coresponding pet profile.
-By default, no information is publicaly available on a pet profile. It is the owner that can define what information is visible by who, including the anonymised information.
+Anyone can scan a QR to visit the corresponding pet profile.
+By default, no information is publicly available on a pet profile. It is the owner that can define what information is visible by who, including the anonymised information.
 Pet owners can receive requests to share some information, but never their personal details.
 From GDPR point of view, with enough effort the data can be traiced back to the user, so the user has to understand the risks.
 

@@ -3,10 +3,28 @@ article,aside,details,figcaption,figure,footer,header,hgroup,nav,section,summary
     display: block
 }
 
+.slim {
+    width: 2px; 
+    margin: 5px 0px 5px 0px; 
+    border: 1px solid #eee;
+    width: 100%
+}
+
+.sub-section {
+    background-color: white; 
+    border-radius: 10px; 
+    border: 1px solid silver;
+    padding: 10px;
+    margin: 10px;
+    display: inline-block;
+    width: 100%;
+}
+
 audio,canvas,video {
     display: inline-block;
     *display: inline;
-    *zoom:1}
+    *zoom:1
+}
 
 audio:not([controls]) {
     display: none

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-    <title>vmie.org - jobs</title>
+    <title>vmie.org - profile</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <script
@@ -73,7 +73,7 @@
         <div class="downloads">
             <span v-if="!isMobile">vmie:</span>
             <ul>
-                <li v-if="!isMobile"><a href="../chat" class="button">Chat</a></li>
+                <li v-if="!isMobile"><a href="../site/?page=Architecture" class="button">Docs</a></li>
                 <li>
                     <a @click="isMobile = !isMobile" class="button"><div style="display: inline-block;">
                         <div class="menu-bar"></div>
@@ -100,74 +100,58 @@
                 <hr>
             </div> 
 
-            <a class="btn btn-success float-right" href="./../developer?page=Developer">Contribute as Developer</a>
             <p v-if="htmlContent" v-html="htmlContent"></p>
 
-            <a v-if="selectedPage && selectedPage.id !== 'Jobs'" class="btn btn-light float-right" href="?page=Jobs">Go Back</a>
-            <div v-if="!selectedPage || selectedPage.id == 'Jobs'">
-                <div class="question-area" v-if="!questionsCompleted">
-                    <div class="question-status">
-                        <span class="btn btn-light" @click="moveNext(-1)">Prev question</span>
-                        <span class="btn btn-light float-right" @click="moveNext(+1)">Next question</span>
+            <div class="question-area" v-if="!questionsCompleted">
+                <div class="question-status">
+                    <span class="btn btn-light" @click="moveNext(-1)">Next task</span>
+                    <span class="btn btn-light float-right" @click="moveNext(+1)">Prew task</span>
+                </div>
+                <div class="question">
+                    <div class="question-text">
+                        {{question.text}}
                     </div>
-                    <div class="question">
-                        <div class="question-text">
-                            {{question.text}} <small class="text-secondary"><span v-if="question.status">See on: <a :href="question.git" style="color: gray; text-decoration: underline;">GitHub</a></span></small>
-                        </div>
-                        <div class="question-info">
-                            {{question.info}} 
-                            <span v-if="!question.readMore" @click="question.readMore = true" class="text-secondary" style="text-decoration: underline;">read more</span>
-                            <div v-if="question.readMore"> {{question.details}}</div>
-                        </div>
-                    </div>
-                    <div>
-                        <center >
-                            <span class="question-actions">
-                            <span class="btn btn-light">Set priority: </span>
-                            <span :class="!question.response || question.response == 1 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 1)">1</span>
-                            <span :class="!question.response || question.response == 2 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 2)">2</span>
-                            <span :class="!question.response || question.response == 3 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 3)">3</span>
-                            <span :class="!question.response || question.response == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 4)">4</span>
-                            <span :class="!question.response || question.response == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 5)">5</span>
-                        </span>
-                    </center>
+                    <div class="question-info">
+                        {{question.info}}
                     </div>
                 </div>
-                <div v-if="false && questionsCompleted">
-
-                    <span class="btn btn-light float-right" @click="startOver()">Start voting</span>
-                    <br>
-                    Features status:
-                    <br>
-
-                    <div v-for="question in questions" style="margin-bottom: 5px;" v-if="!question.deleted">
-                        <div class="question">
-                            <div class="question-text">
-                                {{question.text}} <small class="text-secondary"><span v-if="question.status">See on: <a :href="question.git" style="color: gray; text-decoration: underline;">GitHub</a></span></small>
+                <div>
+                    <center >
+                        <span class="question-actions">
+                        <span class="text-secondary">Fits me: </span>
+                        <span :class="!question.response || question.response == 1 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 1)">1</span>
+                        <span :class="!question.response || question.response == 2 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 2)">2</span>
+                        <span :class="!question.response || question.response == 3 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 3)">3</span>
+                        <span :class="!question.response || question.response == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 4)">4</span>
+                        <span :class="!question.response || question.response == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 5)">5</span>
+                            <div>
+                                <hr class="slim"/>
+                                <small class="text-secondary">1 means I love it, 5 means not for me</small>
                             </div>
-                            <div class="question-info">
-                                {{question.info}} 
-                                <span v-if="!question.readMore" @click="question.readMore = true" class="text-secondary" style="text-decoration: underline;">read more</span>
-                                <div v-if="question.readMore"> {{question.details}}</div>
-                            </div>
+                    </span>
+                </center>
+                </div>
+            </div>
+            <div v-if="questionsCompleted">
 
-                        <div v-if="false">
-                            <center >
-                                <span class="float-right">
-                                    <span class="btn btn-light">Priority: </span>
-                                    <span :class="!question.response || question.response == 1 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 1)">1</span>
-                                    <span :class="!question.response || question.response == 2 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 2)">2</span>
-                                    <span :class="!question.response || question.response == 3 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 3)">3</span>
-                                    <span :class="!question.response || question.response == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 4)">4</span>
-                                    <span :class="!question.response || question.response == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 5)">5</span>
-                                </span>
-                            </center>
-                            <div class="text-secondary float-right">
-                                Your response: {{question.response}} / 5
-                            </div>
+                <span class="btn btn-light float-right" @click="startOver()">Does it fit?</span>
+                <br>
+                Available tasks:
+                <br>
+
+                <div v-for="question in questions" style="margin-bottom: 5px;" v-if="!question.deleted">
+                    <div class="question">
+                        <div class="btn btn-light float-right" @click="selectTask(question)">
+                            <input type="checkbox" v-model="question.follow" :id="'task_' + question.id"> 
+                            <label :for="'task_' + question.id" style="margin-bottom: 0">I like this</label>
                         </div>
-                            <br>
+                        <div class="question-text">
+                            {{question.text}}
+                            <small v-for="skill in question.skills"><span class="skill">{{skill}}</span></small>
+                            <small v-for="tag in question.tags"><a :href="getProjectUrlByTitle(tag)" class="tag">{{tag}}</a></small>
                         </div>
+                        <div class="text-secondary"> {{question.info}} <small class="text-primary"><span @click="question.readMore = !question.readMore" v-if="question.status">read more</span></small></div>
+                        <div v-if="question.readMore"> {{question.details}}</div>
                     </div>
                 </div>
             </div>
@@ -235,9 +219,11 @@
 
                       
                 Tags:
+                <div class="message-area">
                 </span>
             </div>
             Question:
+                      
                    </div>
                    <div class="card-footer">
                       <div class="float-right" >
@@ -273,7 +259,8 @@
             "side-menu-component": SideMenuCompoonent,
         },
         data: {
-            messengerScopeId: 5,
+            messengerScopeId: 4,
+            taskUsers: [],
             apiService: apiService,
             chatService: chatService,
             accountService: accountService,
@@ -296,30 +283,35 @@
         },
         mounted: function () {
             ModalProfileComponent.accountService = accountService;
-            ChatComponent.accountService = accountService;
             this.websitePages = vmieData.websitePages;
 
-
-            let page = this.websitePages.find(p=> p.id == 'Jobs');
+            let page = this.websitePages.find(p=> p.id == 'Developer');
             let pageId = this.apiService.findGetParameter('page');
             if(pageId){
                 let hrefPage = this.websitePages.find(p=> p.id == pageId);
                 if(hrefPage){
                     page = hrefPage;
                     this.selectedPage = page;
-                    if(page.id == 'Jobs'){
+                    if(page.id == 'Board'){
                     }
                 }
             }
 
-            this.loadQuestions();
-            this.renderPage(page);
+            this.loadProjects();
+            this.renderPage(this.selectedPage);
             chatService.initialize(apiService, accountService, this.bus, this.messengerScopeId);
             accountService.initialize(apiService, this.chat, this.bus);
         },
         computed: {
         },
         methods: {
+            selectTask(task){
+                task.follow = !task.follow;
+                this.apiService.postData("https://vmie.org:5000/api/tasks/" + task.id + "/subscribe/" + (task.follow ? 'true':'false'), null, this.taskSubscribed);
+            },
+            taskSubscribed(taskSubscription){
+
+            },
             startOver(){
                 this.questions.forEach(p=>p.response = null);
                 this.questionIndex = 0;
@@ -341,62 +333,148 @@
                 }
                 this.question = this.questions[this.questionIndex];
             },
-            // Messenger
-            loadQuestions(){
+            getProjectUrlByTitle(title){
+                var page = this.websitePages.find(p=> p.title == title);
+                return page ? '../'+ page.url +'?page=' + page.id : '?';
+            },
+            loadTasks(){
+                apiService.getData("https://vmie.org:5000/api/tasks/list", this.tasksListReceived);
+            },
+            tasksListReceived(tasks){
+                this.tasks = tasks;
+                tasks.forEach(p=>{
+                    let task = this.questions.find(task=>task.id == p.taskId);
+                    if(task){
+                        task.follow = p.follow;
+                    }
+                });
+            },
+            loadProjects(){
                 //  sw2if(accountService.simulate)
                 {
-                    let questions = [
+                    let tasks = [
                         {
                             id: 1,
-                            text: "Chat feature",
-                            info: "Allow users to chat and vote on features priorities.",
-                            details: "This is essential for our community-driven featrues. Is also allowing users to input feedback or contribut to different features.",
-                            status: "in progress",
-                            git: "https://github.com/vmie-org/website/tree/main/src/chat",
-                            tags: ['pet', 'owners'],
-                            response: null,
-                        },
-                        {
-                            id: 1,
-                            text: "People's page",
-                            info: "Listing users and interests for better communication.",
-                            details: "A list of people interested in or contributing to our initiatives. Volunteers of any background are welcomed.",
-                            status: "in progress",
-                            git: "https://github.com/vmie-org/website/tree/main/src/board",
-                            tags: ['pet', 'owners'],
+                            text: "Create new project",
+                            info: "We need to create new projects.",
+                            details: "Project objects will be defined as: { projectId: 11, coordinatorId: 23, tasks: [], dueDate: 'March-2025' }",
+                            tags: ['Tasks Management'],
+                            skills: ['frontend'],
+                            status: 1,
+                            follow: 0,
+                            readMore: false,
                             response: null,
                         },
                         {
                             id: 3,
-                            text: "Architecture builder",
-                            info: "Community driven architecture as an experimantal festure.",
-                            details: "Instruments to collect feedback from community and instruments to define exchange rules.",
-                            status: "in progress",
-                            git: "https://github.com/vmie-org/website/tree/main/src/builder",
-                            tags: ['pet', 'owners'],
+                            text: "Delete existent project",
+                            info: "We have to be able to delete a project.",
+                            details: "Project objects will be defined as: { projectId: 11, coordinatorId: 23, tasks: [], dueDate: 'March-2025' }",
+                            tags: ['Tasks Management'],
+                            skills: ['frontend'],
+                            status: 1,
+                            follow: 0,
+                            readMore: false,
+                            response: null,
+                        },
+                        {
+                            id: 2,
+                            text: "Edit a project",
+                            info: "On the project page we need to update projects.",
+                            details: "Project objects will be defined as: { projectId: 11, coordinatorId: 23, tasks: [], dueDate: 'March-2025' }",
+                            tags: ['Tasks Management'],
+                            skills: ['frontend'],
+                            status: 1,
+                            follow: 0,
+                            readMore: false,
                             response: null,
                         },
                         {
                             id: 4,
-                            text: "Data APIs",
-                            info: "Getting data from authorized sources, necessary for apps and logic.",
-                            details: "At the begining, we need to partner with drug companies and ingest reliable data. We can use this data to drive logic and to provide an free API for other apps.",
-                            git: "https://github.com/vmie-org/website/tree/main/src/data",
-                            tags: ['pet', 'owners'],
+                            text: "Create new task",
+                            info: "Once a project is created, we need to define tasks.",
+                            details: "Task objects will be defined as: { taskId: 11, parentTask: 2, coordinatorId: 23, requiredSkills: [ { name: 'vueJs', complexity: 'medium', estimate: '2 days' } ] }",
+                            tags: ['Tasks Management'],
+                            skills: ['frontend'],
+                            status: 1,
+                            follow: 0,
+                            readMore: false,
                             response: null,
                         },
                         {
                             id: 5,
-                            text: "Finance",
-                            info: "Transpacency of contributions is a priority.",
-                            details: "We need to list all contributions and spendings from contributions. At the moment, all the infrastructure is provided by the author.",
-                            git: "https://github.com/vmie-org/website/tree/main/src/finance",
-                            tags: ['pet', 'owners'],
+                            text: "Delete existent task",
+                            info: "We have to be able to delete a task.",
+                            details: "Task objects will be defined as: { taskId: 11, parentTask: 2, coordinatorId: 23, requiredSkills: [ { name: 'vueJs', complexity: 'medium', estimate: '2 days' } ] }",
+                            tags: ['Tasks Management'],
+                            skills: ['frontend'],
+                            status: 1,
+                            follow: 0,
+                            readMore: false,
+                            response: null,
+                        },
+                        {
+                            id: 6,
+                            text: "Edit a task",
+                            info: "On the project page we need to manage tasks. One action is to split tasks. Options: overwrite / save as new.",
+                            details: "Task objects will be defined as: { taskId: 11, parentTask: 2, coordinatorId: 23, requiredSkills: [ { name: 'vueJs', complexity: 'medium', estimate: '2 days' } ] }",
+                            tags: ['Tasks Management'],
+                            skills: ['frontend'],
+                            status: 1,
+                            follow: 0,
+                            readMore: false,
+                            response: null,
+                        },
+                        {
+                            id: 7,
+                            text: "Email template for available tasks",
+                            info: "Mailing weekly tasks availibility will help developers keep in touch when they are less active.",
+                            details: "Create a list like this one into an email template.",
+                            tags: ['Mailing System'],
+                            status: 1,
+                            follow: 0,
+                            readMore: false,
+                            response: null,
+                        },
+                        {
+                            id: 8,
+                            text: "Manage subscriptions",
+                            info: "Create the page where users can manage their mailing subscriptions",
+                            details: "Mailing options objects will be defined as: { userId: 11, email: 'developer@vmie.com', maxFrequency: 'monthly', subscriptions: [ { name: 'development', selected: true } ] }",
+                            tags: ['Mailing System'],
+                            skills: ['frontend'],
+                            status: 1,
+                            follow: 0,
+                            readMore: false,
+                            response: null,
+                        },
+                        {
+                            id: 9,
+                            text: "Tasks scheduler",
+                            info: "Build a simple scheduler that is using the user's mailing preferences to send emails.",
+                            details: "Assume that the email onjects exists and the mailing service exists. Mailing options objects will be defined as: { userId: 11, email: 'developer@vmie.com', maxFrequency: 'monthly', subscriptions: [ { name: 'development', selected: true } ] }",
+                            tags: ['Mailing System'],
+                            skills: ['backend'],
+                            status: 1,
+                            follow: 0,
+                            readMore: false,
+                            response: null,
+                        },
+                        {
+                            id: 10,
+                            text: "Download user data",
+                            info: "Allow users to download their private data stored on vmie",
+                            details: "Will include developer contributions and pet profiles.",
+                            tags: ['GDPR'],
+                            skills: ['backend'],
+                            status: 1,
+                            follow: 0,
+                            readMore: false,
                             response: null,
                         },
                     ];
-                    this.question = this.questions[0];
-                    this.questionsListReceived(questions);
+                    this.question = tasks[0];
+                    this.questionsListReceived(tasks);
                     return;
                 }
                 apiService.postData("https://vmie.org:5000/api/chat/questions", { take: 50 }, this.questionsListReceived);
@@ -422,13 +500,15 @@
             // user management 
             bus(event){
                 if(event == 'UserUpdated'){
-                    this.loadQuestions();
+                    this.loadProjects();
                     chatService.loadMessages();
+                    this.loadTasks();
                 }
             },
             chat(messsage){
                 chatService.receivedMessages(messsage);
             },
+
 
             // page utilities
             renderPage(page){
@@ -439,23 +519,12 @@
                 page.isSelected = true;
             },
             parseContent(content){
-                let originalLines = content.split('\n');
+                let lines = content.split('\n');
 
-                let lines = originalLines.map(line => line.trim());
+                lines = lines.map(line => line.trim());
                 var tableBuilder = null;
-                let isPre = false;
 
-                this.htmlContent = lines.map((line, index) => {
-
-                    if(line.indexOf('<pre') === 0){
-                        isPre = true;
-                    }
-                    else if(line.indexOf('</pre') === 0){
-                        isPre = false;
-                    }
-                    if(isPre){
-                        return originalLines[index] + "<br>";
-                    }
+                this.htmlContent = lines.map(line => {
 
                     if(!line.length){
                         if(tableBuilder){
@@ -511,36 +580,50 @@
 
 </script>
 <style>
-    .bin{
-        display: inline-block;
-        height: 16px;
-        width: 16px;
-        fill: silver;
-    }
-    .bin:hover{
-        fill: red;
-        width: 22px;
-    }
-    .question-area{
-        background-color: aliceblue;
-    }
-    .question{
-        background-color: rgb(255, 253, 231);
-        padding: 10px;
-        border-radius: 10px;
-        border: 1px solid gray;
-    }
-    .question-actions{
-        margin: 10px;
-        display: inline-block;
-        padding: 5px 5px;
-        border-radius: 10px;
-        border: 1px solid silver;
-    }
-    .question-text{
-        font-weight: bold;
-    }
-    .question-info{
-        font-size: small;
-    }
+.bin{
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+    fill: silver;
+}
+.bin:hover{
+    fill: red;
+    width: 22px;
+}
+
+.question-area{
+background-color: aliceblue;
+}
+.question{
+background-color: rgb(255, 253, 231);
+padding: 10px;
+border-radius: 10px;
+border: 1px solid gray;
+}
+.question-actions{
+    margin: 10px;
+    display: inline-block;
+padding: 5px 5px;
+border-radius: 10px;
+border: 1px solid silver;
+}
+.question-text{
+font-weight: bold;
+}
+.question-info{
+font-size: small;
+}
+.tag{
+    background-color: #fffcf7;
+    border-radius: 5px;
+    padding: 3px 5px;
+    color: red
+}
+.skill{
+    background-color: #fffcf7;
+    border-radius: 5px;
+    padding: 3px 5px;
+    font-weight: bold;
+    color: green
+}
 </style>

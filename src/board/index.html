@@ -88,20 +88,12 @@
       <!-- banner end -->
 
     <div class="wrapper">
-        <nav v-if="accountService.showComplex">
-            <ul>
-                <li v-for="page in websitePages" 
-                v-if="page.title && !page.alwaysHide" 
-                :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'"
-                @click="renderPage(page)">
-                    <a :href="'../'+ page.url +'?page=' + page.id">{{page.title}}</a>
-                </li>
-            </ul>
-        </nav>
+        <side-menu-component :account-service="accountService" :parent="this"></side-menu-component>
 
         <section style="height: auto; background-color: #fffcf7;">
          
         <pet-header-component :pet-service="petService" :account-service="accountService"></pet-header-component>
+        
             <div v-if="isMobile" style="display: inline-block; margin-left: 0px; left: 20px;">
                 <span v-for="(page, index) in websitePages" v-if="index > 0 && page.title " 
                      @click="renderPage(page)"><a class="btn btn-light pagename" :class="page.isSelected ? 'active' : ''" :href="'./../'+ page.url +'?page=' + page.id">
@@ -110,7 +102,7 @@
                 <hr>
             </div> 
 
-            <a class="btn btn-success float-right" href="./../profile?page=Developer">Contribute as Developer</a>
+            <a class="btn btn-success float-right" href="./../developer?page=Developer">Contribute as Developer</a>
             <p v-if="htmlContent" v-html="htmlContent"></p>
 
             <a v-if="selectedPage && selectedPage.id !== 'Board'" class="btn btn-light float-right" href="?page=Board">Go Back</a>
@@ -209,6 +201,7 @@
             <div><small>Hosted on <a href="https://vmie.org">vmie.org</a></small></div>
             <div><small>Linkedin <a href="www.linkedin.com/in/vmie">@vmie</a></small></div>
             <div><small>Slack <a href="https://vmie.slack.com">@vmie</a></small></div>
+            <div><small>Dev.to <a href="https://dev.to/vmie">@vmie</a></small></div>
             
         </p>
     </footer>
@@ -272,7 +265,7 @@
     import { vmieData } from "./../services/vmieService.js";
     import { apiService } from "./../services/apiService.js";
     import { chatService, ChatComponent } from "./../services/chatService.js";
-    import { accountService, ModalProfileComponent } from "./../services/accountService.js";
+    import { accountService, ModalProfileComponent, SideMenuCompoonent } from "./../services/accountService.js";
     import { petService, PetHeaderComponent } from "./../services/petService.js";
 
     var app = new Vue({
@@ -281,6 +274,7 @@
             "profile-component":  ModalProfileComponent,
             "chat-component":  ChatComponent,
             "pet-header-component":  PetHeaderComponent,
+            "side-menu-component": SideMenuCompoonent,
         },
         data: {
             messengerScopeId: 2,
