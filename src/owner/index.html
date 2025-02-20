@@ -91,8 +91,8 @@
         <side-menu-component :account-service="accountService" :parent="this"></side-menu-component>
 
         <section style="height: auto; background-color: #fffcf7;">
-            <pet-header-component :pet-service="petService" :account-service="accountService"></pet-header-component>
-            <pet-editor-component :pet-service="petService" :account-service="accountService"></pet-editor-component>
+            <pet-header-component :pet-service="petService" :account-service="accountService" :parent="this"></pet-header-component>
+            <pet-editor-component :pet-service="petService" :account-service="accountService" :parent="this"></pet-editor-component>
 
             <div v-if="isMobile" style="display: inline-block; margin-left: 0px; left: 20px;">
                 <span v-for="(page, index) in websitePages" v-if="index > 0 && page.title " 
@@ -111,7 +111,7 @@
                 </div>
                 <div class="question">
                     <div class="question-text">
-                        {{question.text}}
+                        {{question.real.name}}
                     </div>
                     <div class="question-info">
                         {{question.info}}
@@ -138,20 +138,32 @@
             </div>
             <div v-if="questionsCompleted">
 
-                <span class="btn btn-light float-right" @click="startOver()">Quiz</span>
+                <span class="btn btn-light float-right" @click="startOver()">Pets</span>
                 <br>
                 Available pets:
                 <br>
 
                 <div v-for="pet in questions" style="margin-bottom: 5px;" v-if="!pet.deleted">
-                    <div class="question" @click="pet.editState = !pet.editState">
+                    <div class="question" @click="editPet(pet)">
                         <div class="btn btn-light float-right" @click="selectTask(pet)">
                             <span style="margin-bottom: 0; color: black">View profile</span>
                         </div>
                         <div class="question-text">
-                            {{pet.text}}
-                            <small v-for="skill in pet.skills"><span class="skill">{{skill}}</span></small>
-                            <small v-for="tag in pet.tags"><a :href="getProjectUrlByTitle(tag)" class="tag">{{tag}}</a></small>
+                            <div class="group-container">
+                                <div class="group-label">Pseudo identity</div>
+                                {{pet.name}}
+                                <small v-for="skill in pet.skills"><span class="skill">{{skill}}</span></small>
+                                <small v-for="tag in pet.tags"><a :href="getProjectUrlByTitle(tag)" class="tag">{{tag}}</a></small>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="question-text">
+                            <div class="group-container">
+                                <div class="group-label">Real identity</div>
+                                <span class="text-secondary">{{pet.real.name}}</span>
+                                <small v-for="skill in pet.skills"><span class="text-secondary">{{skill}}</span></small>
+                                <small v-for="tag in pet.tags"><a :href="getProjectUrlByTitle(tag)" class="text-secondary">{{tag}}</a></small>
+                            </div>
                         </div>
                         <div class="text-secondary"> {{pet.info}} <small class="text-primary"><span @click.stop="pet.readMore = !pet.readMore" v-if="pet.status">Settings</span></small></div>
                         <div v-if="pet.readMore"> 
@@ -207,6 +219,7 @@
                             </center>
                         </div>
                     </div>
+                    <br>
                 </div>
             </div>
 
@@ -346,6 +359,7 @@
             this.websitePages = vmieData.websitePages;
 
             let page = this.websitePages.find(p=> p.id == 'Developer');
+            this.selectedPage = page;
             let pageId = this.apiService.findGetParameter('page');
             if(pageId){
                 let hrefPage = this.websitePages.find(p=> p.id == pageId);
@@ -360,11 +374,17 @@
             this.loadProjects();
             this.renderPage(this.selectedPage);
             chatService.initialize(apiService, accountService, this.bus, this.messengerScopeId);
+            petService.initialize(apiService, accountService, this.chat, this.bus);
             accountService.initialize(apiService, this.chat, this.bus);
         },
         computed: {
         },
         methods: {
+            editPet(pet){
+                pet.editState = !pet.editState;
+                petService.selectedPet = pet;
+                petService.showPetEditor = true;
+            },
             selectTask(task){
                 task.follow = !task.follow;
                 this.apiService.postData("https://vmie.org:5000/api/tasks/" + task.id + "/subscribe/" + (task.follow ? 'true':'false'), null, this.taskSubscribed);
@@ -413,34 +433,6 @@
                 //  sw2if(accountService.simulate)
                 {
                     let tasks = [
-                        {
-                            id: 1,
-                            text: "Coco",
-                            info: "",
-                            details: "",
-                            tags: ['Dog, 23 yesrs old, sterilized'],
-                            skills: ['no data'],
-                            status: 1,
-                            follow: 0,
-                            editState: false,
-                            readMore: false,
-                            response: null,
-                            responses: [null, null, null],
-                        },
-                        {
-                            id: 3,
-                            text: "Didi",
-                            info: "",
-                            details: "",
-                            tags: ['Cat, 2 years old, vaccinated'],
-                            skills: ['no data'],
-                            status: 1,
-                            follow: 0,
-                            editState: false,
-                            readMore: false,
-                            response: null,
-                            responses: [null, null, null],
-                        },
                     ];
                     this.question = tasks[0];
                     this.questionsListReceived(tasks);
@@ -474,11 +466,34 @@
 
             // user management 
             bus(event){
-                if(event == 'UserUpdated'){
+                if(event == "UserUpdated"){
                     this.loadProjects();
                     chatService.loadMessages();
                     this.loadTasks();
+                    petService.loadPets();
                 }
+                else
+                if(event == "PetsReceived"){
+                    this.ProcessPets();
+                }
+            },
+            ProcessPets(){
+                let context = this;
+                this.questions = [];
+                petService.petsList.forEach(pet => {
+                    pet.info = "";
+                    pet.details = "";
+                    pet.tags = [`${pet.petType.name}, 2 years old ${(pet.reproductivity.id < 3 ? ', ' + pet.reproductivity.name : '')}`];
+                    pet.skills = ['no data'];
+                    pet.status = 1;
+                    pet.follow = 0;
+                    pet.editState= false;
+                    pet.readMore= false;
+                    pet.response= null;
+                    pet.responses= [null, null, null];
+
+                    this.questions.push(pet);
+                });
             },
             chat(messsage){
                 chatService.receivedMessages(messsage);

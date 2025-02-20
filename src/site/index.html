@@ -198,6 +198,7 @@ import { accountService, ModalProfileComponent, SideMenuCompoonent } from "./../
             
             this.isMobile = window.screen.width < 500;
             let page = this.websitePages[0];
+            this.selectedPage = page;
             let pageId = this.apiService.findGetParameter('page');
             if(pageId){
                 let hrefPage = this.websitePages.find(p=> p.id == pageId);

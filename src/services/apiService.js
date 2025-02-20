@@ -85,7 +85,7 @@ export const apiService = {
         contentType: "application/json",
         success(data) {
             if (data) {
-                if(data.data.success) {
+                if(data) {
                     success(data);
                 }
                 else{

@@ -3,6 +3,25 @@ article,aside,details,figcaption,figure,footer,header,hgroup,nav,section,summary
     display: block
 }
 
+.group-container {
+    border: 1px solid gray;
+    position: relative;
+    border-radius: 5px;
+    padding: 10px 10px 0px 10px;
+}
+
+.group-label {
+    font-size: small;
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    height: 20px;
+    background-color: rgb(255, 253, 231);
+    text-align: center;
+    padding: 0px 5px;
+    color: gray;
+}
+
 .slim {
     width: 2px; 
     margin: 5px 0px 5px 0px; 
