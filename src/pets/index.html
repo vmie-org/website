@@ -52,7 +52,7 @@
             <div class="disclaimer-banner">{{accountService.disclaimer}}</div>
             <h1>Veterinary Medicine Information Exchange</h1>
             <p>Non-Profit Organization for providing standards on vmie.org</p>
-          </header>
+        </header>
           
       <!-- banner start -->
       <div id="banner" @mouseenter="accountService.showComplex = true">
@@ -75,11 +75,12 @@
             <ul>
                 <li v-if="!isMobile"><a href="../site/?page=Architecture" class="button">Docs</a></li>
                 <li>
-                    <a @click="isMobile = !isMobile" class="button"><div style="display: inline-block;">
-                        <div class="menu-bar"></div>
-                        <div class="menu-bar"></div>
-                        <div class="menu-bar"></div>
-                    </div>
+                    <a @click="isMobile = !isMobile" class="button">
+                        <div style="display: inline-block;">
+                            <div class="menu-bar"></div>
+                            <div class="menu-bar"></div>
+                            <div class="menu-bar"></div>
+                        </div>
                     </a>
                 </li>
             </ul>
@@ -88,6 +89,7 @@
       <!-- banner end -->
 
     <div class="wrapper">
+
         <side-menu-component :account-service="accountService" :parent="this"></side-menu-component>
 
         <section style="height: auto; background-color: #fffcf7;">
@@ -97,66 +99,54 @@
                 <span v-for="(page, index) in websitePages" v-if="index > 0 && page.title " 
                      @click="renderPage(page)"><a class="btn btn-light pagename" :class="page.isSelected ? 'active' : ''" :href="'./../'+ page.url +'?page=' + page.id">
                     {{page.id}}
-                </a></span>
+                    </a>
+                </span>
                 <hr>
             </div> 
 
-            <p v-if="htmlContent" v-html="htmlContent"></p>
 
-            <div class="question-area" v-if="!questionsCompleted">
-                <div class="question-status">
-                    <span class="btn btn-light" @click="moveNext(-1)">Next task</span>
-                    <span class="btn btn-light float-right" @click="moveNext(+1)">Prew task</span>
-                </div>
-                <div class="question">
+            <div v-for="pet in petsList" class="pet-card" v-if="!pet.deleted">
+                <div class="question" @click="editPet(pet)">
+                    <div class="btn btn-light float-right" @click="selectTask(pet)" v-if="pet.real && !pet.real.deleted">
+                        <span style="margin-bottom: 0; color: black">View profile</span>
+                    </div>
                     <div class="question-text">
-                        {{question.text}}
+                        <div class="group-container">
+                            <div class="group-label">{{pet.type}}</div>
+                            {{pet.name}}
+                            <small>
+                                <div class="skill">{{pet.dob}}</div>
+                            </small>
+                            <small v-for="tag in pet.tags"><span :href="getProjectUrlByTitle(tag)" class="tag">{{tag}}</span></small>
+                        </div>
                     </div>
-                    <div class="question-info">
-                        {{question.info}}
-                    </div>
-                </div>
-                <div>
-                    <center >
-                        <span class="question-actions">
-                        <span class="text-secondary">Fits me: </span>
-                        <span :class="!question.response || question.response == 1 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 1)">1</span>
-                        <span :class="!question.response || question.response == 2 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 2)">2</span>
-                        <span :class="!question.response || question.response == 3 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 3)">3</span>
-                        <span :class="!question.response || question.response == 4 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 4)">4</span>
-                        <span :class="!question.response || question.response == 5 ? 'btn btn-primary':'btn btn-light'" @click="setResponse(question, 5)">5</span>
-                            <div>
-                                <hr class="slim"/>
-                                <small class="text-secondary">1 means I love it, 5 means not for me</small>
-                            </div>
-                    </span>
-                </center>
                 </div>
             </div>
-            <div v-if="questionsCompleted">
-
-                <span class="btn btn-light float-right" @click="startOver()">Does it fit?</span>
+            <center>
+                <div class="btn btn-primary" @click="loadPets()">Load More...</div>
                 <br>
-                Available pets:
                 <br>
+            </center>
 
-                <div v-for="question in questions" style="margin-bottom: 5px;" v-if="!question.deleted">
-                    <div class="question">
-                        <div class="btn btn-light float-right" @click="selectTask(question)">
-                            <input type="checkbox" v-model="question.follow" :id="'task_' + question.id"> 
-                            <label :for="'task_' + question.id" style="margin-bottom: 0">I like this</label>
+
+            <p v-if="htmlContent" v-html="htmlContent"></p>
+            <div v-for="pet in petService.petsList" class="pet-card" v-if="!pet.deleted">
+                    <div class="question" @click="editPet(pet)">
+                        <div class="btn btn-light float-right" @click="selectTask(pet)" v-if="pet.real && !pet.real.deleted">
+                            <span style="margin-bottom: 0; color: black">View profile</span>
                         </div>
                         <div class="question-text">
-                            {{question.text}}
-                            <small v-for="skill in question.skills"><span class="skill">{{skill}}</span></small>
-                            <small v-for="tag in question.tags"><a :href="getProjectUrlByTitle(tag)" class="tag">{{tag}}</a></small>
+                            <div class="group-container">
+                                <div class="group-label">Pseudo identity</div>
+                                {{pet.name}}
+                                <small v-for="skill in pet.skills"><span class="skill">{{skill}}</span></small>
+                                <small v-for="tag in pet.tags"><span :href="getProjectUrlByTitle(tag)" class="tag">{{tag}}</span></small>
+                            </div>
                         </div>
-                        <div class="text-secondary"> {{question.info}} <small class="text-primary"><span @click="question.readMore = !question.readMore" v-if="question.status">read more</span></small></div>
-                        <div v-if="question.readMore"> {{question.details}}</div>
                     </div>
                 </div>
             </div>
-
+            
             <br>
             <span @click="showCreateQuestion = true">Conversation:</span>
             <chat-component :chat-service="chatService" :account-service="accountService" :take="5" :scope-id="messengerScopeId"></chat-component>
@@ -168,7 +158,8 @@
                 {{accountService.loginText}}</strong>
             </a>
             <a v-if="accountService.user" @click="accountService.showProfile()" class="button fork">
-                Manage your privacy: <strong>
+                Manage your privacy: 
+                <strong>
                     {{accountService.user.name}}
                 </strong>
             </a>
@@ -195,49 +186,6 @@
    
 <!-- CREATE -->
 
-<transition name="modal" v-cloak>
-    <div class="modal-mask" v-if="accountService.user && showCreateQuestion">
-       <div class="modal-wrapper">
-          <div class="modal-container" :class="accountService.isMobile?'mobile':'w600'" :style="accountService.isMobile?'max-height:'+window.innerHeight+'px':''">
-             <div>
-                <div class="card" style="background-color: #F8F8F8;">
-                   <div class="card-header">
-                      <span class="card-title">
-                      <span>Create question</span>
-                      </span>
-                      <div class="float-right">
-                         <div class="btn btn-light" v-on:click="showCreateQuestion = false" >
-                            x
-                         </div>
-                      </div>
-                   </div>
-                   <div class="card-body">
-                      <p>
-                         Add tags
-                      </p>
-                      <hr>
-
-
-                      
-                Tags:
-                <div class="message-area">
-                </span>
-            </div>
-            Question:
-                      
-                   </div>
-                   <div class="card-footer">
-                      <div class="float-right" >
-                        <div class="btn btn-secondary" v-on:click="showCreateQuestion = false">Close</div>
-                        <div class="btn btn-primary" v-on:click="showCreateQuestion = false">Save</div>
-                      </div>
-                   </div>
-                </div>
-             </div>
-          </div>
-       </div>
-    </div>
- </transition>
 
  <!-- CREATE -->
   
@@ -262,7 +210,7 @@
             "pet-header-component":  PetHeaderComponent,
         },
         data: {
-            messengerScopeId: 4,
+            messengerScopeId: 8,
             taskUsers: [],
             apiService: apiService,
             chatService: chatService,
@@ -281,6 +229,7 @@
             websitePages: [],
             showCreateQuestion: false,
             questionsCompleted: true,
+            petsList: [],
 
             // decisions
             users: [],
@@ -302,9 +251,10 @@
                 }
             }
 
-            this.loadProjects();
+            this.loadPets();
             this.renderPage(this.selectedPage);
             chatService.initialize(apiService, accountService, this.bus, this.messengerScopeId);
+            petService.initialize(apiService, accountService, this.chat, this.bus);
             accountService.initialize(apiService, this.chat, this.bus);
         },
         computed: {
@@ -354,48 +304,41 @@
                     }
                 });
             },
-            loadProjects(){
-                //  sw2if(accountService.simulate)
-                {
-                    let tasks = [
-                        {
-                            id: 1,
-                            text: "Coco",
-                            info: "",
-                            details: "Project objects will be defined as: { projectId: 11, coordinatorId: 23, tasks: [], dueDate: 'March-2025' }",
-                            tags: ['Dog, 23 yesrs old, sterilized'],
-                            skills: ['no data'],
-                            status: 1,
-                            follow: 0,
-                            readMore: false,
-                            response: null,
-                        },
-                        {
-                            id: 3,
-                            text: "Didi",
-                            info: "",
-                            details: "Project objects will be defined as: { projectId: 11, coordinatorId: 23, tasks: [], dueDate: 'March-2025' }",
-                            tags: ['Tasks Management'],
-                            skills: ['no data'],
-                            status: 1,
-                            follow: 0,
-                            readMore: false,
-                            response: null,
-                        },
-                    ];
-                    this.question = tasks[0];
-                    this.questionsListReceived(tasks);
+            loadPets(){
+                if(true || this.accountService.simulate){
+                    let pets = [];
+                    let rnd = parseInt(Math.random(100)*100);
+                    let petType = petService.petTypes[rnd % petService.petTypes.length];
+                    let time = parseInt(moment().unix()*1000);
+                    for(let i=0; i < 10; i++){
+                        let pet = {
+                            id: time + i,
+                            scopeId: 0,
+                            userId: 9,
+                            name: petService.generatePetName(time + i),
+                            weight: 5,
+                            dob: petService.humanAge(time - 4000 * rnd * 100000),
+                            type: petType.name,
+                            created: time,
+                            updated: 0,
+                            deleted: 0,
+                            deletedBy: null,
+                            customOffset: 0
+                        };
+                        pets.push(pet);
+                    }
+                    this.petsListReceived(pets);
                     return;
                 }
-                apiService.postData("https://vmie.org:5000/api/chat/questions", { take: 50 }, this.questionsListReceived);
+                apiService.postData("https://vmie.org:5000/api/pet/list", { take: 50 }, this.questionsListReceived);
             },
-            questionsListReceived(questions){
-                questions.forEach(p => { 
-                    p.response = null;
-                    p.deleted = 0;
-                    p.readMore = false;
+            petsListReceived(petsList){
+                petsList.forEach(pet => { 
+                    pet.response = null;
+                    pet.deleted = 0;
+                    pet.readMore = false;
+                    this.petsList.push(pet);
                 });
-                this.questions = questions;
             },
             setResponse(question, response){
                 question.response = response;
@@ -410,7 +353,8 @@
             // user management 
             bus(event){
                 if(event == 'UserUpdated'){
-                    this.loadProjects();
+                    this.loadPets();
+                    petService.loadPets();
                     chatService.loadMessages();
                     this.loadTasks();
                 }

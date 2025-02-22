@@ -3,6 +3,20 @@ article,aside,details,figcaption,figure,footer,header,hgroup,nav,section,summary
     display: block
 }
 
+.pet-card{
+    display: inline-block; 
+    margin: 5px; 
+    width: 100%;
+}
+
+.pet-name{
+    color: blue;
+    font-weight: bold;
+    background-color: white;
+    padding: 0px 10px;
+    border-radius: 10px;
+}
+
 .group-container {
     border: 1px solid gray;
     position: relative;

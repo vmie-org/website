@@ -8,7 +8,7 @@ export const SideMenuCompoonent = {
          v-if="page.title && !page.alwaysHide" 
          :class="page.isSelected ? 'tag-h1 active' : 'tag-h2'"
          @click="parent.renderPage(page)">
-            <span v-if="!page.id">
+            <span v-if="false && !page.id">
                 <hr class="slim" style="width: 100px"/>
                 <span class="float-left text-primary"><small>{{page.title}}</small></span>
             </span>

@@ -205,6 +205,36 @@ export const chatService = {
     },
     loadMessages(){
         that = this;
+        if(this.accountService.simulate){
+            let dummyMessages = [
+                {
+                    "id": 24,
+                    "scopeId": this.scopeId,
+                    "userId": 8,
+                    "created": 1739029740,
+                    "updated": 0,
+                    "message": "Demo message",
+                    "initials": "FC",
+                    "deleted": 0,
+                    "deletedBy": null,
+                    "deletedReason": 0
+                },
+                {
+                    "id": 25,
+                    "scopeId": this.scopeId,
+                    "userId": 1,
+                    "created": 1739029740,
+                    "updated": 0,
+                    "message": "SIMULATION",
+                    "initials": "FC",
+                    "deleted": 0,
+                    "deletedBy": null,
+                    "deletedReason": 0
+                }
+            ];
+            this.messagesListReceived(dummyMessages);
+            return;
+        }
         this.apiService.postData("https://vmie.org:5000/api/chat/list", { take: 50, scopeId: this.scopeId }, this.messagesListReceived);
     },
     searchMessages(){

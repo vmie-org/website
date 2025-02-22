@@ -23,6 +23,14 @@ export const vmieData = {
             isSelected: false,
         },
         {
+            id: "Explorer",
+            title:  "Manage your pets",
+            contentUrl: "./content/pets-list.txt",
+            url: "owner",
+            hideOnMobile: true,
+            isSelected: false,
+        },
+        {
             id: "PetId",
             title:  "PetId (project)",
             contentUrl: "./content/petId.txt",
