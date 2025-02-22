@@ -286,6 +286,7 @@
             this.websitePages = vmieData.websitePages;
 
             let page = this.websitePages.find(p=> p.id == 'Developer');
+            this.selectedPage = page;
             let pageId = this.apiService.findGetParameter('page');
             if(pageId){
                 let hrefPage = this.websitePages.find(p=> p.id == pageId);

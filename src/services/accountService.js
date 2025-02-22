@@ -41,6 +41,7 @@ export const ModalProfileComponent = {
                      </div>
                   </div>
                   <div class="card-body">
+
                      <p>
                         Your user has been deleted. <br>
                         You can login with LinkedIn to create a new account. 
@@ -51,6 +52,7 @@ export const ModalProfileComponent = {
                         <div class="btn btn-secondary" v-on:click="parent.showUserDeleted = false">Close</div>
                      </div>
                   </div>
+                  
                </div>
             </div>
          </div>

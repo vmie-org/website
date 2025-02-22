@@ -300,6 +300,7 @@
 
 
             let page = this.websitePages.find(p=> p.id == 'News');
+            this.selectedPage = page;
             let pageId = this.apiService.findGetParameter('page');
             if(pageId){
                 let hrefPage = this.websitePages.find(p=> p.id == pageId);

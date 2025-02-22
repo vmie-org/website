@@ -92,7 +92,7 @@
 
         <section style="height: auto; background-color: #fffcf7;">
          
-        <pet-header-component :pet-service="petService" :account-service="accountService"></pet-header-component>
+        <pet-header-component :pet-service="petService" :account-service="accountService" :parent="this"></pet-header-component>
         
             <div v-if="isMobile" style="display: inline-block; margin-left: 0px; left: 20px;">
                 <span v-for="(page, index) in websitePages" v-if="index > 0 && page.title " 
@@ -305,6 +305,7 @@
             this.websitePages = vmieData.websitePages;
 
             let page = this.websitePages.find(p=> p.id == 'Board');
+            this.selectedPage = page;
             let pageId = this.apiService.findGetParameter('page');
             if(pageId){
                 let hrefPage = this.websitePages.find(p=> p.id == pageId);
