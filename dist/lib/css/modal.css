@@ -1,0 +1,374 @@
+.otb-quick-transact{
+  background-color: white;
+  position: relative;
+  border: 1px solid gray;
+  margin: 10px;
+  outline-style: auto;
+}
+
+.w1200{
+  max-width: 800px;
+}
+
+.otb-quick-transact:hover{
+ }
+
+.otb-middle-mask {
+  position: fixed;
+  z-index: 1998;
+  /* top: 0; */
+  bottom: 0px;
+  left: 5px;
+  /* width: 100%; */
+  height: 600px;
+  background-color: rgba(0, 0, 0, 0.5);
+  /* display: table; */
+  transition: opacity 0.3s ease;
+}
+
+.modal-mask {
+    position: fixed;
+    z-index: 9998;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: table;
+    transition: opacity 0.3s ease;
+  }
+
+  .mobile-selector{
+    font-size: 18px;
+    color: black;
+    background-color: #fff;
+  }
+  .selector-option:hover{
+    background-color: rgb(200, 249, 255);
+  }
+  
+  .modal-wrapper {
+    display: table-cell;
+    vertical-align: middle;
+  }
+  
+  .modal-wrapper.mobile {
+    overflow-x: scroll;
+    display: table-cell;
+    margin-top: 100px;
+    max-width: 400px;
+    vertical-align: top;
+    padding-top: 200px;
+  }
+  
+  .modal-wrapper.mobile-full {
+    overflow-x: scroll;
+    display: table-cell;
+    margin-top: 100px;
+    max-width: 400px;
+    vertical-align: top;
+    padding-top: 2px;
+  }
+
+.wMax{
+  width: 100%;
+  min-width: 100%;
+}
+.w600 {
+  width: 600px;
+}
+
+.w400 {
+  width: 400px;
+}
+  
+  .uiTestingTable {
+    width: 600px;
+    height: 200px;
+    max-height: 200px;
+  }
+
+  .mh-50{
+    pheight: 50%;
+    max-height: 600px;
+  }
+  .mh-90{
+    pheight: 95%;
+    max-height: 900px;
+  }
+
+.otb-step-icon {
+  margin: 5px;
+  border-radius: 50px;
+  display: inline-block;
+  padding: 3px 10px 5px 10px;
+}
+
+.inline-close-icon{
+  border: 1px solid gray;
+  background-color: white;
+  border-radius: 50px;
+  position: relative;
+  display: inline;
+  padding: 2px 3px 5px 10px;
+  margin: 0px 5px 0px 0px;
+}
+
+  .modal-close-icon{
+    background-color: #ededed;
+    margin-top: -10px;
+    float: right;
+    z-index: 10000;
+    border-radius: 50px;
+    /*border: 1px solid gray;*/
+    /* display: inline-table; Do I need this? */
+    position: relative;
+    display: block;
+    margin-right: -20px;
+    padding: 3px 10px 5px 10px;
+  }
+  .modal-close-icon:hover{
+    background-color: #ffefd7;
+  }
+  .modal-close-icon.float-right{
+    margin-top: 0px;
+  }
+
+  .otb-modal-close-icon{
+    background-color: #ddd;
+    color: black;
+    margin-top: -6px;
+    margin-right: -15px;
+    float: right;
+    z-index: 10000;
+    border-radius: 50px;
+    border: 1px solid #999;
+    position: relative;
+    display: block;
+    padding: 3px 10px 5px 10px;
+  }
+  
+  .modal-container {
+    margin: 0px auto;
+    padding: 20px 30px;
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+    transition: all 0.3s ease;
+    font-family: Helvetica, Arial, sans-serif;
+    overflow-y: auto;
+    max-height: 1200px;
+    margin-bottom: 100px;
+  }
+
+  .modal-container.mobile {
+    margin: 30px 0px 30px 0px ;
+    max-width: 500px;
+    overflow-y: scroll;
+    max-height: 800px;
+    padding: 10px;
+    margin: 10px;
+  }
+  
+  .otb-expert-graph {
+    width: 1500px;
+    height: 1500px;
+    max-height: 1500px;
+  }
+    
+  .h800 {
+    height: 800px;
+  }
+  
+  .modal-header h3 {
+    margin-top: 0;
+    color: #42b983;
+  }
+  
+  .modal-body {
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: auto;
+    position: relative;
+    margin: 20px 0;
+  }
+  
+  .modal-default-button {
+    float: right;
+  }
+
+.otb-expert-stock-user{
+  width: 100%;
+  border: 2px solid gray;
+  padding: 5px;
+  margin: 5px 5px 5px 5px;
+  font-size: 24px;
+  float: left;
+  font-weight: bold;
+  color: blue;
+}
+
+.otb-expert-stock-provider{
+  width: 100%;
+  border-bottom: 2px solid gray;
+  padding: 5px;
+  margin: 5px 5px 5px 5px;
+  font-size: 18px;
+  float: left;
+  font-weight: bold;
+  color: darkmagenta;
+}
+
+.otb-expert-stock-balance{
+  font-size: 18px;
+  float: left;
+  font-weight: bold;
+  color: black;
+
+}
+
+.otb-expert-stock-owner{
+  font-size: 14px;
+  font-style: italic;
+  float: left;
+}
+
+.otb-expert-stock-code{
+  font-size: 14px;
+  float: left;
+
+}
+
+.otb-expert-stock-time-cost{
+  font-size: 14px;
+
+}
+
+.otb-expert-stock-time-ago{
+  font-size: 14px;
+  float: left;
+}
+  
+  /*
+   * The following styles are auto-applied to elements with
+   * transition="modal" when their visibility is toggled
+   * by Vue.js.
+   *
+   * You can easily play with the modal transition by editing
+   * these styles.
+   */
+  
+  .modal-enter {
+    opacity: 0;
+  }
+  
+  .modal-leave-active {
+    opacity: 0;
+  }
+
+.tooltip-inner{
+  max-width: 600px !important;
+}
+
+.tooltip-inner{
+  max-width: 600px !important;
+  font-size: large !important;
+  background-color: transparent !important;
+  color: black !important;
+}
+.tooltip{
+  opacity: 1 !important;
+  max-width: 600px !important;
+}
+.popover{
+  opacity: 1 !important;
+}
+.v-popover
+{
+  display: inline-block;
+}
+
+.trigger{ 
+  height: 24px; 
+  float: right;
+  padding-top: 10px;
+  padding-left: 10px;
+}
+  
+  .modal-enter .modal-container,
+  .modal-leave-active .modal-container {
+    -webkit-transform: scale(1.1);
+    transform: scale(1.1);
+  }
+  
+
+.w700{	
+  width: 700px;
+}
+
+.otb-user-menu-item{
+  cursor: pointer;
+  min-height: 500px;
+  padding: 15px 25px 10px 25px;
+  text-align: center;
+  border: 1px solid white;
+  margin: 10px;
+}
+
+.otb-user-menu-item.mobile{
+  min-height: 200px;
+}
+
+.otb-user-menu-image{
+  min-width: 50px;
+  opacity: 0.5;
+  max-height: 200px;
+  border-radius: 20px;
+  border: 3px solid gray;
+  padding: 20px 0px;
+  background-color: gray;
+}
+
+.otb-user-menu-image.mobile{
+  margin: 10px;
+  max-height: 100px;
+  padding: 2px 0px;
+  border-radius: 10px;
+}
+
+.otb-user-menu-title{
+  font-size: x-large;
+  margin: 5px 20px;
+}
+
+.otb-user-menu-info.mobile{
+  font-size: small;
+  min-width: 160px;
+  margin: 5px 5px;
+}
+
+.otb-user-menu-info{
+  min-width: 300px;
+  font-size: large;
+  text-align: left;
+  margin: 5px 20px;
+}
+
+.otb-user-menu-item:hover .otb-user-menu-image
+{
+  opacity: 1;
+}
+
+.otb-user-menu-item.current
+{
+  background-color: aliceblue;
+  border: 1px solid gray;
+  border-radius: 20px;
+}
+
+.otb-user-menu-item:hover
+{
+  background-color: ivory;
+  border: 1px solid gray;
+  border-radius: 20px;
+}

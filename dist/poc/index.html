@@ -1,0 +1,3178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Information exchange compatibility POC</title>
+
+
+    <link rel="stylesheet" href="../../lib/data-tables/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="../../lib/css/mobile.table.css"/>
+    <link rel="stylesheet" href="../../lib/bootstrap/css/bootstrap-icons.css">
+
+    <link rel="stylesheet" href="../../lib/css/table.css" />
+    <link rel="stylesheet" href="../../lib/css/modal.css" />
+
+    <meta name="format-detection" content="telephone=no" />
+    <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, target-densitydpi=device-dpi" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
+    <script src="./lib/vuejs-datepicker/vuejs-datepicker.js"
+            asp-integrity-src="./lib/vuejs-datepicker/vuejs-datepicker.js"
+            crossorigin="anonymous" asp-append-version="true"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" asp-append-version="true"></script>
+    <script src="../../lib/vue/vue.js"></script>
+    <link rel="stylesheet" href="../../lib/bootstrap/css/bootstrap.min.css" />
+
+    <style>
+        [v-cloak] { display:none; }
+
+	  .text-left {
+		text-align: left;
+	  }
+        .card-title {
+            font-weight: bold;
+        }
+
+        w1200{
+            max-width: 1200px;
+        }
+
+        #progress-bar {
+            width: 100%;
+            height: 30px;
+            background-color: #ccc;
+        }
+        .progress-bar-votes {
+            margin: 3px;
+            width: 100%;
+            height: 30px;
+            border: 1px solid #ccc;
+        }
+
+        #progress {
+            width: 0%;
+            height: 100%;
+            background-color: green;
+            transition: width 1s linear;
+        }
+
+        .progress-yellow {
+            background-color: yellow;
+            color: blue;
+        }
+
+        .progress-green {
+            background-color: darkblue;
+            color: white;
+        }
+
+        .progress-votes {
+            width: 0%;
+            height: 100%;
+            /* background-color: darkgreen; */
+            transition: width 1s linear;
+        }
+
+        .blink {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .full-width{
+            width: 100%;
+        }
+        .voting-selection{
+            border: 1px solid gray;
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .section-title{
+            font-weight: bold;
+            font-size: x-large;
+        }
+        
+        td, th{
+            text-align: right;
+        }
+		
+		.page-number{
+			background-color: #f2f2f2;
+			font-family: monospace;
+			padding: 0px 5px;
+			text-align: center;
+			display: inline-block;
+			min-width: 18px;
+			border: 1px solid #e2e2e2;
+		}
+		.add-new{
+		    font-size: small;
+			text-align: center;
+			display: inline-block;
+			min-width: 18px;
+			border: 1px solid silver;
+			padding: 0px 5px;
+			border-radius: 5px;
+		}
+		.search-for{
+			border: none !important;
+		}
+		.search-box{
+		margin-top: 10px;
+		}
+		.blueTable-properties{
+		width: 100%;
+		}
+		.input-helper{
+		display: none;
+		}
+		.blueTable-properties tr{
+		height: 40px;
+		line-height: 14px; 
+		}
+		.blueTable-properties td{
+		padding: 0px 5px; 
+		}
+		
+		.menu1{
+			float: right;
+			font-size: large,
+			font-weight: bold;
+		}
+		.menu-option.selected{
+			background-color: #f2f2f2;
+		}
+		.menu-option{
+			text-align: center;
+			display: inline-block;
+			border: 1px solid silver;
+			padding: 0px 5px;
+			border-radius: 5px;
+		}
+
+    </style>
+</head>
+    <!-- Page content -->
+
+    <div id="adminApp">
+        <div class="container" v-cloak>
+
+	
+            <div class="row" v-cloak >
+
+            <div class="col-12" style="min-width: 300px; text-align: left">
+					
+			<div style="text-align: center;" :style="highlightLogin ? 'border: 1px solid white;':''" v-if="user">
+
+			</div>
+			<div>
+				<span class="menu-option" @click="showMenu = !showMenu">Menu</span>
+				<span class="float-right"><span v-if="user">{{user.email}} </span><span @click="sendLogout()"> Log out</span></span>
+				<div v-if="showMenu">
+					<table class='blueTable' style="text-align: left">
+						<tr>
+							<th style="text-align: left; max-width: 100px">
+								<span @click="showDataExportModal = !showDataExportModal">Export data...</span>
+							</th>
+							<th style="text-align: left;">
+								Export your data. Exports are incremental by default.
+							</th>
+						</tr>
+						<tr>
+							<th style="text-align: left; max-width: 100px">
+								<span @click="showDataImportModal = !showDataImportModal">Import data...</span>
+							</th>
+							<th style="text-align: left;">
+								Export your data. Exports are incremental by default.
+							</th>
+						</tr>
+						<tr>
+							<th style="text-align: left; max-width: 100px">
+								<span @click="showCompatibilityModal = !showCompatibilityModal">Check compatibility...</span>
+							</th>
+							<th style="text-align: left;">
+								Check for schema differences in your model
+							</th>
+						</tr>
+					</table>
+					<br/>
+					<hr/>
+				</div>
+			</div>
+			<div class="menu1">
+				Views: 
+				<span class="menu-option" :class="options.seeAsDoctor ? 'selected':''" @click="options.seeAsDoctor = !options.seeAsDoctor">Doctor</span>
+				<span class="menu-option" :class="options.seeAsOwner ? 'selected':''" @click="options.seeAsOwner = !options.seeAsOwner">Owner</span>
+			</div>
+			</div>
+			</div>
+
+
+		<div class="alert alert-success"> Disclaimer: This proof of concept contains generated information and no information is collected from users. </div>
+		
+            <div class="row" v-cloak >
+
+            <div class="col-12" style="min-width: 300px; text-align: left" v-if="options.seeAsDoctor || options.seeAsOwner">
+                <br>
+                
+                <!-- PRACTICE START -->
+                <div class="section-title">
+				Practice
+                <span class="add-new" v-on:click="addPractice()">Create new</span>
+                <span class="add-new float-right search-box" @keyup="getPractices()"><input v-model="options.practices.filter" class="search-for" type="text" placeholder="Search..."/></span>
+				</div>
+                <table class='blueTable' style="text-align: right">
+                    <tr>
+                        <th v-if="showProvisionalIds">ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>PostCode</th>
+                        <th>Address</th>
+                        <th>Created</th>
+                        <th v-if="false">Gdpr</th>
+                        <th v-if="false">Doctors</th>
+                        <th v-if="false">Id</th>
+                    </tr>
+                    <template v-for="(practice, index) in data.practices.items" v-if="practice && !practice.deleted">
+                        <tr v-on:click="selectPractice(practice)">
+                            <td v-if="showProvisionalIds">
+                                <div>{{practice.practiceId}}</div>
+                            </td>
+                            <td class="text-left">
+                                <div>{{practice.name}}</div>
+                            </td>
+                            <td>
+                                <div>{{practice.email}}</div>
+                            </td>
+                            <td>
+                                <div>{{practice.phone}}</div>
+                            </td>
+                            <td>
+                                <div>{{practice.postCode}}</div>
+                            </td>
+                            <td>
+                                <div>{{practice.address}}</div>
+                            </td>
+                            <td>
+                                <div>{{ timeAgo(practice.created) }} ago</div>
+                            </td>
+                            <td v-if="false">
+                                <div>{{practice.gdpr}}</div>
+                            </td>
+                            <td v-if="false">
+                                <div>{{practice.doctors}}</div>
+                            </td>
+                            <td v-if="false">
+                                <div>{{practice.id}}</div>
+                            </td>
+                    </template>
+                </table>
+				<div style="font-size: small;">
+					<span class="text-secondary" v-if="data.practices.totalCount > options.practices.pageSize">{{options.practices.currentPage * options.practices.pageSize + 1}} - {{(options.practices.currentPage + 1) * options.practices.pageSize }} of {{data.practices.totalCount}}</span>
+					<div v-if="false" class="text-secondary float-right" style="padding-top: 3px;">
+						<span class="page-number" @click="addPage(options.practices, -options.practices.currentPage); getPractices(options.practices.currentPage, options.practices.pageSize, practicesUpdated)" v-if="options.practices.currentPage >= 3">1</span>
+						<span v-if="options.practices.currentPage >= 4"> ... </span>
+						<span class="page-number" @click="addPage(options.practices, -2); getPractices(options.practices.currentPage, options.practices.pageSize, practicesUpdated)" v-if="options.practices.currentPage >= 2">{{options.practices.currentPage - 1}}</span>
+						<span class="page-number" @click="addPage(options.practices, -1); getPractices(options.practices.currentPage, options.practices.pageSize, practicesUpdated)" v-if="options.practices.currentPage >= 1">{{options.practices.currentPage - 0}}</span>
+						<span class="page-number" style="color: black; background-color: #ddf">{{options.practices.currentPage + 1}}</span>
+						<span v-if="options.practices.currentPage < lastPage(demo.practices, options.practices) -1" class="page-number" @click="addPage(options.practices, +1); getPractices(options.practices.currentPage, options.practices.pageSize, practicesUpdated)">{{options.practices.currentPage + 2}}</span>
+						<span v-if="options.practices.currentPage < lastPage(demo.practices, options.practices) -2" class="page-number" @click="addPage(options.practices, +2); getPractices(options.practices.currentPage, options.practices.pageSize, practicesUpdated)">{{options.practices.currentPage + 3}}</span>
+						<span v-if="options.practices.currentPage < lastPage(demo.practices, options.practices) -4"> ... </span>
+						<span class="page-number" v-if="options.practices.currentPage < lastPage(demo.practices, options.practices) -3" @click="addPage(options.practices, lastPage(demo.practices, options.practices) - options.practices.currentPage - 1); getPractices(options.practices.currentPage, options.practices.pageSize, practicesUpdated)">{{lastPage(demo.practices, options.practices)}}</span>
+					</div>
+					<div class="text-secondary float-right" style="padding-top: 3px;">
+						<span class="page-number" @click="addPage(options.practices, -2); getPractices(options.practices.currentPage, options.practices.pageSize)" v-if="options.practices.currentPage >= 2"> &lt; &lt; </span>
+						<span class="page-number" @click="addPage(options.practices, -1); getPractices(options.practices.currentPage, options.practices.pageSize)" v-if="options.practices.currentPage >= 1"> &lt; </span>
+						<span v-if="options.practices.currentPage == 0"> Page: </span>
+						<span class="page-number" style="color: black;">{{options.practices.currentPage + 1}}</span>
+						<span v-if="options.practices.currentPage < lastPage(demo.practices, options.practices) -1" class="page-number" @click="addPage(options.practices, +1); getPractices(options.practices.currentPage, options.practices.pageSize)"> &gt; </span>
+						<span v-if="options.practices.currentPage < lastPage(demo.practices, options.practices) -2" class="page-number" @click="addPage(options.practices, +2); getPractices(options.practices.currentPage, options.practices.pageSize)"> &gt; &gt; </span>
+					</div>
+				</div>
+                <br>
+
+                <transition name="modal">
+                    <div class="modal-mask"  v-if="selectedPractice">
+                        <div class="modal-wrapper">
+                            <div class="modal-container" :class="isMobile?'mobile':'w1200'" :style="isMobile?'max-height:'+window.innerHeight+'px':''">
+                                
+                <div v-if="selectedPractice">
+                    <div class="card" style="background-color: #F8F8F8;">
+                        <div class="card-header">
+                                <span class="card-title">
+                                    {{selectedPractice.practiceId ? "Edit":"Create"}} Practice
+                                </span>
+								<div class="btn btn-light float-right" v-on:click="selectedPractice = null" >
+									x
+								</div>
+                        </div>
+                        <div class="card-body">
+
+                    <table class='blueTable-properties' style="text-align: right">
+                        <tr v-if="selectedPractice.practiceId && showProvisionalIds">
+                            <th>PracticeId</th>
+                            <td>
+                                <div class="input-helper">{{selectedPractice.practiceId}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Name</th>
+                            <td>
+                                <input v-if="editPractice" class="full-width" v-model="selectedPractice.name">
+                                <div class="input-helper">{{selectedPractice.name}}</div>
+                                <div class="text-left" v-if="!editPractice">{{selectedPractice.name}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>
+                                <input v-if="editPractice" class="full-width" v-model="selectedPractice.email">
+                                <div class="input-helper">{{selectedPractice.email}}</div>
+                                <div class="text-left" v-if="!editPractice">{{selectedPractice.email}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Phone</th>
+                            <td>
+                                <input v-if="editPractice" class="full-width" v-model="selectedPractice.phone">
+                                <div class="input-helper">{{selectedPractice.phone}}</div>
+                                <div class="text-left" v-if="!editPractice">{{selectedPractice.phone}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>PostCode</th>
+                            <td>
+                                <input v-if="editPractice" class="full-width" v-model="selectedPractice.postCode">
+                                <div class="input-helper">{{selectedPractice.postCode}}</div>
+                                <div class="text-left" v-if="!editPractice">{{selectedPractice.postCode}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Address</th>
+                            <td>
+                                <input v-if="editPractice" class="full-width" v-model="selectedPractice.address">
+                                <div class="input-helper">{{selectedPractice.address}}</div>
+                                <div class="text-left" v-if="!editPractice">{{selectedPractice.address}}</div>
+                            </td>
+                        </tr>
+                        <tr v-if="selectedPractice.practiceId">
+                            <th>Gdpr</th>
+                            <td>
+                                <input v-if="editPractice" class="full-width" v-model="selectedPractice.gdpr">
+                                <div class="input-helper">{{selectedPractice.gdpr}}</div>
+                                <div class="text-left" v-if="!editPractice">{{selectedPractice.gdpr}}</div>
+                            </td>
+                        </tr>
+                        <tr v-if="selectedPractice.practiceId">
+                            <th>Doctors</th>
+                            <td>
+                                <input v-if="editPractice" class="full-width" v-model="selectedPractice.doctors">
+                                <div class="input-helper">{{selectedPractice.doctors}}</div>
+                                <div class="text-left" v-if="!editPractice">{{selectedPractice.doctors}}</div>
+                            </td>
+                        </tr>
+                        <tr v-if="selectedPractice.practiceId">
+                            <th>Id</th>
+                            <td>
+                                <input v-if="editPractice" class="full-width" v-model="selectedPractice.id">
+                                <div class="input-helper">{{selectedPractice.id}}</div>
+                                <div class="text-left" v-if="!editPractice">{{selectedPractice.id}}</div>
+                            </td>
+                        </tr>
+                        <tr v-if="selectedPractice.practiceId">
+                            <th>Created</th>
+                            <td>
+                                <div class="input-helper">{{ timeAgo(selectedPractice.created) }} ago</div>
+                            </td>
+                        </tr>
+                    </table>
+                            
+                        </div>
+
+                        <div class="card-footer">
+
+                    <div class="float-left">
+                        <div class="btn btn-danger" v-on:click="deletePractice(selectedPractice)">Delete</div>
+                    </div>
+                    <div class="float-right" v-if="editPractice">
+                        <div class="btn btn-secondary" v-on:click="editPractice = false">Cancel</div>
+                        <div class="btn btn-primary" v-on:click="savePractice()">Save</div>
+                    </div>
+                    <div class="float-right" v-else>
+                        <div class="btn btn-primary" v-on:click="selectedPractice = null">Close</div>
+                        <div class="btn btn-secondary" v-on:click="editPractice = true">Edit</div>
+                    </div>
+                        </div>
+                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </transition>
+                
+                
+                <!-- TABLE END -->
+				</div>
+            <div class="col-12" style="min-width: 300px; text-align: left" v-if="options.seeAsDoctor">
+                <br>
+
+                <!-- TABLE START -->
+                <div class="section-title">
+				Doctors
+                <span class="add-new" v-on:click="addDoctor()">Create new</span>
+				<span class="add-new float-right search-box" @keyup="getDoctors()"><input v-model="options.doctors.filter" class="search-for" type="text" placeholder="Search..."/></span>
+				</div>
+                <table class='blueTable' style="text-align: right">
+                    <tr>
+                        <th v-if="showProvisionalIds">ID</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>PostCode</th>
+                        <th v-if="false">Password</th>
+                        <th v-if="false">Gdpr</th>
+                        <th>Created</th>
+                    </tr>
+                    <template v-for="(doctor, index) in data.doctors.items" v-if="doctor && !doctor.deleted">
+                        <tr v-on:click="selectDoctor(doctor)">
+                            <td v-if="showProvisionalIds">
+                                <div>{{doctor.doctorId}}</div>
+                            </td>
+                            <td class="text-left">
+                                <div>{{doctor.name}}</div>
+                            </td>
+                            <td>
+                                <div>{{doctor.phone}}</div>
+                            </td>
+                            <td>
+                                <div>{{doctor.email}}</div>
+                            </td>
+                            <td>
+                                <div>{{doctor.postCode}}</div>
+                            </td>
+                            <td v-if="false">
+                                <div>{{doctor.password}}</div>
+                            </td>
+                            <td v-if="false">
+                                <div>{{doctor.gdpr}}</div>
+                            </td>
+                            <td>
+                                <div>{{ timeAgo(doctor.created) }} ago</div>
+                            </td>
+                        </tr>
+                        <tr></tr>
+                    </template>
+                </table>
+				<div style="font-size: small;">
+					<span class="text-secondary" v-if="data.doctors.totalCount > options.doctors.pageSize">{{options.doctors.currentPage * options.doctors.pageSize + 1}} - {{(options.doctors.currentPage + 1) * options.doctors.pageSize }} of {{data.doctors.totalCount}}</span>
+					<div v-if="false" class="text-secondary float-right" style="padding-top: 3px;">
+						<span class="page-number" @click="addPage(options.doctors, -options.doctors.currentPage); getDoctors(options.doctors.currentPage, options.doctors.pageSize)" v-if="options.doctors.currentPage >= 3">1</span>
+						<span v-if="options.doctors.currentPage >= 4"> ... </span>
+						<span class="page-number" @click="addPage(options.doctors, -2); getDoctors(options.doctors.currentPage, options.doctors.pageSize)" v-if="options.doctors.currentPage >= 2">{{options.doctors.currentPage - 1}}</span>
+						<span class="page-number" @click="addPage(options.doctors, -1); getDoctors(options.doctors.currentPage, options.doctors.pageSize)" v-if="options.doctors.currentPage >= 1">{{options.doctors.currentPage - 0}}</span>
+						<span class="page-number" style="color: black; background-color: #ddf">{{options.doctors.currentPage + 1}}</span>
+						<span v-if="options.doctors.currentPage < lastPage(demo.doctors, options.doctors) -1" class="page-number" @click="addPage(options.doctors, +1); getDoctors(options.doctors.currentPage, options.doctors.pageSize)">{{options.doctors.currentPage + 2}}</span>
+						<span v-if="options.doctors.currentPage < lastPage(demo.doctors, options.doctors) -2" class="page-number" @click="addPage(options.doctors, +2); getDoctors(options.doctors.currentPage, options.doctors.pageSize)">{{options.doctors.currentPage + 3}}</span>
+						<span v-if="options.doctors.currentPage < lastPage(demo.doctors, options.doctors) -4"> ... </span>
+						<span class="page-number" v-if="options.doctors.currentPage < lastPage(demo.doctors, options.doctors) -3" @click="addPage(options.doctors, lastPage(demo.doctors, options.doctors) - options.doctors.currentPage - 1); getDoctors(options.doctors.currentPage, options.doctors.pageSize)">{{lastPage(demo.doctors, options.doctors)}}</span>
+					</div>
+					<div class="text-secondary float-right" style="padding-top: 3px;">
+						<span class="page-number" @click="addPage(options.doctors, -2); getDoctors(options.doctors.currentPage, options.doctors.pageSize)" v-if="options.doctors.currentPage >= 2"> &lt; &lt; </span>
+						<span class="page-number" @click="addPage(options.doctors, -1); getDoctors(options.doctors.currentPage, options.doctors.pageSize)" v-if="options.doctors.currentPage >= 1"> &lt; </span>
+						<span v-if="options.doctors.currentPage == 0"> Page: </span>
+						<span class="page-number" style="color: black;">{{options.doctors.currentPage + 1}}</span>
+						<span v-if="options.doctors.currentPage < lastPage(demo.doctors, options.doctors) -1" class="page-number" @click="addPage(options.doctors, +1); getDoctors(options.doctors.currentPage, options.doctors.pageSize)"> &gt; </span>
+						<span v-if="options.doctors.currentPage < lastPage(demo.doctors, options.doctors) -2" class="page-number" @click="addPage(options.doctors, +2); getDoctors(options.doctors.currentPage, options.doctors.pageSize)"> &gt; &gt; </span>
+					</div>
+				</div>
+                <br>
+
+
+                <transition name="modal">
+                    <div class="modal-mask"  v-if="selectedDoctor">
+                        <div class="modal-wrapper">
+                            <div class="modal-container" :class="isMobile?'mobile':'w1200'" :style="isMobile?'max-height:'+window.innerHeight+'px':''">
+                <div v-if="selectedDoctor">
+                    <div class="card" style="background-color: #F8F8F8;">
+                        <div class="card-header">
+                                <span class="card-title">
+                                    {{selectedDoctor.doctorId ? "Edit":"Create"}} Doctor
+                                </span>
+								<div class="btn btn-light float-right" v-on:click="selectedDoctor = null" >
+									x
+								</div>
+                        </div>
+                        <div class="card-body">
+                    
+                    <table class='blueTable-properties' style="text-align: right">
+                        <tr v-if="selectedDoctor.ownerId && showProvisionalIds">
+                            <th>DoctorId</th>
+                            <td>
+                                <div class="input-helper">{{selectedDoctor.ownerId}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Name</th>
+                            <td>
+                                <input v-if="editDoctor" class="full-width" v-model="selectedDoctor.name">
+                                <div class="input-helper">{{selectedDoctor.name}}</div>
+                                <div class="text-left" v-if="!editDoctor">{{selectedDoctor.name}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Phone</th>
+                            <td>
+                                <input v-if="editDoctor" class="full-width" v-model="selectedDoctor.phone">
+                                <div class="input-helper">{{selectedDoctor.phone}}</div>
+                                <div class="text-left" v-if="!editDoctor">{{selectedDoctor.phone}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>
+                                <input v-if="editDoctor" class="full-width" v-model="selectedDoctor.email">
+                                <div class="input-helper">{{selectedDoctor.email}}</div>
+                                <div class="text-left" v-if="!editDoctor">{{selectedDoctor.email}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>PostCode</th>
+                            <td>
+                                <input v-if="editDoctor" class="full-width" v-model="selectedDoctor.postCode">
+                                <div class="input-helper">{{selectedDoctor.postCode}}</div>
+                                <div class="text-left" v-if="!editDoctor">{{selectedDoctor.gdpr}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Password</th>
+                            <td>
+                                <input v-if="editDoctor" class="full-width" type="password" v-model="selectedDoctor.password">
+                                <div class="input-helper"></div>
+                                <div class="text-left" v-if="!editDoctor">{{selectedDoctor.gdpr}}</div>
+                            </td>
+                        </tr>
+                        <tr v-if="selectedDoctor.ownerId">
+                            <th>Gdpr</th>
+                            <td>
+                                <input class="full-width" v-model="selectedDoctor.gdpr">
+                                <div class="input-helper">{{selectedDoctor.gdpr}}</div>
+                                <div class="text-left" v-if="!editDoctor">{{selectedDoctor.gdpr}}</div>
+                            </td>
+                        </tr>
+                        <tr v-if="selectedDoctor.ownerId">
+                            <th>Created</th>
+                            <td>
+                                <div class="input-helper">{{ timeAgo(selectedDoctor.created) }} ago</div>
+                            </td>
+                        </tr>
+                    </table>
+
+                        </div>
+
+                        <div class="card-footer">
+
+                    <div class="float-left">
+                        <div class="btn btn-danger" v-on:click="deleteDoctor(selectedDoctor)">Delete</div>
+                    </div>
+                    <div class="float-right" v-if="editDoctor">
+                        <div class="btn btn-secondary" v-on:click="editDoctor = false">Cancel</div>
+                        <div class="btn btn-primary" v-on:click="saveDoctor()">Save</div>
+                    </div>
+                    <div class="float-right" v-else>
+                        <div class="btn btn-primary" v-on:click="selectedDoctor = null">Close</div>
+                        <div class="btn btn-secondary" v-on:click="editDoctor = true">Edit</div>
+                    </div>
+                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            </div>
+            </transition>
+                
+                <!-- TABLE END -->
+				</div>
+            <div class="col-12" style="min-width: 300px; text-align: left" v-if="options.seeAsDoctor">
+                <br>
+
+                <!-- TABLE START -->
+                <div class="section-title">
+				Owners
+                <span class="add-new" v-on:click="addOwner()">Create new</span>
+				<span class="add-new float-right search-box" @keyup="getOwners()"><input v-model="options.owners.filter" class="search-for" type="text" placeholder="Search..."/></span>
+				</div>
+                <table class='blueTable' style="text-align: right">
+                    <tr>
+                        <th v-if="showProvisionalIds">ID</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>PostCode</th>
+                        <th v-if="false">Password</th>
+                        <th v-if="false">Gdpr</th>
+                        <th>Created</th>
+                    </tr>
+                    <template v-for="(owner, index) in data.owners.items" v-if="owner && !owner.deleted">
+                        <tr v-on:click="selectOwner(owner)">
+                            <td v-if="showProvisionalIds">
+                                <div>{{owner.ownerId}}</div>
+                            </td>
+                            <td class="text-left">
+                                <div>{{owner.name}}</div>
+                            </td>
+                            <td>
+                                <div>{{owner.phone}}</div>
+                            </td>
+                            <td>
+                                <div>{{owner.email}}</div>
+                            </td>
+                            <td>
+                                <div>{{owner.postCode}}</div>
+                            </td>
+                            <td v-if="false">
+                                <div>{{owner.password}}</div>
+                            </td>
+                            <td v-if="false">
+                                <div>{{owner.gdpr}}</div>
+                            </td>
+                            <td>
+                                <div>{{ timeAgo(owner.created) }} ago</div>
+                            </td>
+                        </tr>
+                        <tr></tr>
+                    </template>
+                </table>
+				<div style="font-size: small;">
+					<span class="text-secondary" v-if="data.owners.totalCount > options.owners.pageSize">{{options.owners.currentPage * options.owners.pageSize + 1}} - {{(options.owners.currentPage + 1) * options.owners.pageSize }} of {{data.owners.totalCount}}</span>
+					<div v-if="false" class="text-secondary float-right" style="padding-top: 3px;">
+						<span class="page-number" @click="addPage(options.owners, -options.owners.currentPage); getOwners(options.owners.currentPage, options.owners.pageSize)" v-if="options.owners.currentPage >= 3">1</span>
+						<span v-if="options.owners.currentPage >= 4"> ... </span>
+						<span class="page-number" @click="addPage(options.owners, -2); getOwners(options.owners.currentPage, options.owners.pageSize)" v-if="options.owners.currentPage >= 2">{{options.owners.currentPage - 1}}</span>
+						<span class="page-number" @click="addPage(options.owners, -1); getOwners(options.owners.currentPage, options.owners.pageSize)" v-if="options.owners.currentPage >= 1">{{options.owners.currentPage - 0}}</span>
+						<span class="page-number" style="color: black; background-color: #ddf">{{options.owners.currentPage + 1}}</span>
+						<span v-if="options.owners.currentPage < lastPage(demo.owners, options.owners) -1" class="page-number" @click="addPage(options.owners, +1); getOwners(options.owners.currentPage, options.owners.pageSize)">{{options.owners.currentPage + 2}}</span>
+						<span v-if="options.owners.currentPage < lastPage(demo.owners, options.owners) -2" class="page-number" @click="addPage(options.owners, +2); getOwners(options.owners.currentPage, options.owners.pageSize)">{{options.owners.currentPage + 3}}</span>
+						<span v-if="options.owners.currentPage < lastPage(demo.owners, options.owners) -4"> ... </span>
+						<span class="page-number" v-if="options.owners.currentPage < lastPage(demo.owners, options.owners) -3" @click="addPage(options.owners, lastPage(demo.owners, options.owners) - options.owners.currentPage - 1); getOwners(options.owners.currentPage, options.owners.pageSize)">{{lastPage(demo.owners, options.owners)}}</span>
+					</div>
+					<div class="text-secondary float-right" style="padding-top: 3px;">
+						<span class="page-number" @click="addPage(options.owners, -2); getOwners(options.owners.currentPage, options.owners.pageSize)" v-if="options.owners.currentPage >= 2"> &lt; &lt; </span>
+						<span class="page-number" @click="addPage(options.owners, -1); getOwners(options.owners.currentPage, options.owners.pageSize)" v-if="options.owners.currentPage >= 1"> &lt; </span>
+						<span v-if="options.owners.currentPage == 0"> Page: </span>
+						<span class="page-number" style="color: black;">{{options.owners.currentPage + 1}}</span>
+						<span v-if="options.owners.currentPage < lastPage(demo.owners, options.owners) -1" class="page-number" @click="addPage(options.owners, +1); getOwners(options.owners.currentPage, options.owners.pageSize)"> &gt; </span>
+						<span v-if="options.owners.currentPage < lastPage(demo.owners, options.owners) -2" class="page-number" @click="addPage(options.owners, +2); getOwners(options.owners.currentPage, options.owners.pageSize)"> &gt; &gt; </span>
+					</div>
+				</div>
+                <br>
+
+                                <transition name="modal">
+                                    <div class="modal-mask"  v-if="selectedOwner">
+                                        <div class="modal-wrapper">
+                                            <div class="modal-container" :class="isMobile?'mobile':'w1200'" :style="isMobile?'max-height:'+window.innerHeight+'px':''">
+                <div v-if="selectedOwner">
+                    <div class="card" style="background-color: #F8F8F8;">
+                        <div class="card-header">
+                                <span class="card-title">
+                                    {{selectedOwner.ownerId ? "Edit":"Create"}}  Owner
+                                </span>
+								<div class="btn btn-light float-right" v-on:click="selectedOwner = null" >
+									x
+								</div>
+                        </div>
+                        <div class="card-body">
+
+                    <table class='blueTable-properties' style="text-align: right">
+                        <tr v-if="selectedOwner.ownerId && showProvisionalIds">
+                            <th>OwnerId</th>
+                            <td>
+                                <div class="input-helper">{{selectedOwner.ownerId}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Public nickname</th>
+                            <td>
+                                <input v-if="editOwner" class="full-width" type="text" v-model="selectedOwner.nickName">
+                                <div class="input-helper">{{selectedOwner.nickName}}</div>
+                                <div class="text-left" v-if="!editOwner">{{selectedOwner.nickName}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Name</th>
+                            <td>
+                                <input v-if="editOwner" class="full-width" v-model="selectedOwner.name">
+                                <div class="input-helper">{{selectedOwner.name}}</div>
+                                <div class="text-left" v-if="!editOwner">{{selectedOwner.name}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Phone</th>
+                            <td>
+                                <input v-if="editOwner" class="full-width" v-model="selectedOwner.phone">
+                                <div class="input-helper">{{selectedOwner.phone}}</div>
+                                <div class="text-left" v-if="!editOwner">{{selectedOwner.phone}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>
+                                <input v-if="editOwner" class="full-width" v-model="selectedOwner.email">
+                                <div class="input-helper">{{selectedOwner.email}}</div>
+                                <div class="text-left" v-if="!editOwner">{{selectedOwner.email}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>PostCode</th>
+                            <td>
+                                <input v-if="editOwner" class="full-width" v-model="selectedOwner.postCode">
+                                <div class="input-helper">{{selectedOwner.postCode}}</div>
+                                <div class="text-left" v-if="!editOwner">{{selectedOwner.postCode}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Password</th>
+                            <td>
+                                <input v-if="editOwner" class="full-width" v-model="selectedOwner.password">
+                                <div class="input-helper">{{selectedOwner.password}}</div>
+                                <div class="text-left" v-if="!editOwner">{{selectedOwner.password}}</div>
+                            </td>
+                        </tr>
+                        <tr v-if="selectedOwner.ownerId">
+                            <th>Gdpr</th>
+                            <td>
+                                <input v-if="editOwner" class="full-width" v-model="selectedOwner.gdpr">
+                                <div class="input-helper">{{selectedOwner.gdpr}}</div>
+                                <div class="text-left" v-if="!editOwner">{{selectedOwner.gdpr}}</div>
+                            </td>
+                        </tr>
+                        <tr v-if="selectedOwner.ownerId">
+                            <th>Created</th>
+                            <td>
+                                <div>{{ timeAgo(selectedOwner.created) }} ago</div>
+                            </td>
+                        </tr>
+                    </table>
+
+                        </div>
+
+                        <div class="card-footer">
+
+                    <div class="float-left">
+                        <div class="btn btn-danger" v-on:click="deleteOwner(selectedOwner)">Delete</div>
+                    </div>
+                    <div class="float-right" v-if="editOwner">
+                        <div class="btn btn-secondary" v-on:click="editOwner = false">Cancel</div>
+                        <div class="btn btn-primary" v-on:click="saveOwner()">Save</div>
+                    </div>
+                    <div class="float-right" v-else>
+                        <div class="btn btn-primary" v-on:click="selectedOwner = null">Close</div>
+                        <div class="btn btn-secondary" v-on:click="editOwner = true">Edit</div>
+                    </div>
+                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+        </div>
+    </div>
+</transition>
+                
+                <!-- TABLE END -->
+				</div>
+            <div class="col-12" style="min-width: 300px; text-align: left" v-if="options.seeAsOwner">
+                <br>
+
+                <!-- TABLE START -->
+                <div class="section-title">Pets
+                <span class="add-new" v-on:click="addPet()">Create new</span>
+				<span class="add-new float-right search-box" @keyup="getPets()"><input v-model="options.pets.filter" class="search-for" type="text" placeholder="Search..."/></span>
+				</div>
+                <table class='blueTable' style="text-align: right">
+                    <tr>
+                        <th v-if="showProvisionalIds">ID</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Sex</th>
+                        <th>Age</th>
+                        <th v-if="false">Dob</th>
+                        <th>Weight</th>
+                        <th>Id</th>
+                        <th>PostCode</th>
+                        <th>Owner</th>
+                        <th>Doctor</th>
+                        <th>Created</th>
+                    </tr>
+                    <template v-for="(pet, index) in data.pets.items" v-if="pet && !pet.deleted">
+                        <tr v-on:click="selectPet(pet)">
+                            <td v-if="showProvisionalIds">
+                                <div>{{pet.petId}}</div>
+                            </td>
+                            <td class="text-left">
+                                <div>{{pet.name}}</div>
+                            </td>
+                            <td>
+                                <div>{{ pet.type < knownPetTypes.length ? knownPetTypes[pet.type].name : pet.type }}</div>
+                            </td>
+                            <td>
+                                <div>{{ pet.sex < knownPetSex.length ? knownPetSex[pet.sex].name : pet.sex }}</div>
+                            </td>
+                            <td>
+                                <div>{{ timeAgo(pet.dob) }}</div>
+                            </td>
+                            <td v-if="false">
+                                <div>{{ timeAgo(pet.dob) }}</div>
+                            </td>
+                            <td>
+                                <div>{{pet.kg}}</div>
+                            </td>
+                            <td>
+                                <div>{{pet.id}}</div>
+                            </td>
+                            <td>
+                                <div>{{pet.postCode}}</div>
+                            </td>
+                            <td>
+                                <div>{{lookupOwners(pet.ownerId)}}</div>
+                            </td>
+                            <td>
+                                <div>{{lookupDoctors(pet.doctorId)}}</div>
+                            </td>
+                            <td>
+                                <div>{{ timeAgo(pet.created) }} ago</div>
+                            </td>
+                    </template>
+                </table>
+				<div style="font-size: small;">
+					<span class="text-secondary" v-if="data.pets.totalCount > options.pets.pageSize">{{options.pets.currentPage * options.pets.pageSize + 1}} - {{(options.pets.currentPage + 1) * options.pets.pageSize }} of {{data.pets.totalCount}}</span>
+					<div v-if="false" class="text-secondary float-right" style="padding-top: 3px;">
+						<span class="page-number" @click="addPage(options.pets, -options.pets.currentPage); getPets(options.pets.currentPage, options.pets.pageSize)" v-if="options.pets.currentPage >= 3">1</span>
+						<span v-if="options.pets.currentPage >= 4"> ... </span>
+						<span class="page-number" @click="addPage(options.pets, -2); getPets(options.pets.currentPage, options.pets.pageSize)" v-if="options.pets.currentPage >= 2">{{options.pets.currentPage - 1}}</span>
+						<span class="page-number" @click="addPage(options.pets, -1); getPets(options.pets.currentPage, options.pets.pageSize)" v-if="options.pets.currentPage >= 1">{{options.pets.currentPage - 0}}</span>
+						<span class="page-number" style="color: black; background-color: #ddf">{{options.pets.currentPage + 1}}</span>
+						<span v-if="options.pets.currentPage < lastPage(demo.pets, options.pets) -1" class="page-number" @click="addPage(options.pets, +1); getPets(options.pets.currentPage, options.pets.pageSize)">{{options.pets.currentPage + 2}}</span>
+						<span v-if="options.pets.currentPage < lastPage(demo.pets, options.pets) -2" class="page-number" @click="addPage(options.pets, +2); getPets(options.pets.currentPage, options.pets.pageSize)">{{options.pets.currentPage + 3}}</span>
+						<span v-if="options.pets.currentPage < lastPage(demo.pets, options.pets) -4"> ... </span>
+						<span class="page-number" v-if="options.pets.currentPage < lastPage(demo.pets, options.pets) -3" @click="addPage(options.pets, lastPage(demo.pets, options.pets) - options.pets.currentPage - 1); getPets(options.pets.currentPage, options.pets.pageSize)">{{lastPage(demo.pets, options.pets)}}</span>
+					</div>
+					<div class="text-secondary float-right" style="padding-top: 3px;">
+						<span class="page-number" @click="addPage(options.pets, -2); getPets(options.pets.currentPage, options.pets.pageSize)" v-if="options.pets.currentPage >= 2"> &lt; &lt; </span>
+						<span class="page-number" @click="addPage(options.pets, -1); getPets(options.pets.currentPage, options.pets.pageSize)" v-if="options.pets.currentPage >= 1"> &lt; </span>
+						<span v-if="options.pets.currentPage == 0"> Page: </span>
+						<span class="page-number" style="color: black;">{{options.pets.currentPage + 1}}</span>
+						<span v-if="options.pets.currentPage < lastPage(demo.pets, options.pets) -1" class="page-number" @click="addPage(options.pets, +1); getPets(options.pets.currentPage, options.pets.pageSize)"> &gt; </span>
+						<span v-if="options.pets.currentPage < lastPage(demo.pets, options.pets) -2" class="page-number" @click="addPage(options.pets, +2); getPets(options.pets.currentPage, options.pets.pageSize)"> &gt; &gt; </span>
+					</div>
+				</div>
+                <br>
+
+
+                                                <transition name="modal">
+                                                    <div class="modal-mask"  v-if="selectedPet">
+                                                        <div class="modal-wrapper">
+                                                            <div class="modal-container" :class="isMobile?'mobile':'w1200'" :style="isMobile?'max-height:'+window.innerHeight+'px':''">
+                <div v-if="selectedPet">
+                    <div class="card" style="background-color: #F8F8F8;">
+                        <div class="card-header">
+                                <span class="card-title">
+                                    {{selectedPet.petId ? "Edit":"Create"}} Pet
+                                </span>
+								<div class="btn btn-light float-right" v-on:click="selectedPet = null" >
+									x
+								</div>
+                        </div>
+                        <div class="card-body">
+
+                    
+                    <table class='blueTable-properties' style="text-align: right">
+                        <tr v-if="selectedPet.petId && showProvisionalIds">
+                            <th>PetId</th>
+                            <td>
+                                <div class="input-helper">{{selectedPet.petId}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td style="text-align: left">
+                                <div v-if="editPetType">
+                                    <div><input id="petType_1" type="radio" name="petType" value="1" v-model.number="selectedPet.type"/><label for="petType_1">Dog</label></div>
+                                    <div><input id="petType_2" type="radio" name="petType" value="2" v-model.number="selectedPet.type"/><label for="petType_2">Cat</label></div>
+                                </div>
+                                <div v-else>
+                                    {{ selectedPet.type < knownPetTypes.length ? knownPetTypes[selectedPet.type].name : selectedPet.type }}
+                                    <span class="float-right blue" v-on:click="editPetType = !editPetType">Change</span>
+                                </div>
+                                <div class="input-helper">{{selectedPet.type}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Name</th>
+                            <td>
+                                <input v-if="editPet" class="full-width" v-model="selectedPet.name">
+                                <div class="input-helper">{{selectedPet.name}}</div>
+                                <div class="text-left" v-if="!editPet">{{selectedPet.name}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Sex (M/F)</th>
+                            <td style="text-align: left">
+                                <div v-if="editPetSex">
+                                    <div><input id="petSex_1" type="radio" name="petSex" value="1" v-model.number="selectedPet.sex"/><label for="petSex_1">M</label></div>
+                                    <div><input id="petSex_2" type="radio" name="petSex" value="2" v-model.number="selectedPet.sex"/><label for="petSex_2">F</label></div>
+                                    <div><input id="petSex_3" type="radio" name="petSex" value="3" v-model.number="selectedPet.sex"/><label for="petSex_3">Sterilized Female</label></div>
+                                    <div><input id="petSex_4" type="radio" name="petSex" value="4" v-model.number="selectedPet.sex"/><label for="petSex_4">Sterilized Male</label></div>
+                                </div>
+                                <div v-else>
+                                    {{ selectedPet.sex < knownPetSex.length ? knownPetSex[selectedPet.sex].name : selectedPet.sex }}
+                                    <span class="float-right blue" v-on:click="editPetSex = !editPetSex">Change</span>
+                                </div>                                
+                                
+                                <div class="input-helper">{{selectedPet.sex}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Dob</th>
+                            <td style="text-align: left">
+                                <div v-if="editPetDob">
+                                    <div>
+                                        <vuejs-datepicker @selected="updatePetDob"></vuejs-datepicker>
+                                    </div>
+                                </div>
+                                <div v-else>
+                                    {{ epochToDate(selectedPet.dob) }}
+                                    <span class="float-right blue" v-on:click="editPetDob = !editPetDob">Change</span>
+                                </div>
+                                <div class="input-helper">Age: {{ timeAgo(selectedPet.dob) }}</div>
+                            </td>
+                        </tr>
+                        <tr v-if="selectedPet.petId">
+                            <th>Age (years)</th>
+                            <td>
+                                <input v-if="editPet" class="full-width" type="number" v-model.number="selectedPet.age">
+                                <div class="input-helper">{{selectedPet.age}}</div>
+                                <div class="text-left" v-if="!editPet">{{selectedPet.age}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Weight (Kg)</th>
+                            <td>
+                                <input v-if="editPet" class="full-width" type="number" v-model.number="selectedPet.kg">
+                                <div class="input-helper">{{selectedPet.kg}}</div>
+                                <div class="text-left" v-if="!editPet">{{selectedPet.kg}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Id (microcip)</th>
+                            <td>
+                                <input v-if="editPet" class="full-width" v-model="selectedPet.id">
+                                <div class="input-helper">{{selectedPet.id}}</div>
+                                <div class="text-left" v-if="!editPet">{{selectedPet.id}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>PostCode</th>
+                            <td>
+                                <input v-if="editPet" class="full-width" v-model="selectedPet.postCode">
+                                <div class="input-helper">{{selectedPet.postCode}}</div>
+                                <div class="text-left" v-if="!editPet">{{selectedPet.postCode}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Owner</th>
+                            <td style="text-align: left">
+								<span> {{lookupOwners(selectedPet.ownerId)}}  </span>
+                                <span v-if="selectedPet.owner">{{selectedPet.owner.name}} [{{selectedPet.owner.ownerId}}]</span>
+                                <input v-if="editPet" class="full-width" type="hidden" v-model.number="selectedPet.ownerId">
+                                <span class="float-right blue" v-on:click="openOwnerSelector(selectedPet, selectedPetOwnerChanged)">Change</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Doctor</th>
+                            <td style="text-align: left">
+								<span> {{lookupDoctors(selectedPet.doctorId)}}  </span>
+                                <span v-if="selectedPet.doctor">Dr: {{selectedPet.doctor.name}} [{{selectedPet.doctor.doctorId}}]</span>
+                                <input v-if="editPet" class="full-width" type="hidden" v-model.number="selectedPet.doctorId"> 
+                                <span class="float-right blue" v-on:click="openDoctorSelector(selectedPet, selectedPetDoctorChanged)">Change</span>
+                            </td>
+                        </tr>
+                        <tr v-if="selectedPet.petId">
+                            <th>Created</th>
+                            <td>
+                                <div class="input-helper">{{ timeAgo(selectedPet.created) }} ago</div>
+                            </td>
+                        </tr>
+                    </table>
+                            
+                            <div v-if="modalErrors && modalErrors.length" class="alert-danger">
+                                <div v-for="modalError in modalErrors">{{ modalError }}</div>
+                            </div>
+
+                        </div>
+
+                        <div class="card-footer">
+                    <div class="float-left">
+                        <div class="btn btn-danger" v-on:click="deletePet(selectedPet)">Delete</div>
+                    </div>
+                    <div class="float-right" v-if="editPet">
+                        <div class="btn btn-secondary" v-on:click="editPet = false">Cancel</div>
+                        <div class="btn btn-primary" v-on:click="savePet()">Save</div>
+                    </div>
+                    <div class="float-right" v-else>
+                        <div class="btn btn-primary" v-on:click="selectedPet = null">Close</div>
+                        <div class="btn btn-secondary" v-on:click="editPet = true">Edit</div>
+                    </div>
+                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    </div>
+                                                    </div>
+                                                </transition>
+                <!-- TABLE END -->
+				</div>
+            <div class="col-12" style="min-width: 300px; text-align: left" v-if="options.seeAsDoctor">
+                <br>
+
+                <!-- TABLE START -->
+                <div class="section-title">Drugs
+                <span class="add-new" v-on:click="addDrug()">Create new</span>
+				<span class="add-new float-right search-box" @keyup="getDrugs()"><input v-model="options.drugs.filter" class="search-for" type="text" placeholder="Search..."/></span>
+				</div>
+                <table class='blueTable' style="text-align: right">
+                    <tr>
+                        <th v-if="showProvisionalIds">ID</th>
+                        <th>Name</th>
+                        <th>Use</th>
+                        <th>Dose</th>
+                        <th>Note</th>
+                        <th>Up Votes</th>
+                        <th>Down Votes</th>
+                        <th>Created</th>
+                        <th></th>
+                    </tr>
+                    <template v-for="(drug, index) in data.drugs.items" v-if="drug && !drug.deleted">
+                        <tr v-on:click="selectDrug(drug)">
+                            <td v-if="showProvisionalIds">
+                                <div>{{drug.drugId}}</div>
+                            </td>
+                            <td class="text-left">
+                                <div>{{drug.name}}</div>
+                            </td>
+                            <td>
+                                <div>{{drug.use}}</div>
+                            </td>
+                            <td>
+                                <div>{{drug.doses}}</div>
+                            </td>
+                            <td>
+                                <div>{{drug.note}}</div>
+                            </td>
+                            <td>
+                                <div>{{drug.upVotes}}</div>
+                            </td>
+                            <td>
+                                <div>{{drug.downVotes}}</div>
+                            </td>
+                            <td>
+                                <div>{{ timeAgo(drug.created) }} ago</div>
+                            </td>
+                        </tr>
+                        <tr></tr>
+                    </template>
+                </table>
+				<div style="font-size: small;">
+					<span class="text-secondary" v-if="data.drugs.totalCount > options.drugs.pageSize">{{options.drugs.currentPage * options.drugs.pageSize + 1}} - {{(options.drugs.currentPage + 1) * options.drugs.pageSize }} of {{data.drugs.totalCount}}</span>
+					<div v-if="false" class="text-secondary float-right" style="padding-top: 3px;">
+						<span class="page-number" @click="addPage(options.drugs, -options.drugs.currentPage); getDrugs(options.drugs.currentPage, options.drugs.pageSize)" v-if="options.drugs.currentPage >= 3">1</span>
+						<span v-if="options.drugs.currentPage >= 4"> ... </span>
+						<span class="page-number" @click="addPage(options.drugs, -2); getDrugs(options.drugs.currentPage, options.drugs.pageSize)" v-if="options.drugs.currentPage >= 2">{{options.drugs.currentPage - 1}}</span>
+						<span class="page-number" @click="addPage(options.drugs, -1); getDrugs(options.drugs.currentPage, options.drugs.pageSize)" v-if="options.drugs.currentPage >= 1">{{options.drugs.currentPage - 0}}</span>
+						<span class="page-number" style="color: black; background-color: #ddf">{{options.drugs.currentPage + 1}}</span>
+						<span v-if="options.drugs.currentPage < lastPage(demo.drugs, options.drugs) -1" class="page-number" @click="addPage(options.drugs, +1); getDrugs(options.drugs.currentPage, options.drugs.pageSize)">{{options.drugs.currentPage + 2}}</span>
+						<span v-if="options.drugs.currentPage < lastPage(demo.drugs, options.drugs) -2" class="page-number" @click="addPage(options.drugs, +2); getDrugs(options.drugs.currentPage, options.drugs.pageSize)">{{options.drugs.currentPage + 3}}</span>
+						<span v-if="options.drugs.currentPage < lastPage(demo.drugs, options.drugs) -4"> ... </span>
+						<span class="page-number" v-if="options.drugs.currentPage < lastPage(demo.drugs, options.drugs) -3" @click="addPage(options.drugs, lastPage(demo.drugs, options.drugs) - options.drugs.currentPage - 1); getDrugs(options.drugs.currentPage, options.drugs.pageSize)">{{lastPage(demo.drugs, options.drugs)}}</span>
+					</div>
+					<div class="text-secondary float-right" style="padding-top: 3px;">
+						<span class="page-number" @click="addPage(options.drugs, -2); getDrugs(options.drugs.currentPage, options.drugs.pageSize)" v-if="options.drugs.currentPage >= 2"> &lt; &lt; </span>
+						<span class="page-number" @click="addPage(options.drugs, -1); getDrugs(options.drugs.currentPage, options.drugs.pageSize)" v-if="options.drugs.currentPage >= 1"> &lt; </span>
+						<span v-if="options.drugs.currentPage == 0"> Page: </span>
+						<span class="page-number" style="color: black;">{{options.drugs.currentPage + 1}}</span>
+						<span v-if="options.drugs.currentPage < lastPage(demo.drugs, options.drugs) -1" class="page-number" @click="addPage(options.drugs, +1); getDrugs(options.drugs.currentPage, options.drugs.pageSize)"> &gt; </span>
+						<span v-if="options.drugs.currentPage < lastPage(demo.drugs, options.drugs) -2" class="page-number" @click="addPage(options.drugs, +2); getDrugs(options.drugs.currentPage, options.drugs.pageSize)"> &gt; &gt; </span>
+					</div>
+				</div>
+                <br>
+
+
+
+                                                                <transition name="modal">
+                                                                    <div class="modal-mask"  v-if="selectedDrug">
+                                                                        <div class="modal-wrapper">
+                                                                            <div class="modal-container" :class="isMobile?'mobile':'w1200'" :style="isMobile?'max-height:'+window.innerHeight+'px':''">
+                <div v-if="selectedDrug">
+                    <div class="card" style="background-color: #F8F8F8;">
+                        <div class="card-header">
+                                <span class="card-title">
+                                    {{selectedDrug.drugId ? "Edit":"Create"}} Drug
+                                </span>
+								<div class="btn btn-light float-right" v-on:click="selectedDrug = null" >
+									x
+								</div>
+                        </div>
+                        <div class="card-body">
+
+                    
+                    <table class='blueTable-properties' style="text-align: right">
+                        <tr v-if="selectedDrug.drugId && showProvisionalIds">
+                            <th>DrugId</th>
+                            <td>
+                                <div class="input-helper">{{selectedDrug.drugId}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Name</th>
+                            <td>
+                                <input v-if="editDrug" class="full-width" v-model="selectedDrug.name">
+                                <div class="input-helper">{{selectedDrug.name}}</div>
+                                <div class="text-left" v-if="!editDrug">{{selectedDrug.name}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Use</th>
+                            <td>
+                                <input v-if="editDrug" class="full-width" v-model="selectedDrug.use">
+                                <div class="input-helper">{{selectedDrug.use}}</div>
+                                <div class="text-left" v-if="!editDrug">{{selectedDrug.use}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Doses</th>
+                            <td>
+                                <input v-if="editDrug" class="full-width" v-model="selectedDrug.doses">
+                                <div class="input-helper">{{selectedDrug.doses}}</div>
+                                <div class="text-left" v-if="!editDrug">{{selectedDrug.doses}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Note</th>
+                            <td>
+                                <input v-if="editDrug" class="full-width" v-model="selectedDrug.note">
+                                <div class="input-helper">{{selectedDrug.note}}</div>
+                                <div class="text-left" v-if="!editDrug">{{selectedDrug.note}}</div>
+                            </td>
+                        </tr>
+                        <tr v-if="selectedDrug.drugId">
+                            <th>UpVotes</th>
+                            <td>
+                                <div class="input-helper">{{selectedDrug.upVotes}}</div>
+                            </td>
+                        </tr>
+                        <tr v-if="selectedDrug.drugId">
+                            <th>DownVotes</th>
+                            <td>
+                                <div class="input-helper">{{selectedDrug.downVotes}}</div>
+                            </td>
+                        </tr>
+                        <tr v-if="selectedDrug.drugId">
+                            <th>Created</th>
+                            <td>
+                                <div class="input-helper">{{ timeAgo(selectedDrug.created) }} ago</div>
+                            </td>
+                        </tr>
+                    </table>
+
+                        </div>
+
+                        <div class="card-footer">
+                    <div class="float-left">
+                        <div class="btn btn-danger" v-on:click="deleteDrug(selectedDrug)">Delete</div>
+                    </div>
+                    <div class="float-right" v-if="editDrug">
+                        <div class="btn btn-secondary" v-on:click="editDrug = false">Cancel</div>
+                        <div class="btn btn-primary" v-on:click="saveDrug()">Save</div>
+                    </div>
+                    <div class="float-right" v-else>
+                        <div class="btn btn-primary" v-on:click="selectedDrug = null">Close</div>
+                        <div class="btn btn-secondary" v-on:click="editDrug = true">Edit</div>
+                    </div>
+                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    </div>
+                                                                    </div>
+                                                                </transition>
+                <!-- TABLE END -->
+                
+				</div>
+            <div class="col-12" style="min-width: 300px; text-align: left" v-if="options.seeAsDoctor">
+                <br>
+            </div>
+            </div>
+
+            <!-- END OF ROW -->
+
+
+
+
+
+
+
+
+
+            <transition name="modal">
+                <div class="modal-mask"  v-if="showDoctorSelector">
+                    <div class="modal-wrapper">
+                        <div class="modal-container" :class="isMobile?'mobile':'w1200'" :style="isMobile?'max-height:'+window.innerHeight+'px':''">
+                            <div class="card" style="background-color: #F8F8F8;">
+                                <div class="card-header">
+                                <span class="card-title">
+                                    Select Doctor
+                                </span>
+								<div class="btn btn-light float-right" v-on:click="showDoctorSelector = false" >
+									x
+								</div>
+                                </div>
+                                <div class="card-body">
+
+                                    <div class="section-title">Doctors</div>
+                                    <table class='blueTable' style="text-align: right">
+                                        <tr>
+                                            <th v-if="showProvisionalIds">ID</th>
+                                            <th>Name</th>
+                                            <th>Phone</th>
+                                            <th>Email</th>
+                                        </tr>
+										<div>{{data.doctors.items}}</div>
+                                        <template v-for="(doctor, index) in data.doctors.items" v-if="doctor && !doctor.deleted">
+                                            <tr v-on:click="selectionChangedDoctor(doctor)">
+                                                <td v-if="showProvisionalIds">
+                                                    <div>{{doctor.doctorId}}</div>
+                                                </td>
+												<td class="text-left">
+                                                    <div>{{doctor.name}}</div>
+                                                </td>
+                                                <td>
+                                                    <div>{{doctor.phone}}</div>
+                                                </td>
+                                                <td>
+                                                    <div>{{doctor.email}}</div>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </table>
+                                    
+                                    <div v-if="doctorSelectorSelectedItem">SelectedId: {{ doctorSelectorSelectedItem.doctorId }}</div>
+
+                                </div>
+                                <div class="card-footer">
+
+                                <div class="float-right">
+                                    <div class="btn btn-secondary" v-on:click="showDoctorSelector = false">Cancel</div>
+                                    <div class="btn btn-danger" v-on:click="adoptDoctor(doctorSelectorSelectedItem)">OK</div>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </transition>
+
+
+            <transition name="modal">
+                <div class="modal-mask"  v-if="showOwnerSelector">
+                    <div class="modal-wrapper">
+                        <div class="modal-container" :class="isMobile?'mobile':'w1200'" :style="isMobile?'max-height:'+window.innerHeight+'px':''">
+                            <div class="card" style="background-color: #F8F8F8;">
+                                <div class="card-header">
+                                <span class="card-title">
+                                    Select Owner
+                                </span>
+								<div class="btn btn-light float-right" v-on:click="showOwnerSelector = false" >
+									x
+								</div>
+                                </div>
+                                <div class="card-body">
+
+                                    <div class="section-title">Owners</div>
+                                    <table class='blueTable-properties' style="text-align: right">
+                                        <tr>
+                                            <th v-if="showProvisionalIds">ID</th>
+                                            <th>Name</th>
+                                            <th>Phone</th>
+                                            <th>Email</th>
+                                        </tr>
+                                        <template v-for="(owner, index) in data.owners.items" v-if="owner && !owner.deleted">
+                                            <tr v-on:click="selectionChangedOwner(owner)">
+                                                <td v-if="showProvisionalIds">
+                                                    <div>{{owner.ownerId}}</div>
+                                                </td>
+                                                <td>
+												<td class="text-left">
+                                                    <div>{{owner.name}}</div>
+                                                </td>
+                                                <td>
+                                                    <div>{{owner.phone}}</div>
+                                                </td>
+                                                <td>
+                                                    <div>{{owner.email}}</div>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </table>
+
+                                    <div v-if="ownerSelectorSelectedItem">SelectedId: {{ ownerSelectorSelectedItem.ownerId }}</div>
+
+                                </div>
+                                <div class="card-footer">
+
+                                <div class="float-right">
+                                    <div class="btn btn-secondary" v-on:click="showOwnerSelector = false">Cancel</div>
+                                    <div class="btn btn-danger" v-on:click="adoptOwner(ownerSelectorSelectedItem)">OK</div>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </transition>
+            
+			
+			
+
+                <transition name="modal">
+                    <div class="modal-mask"  v-if="showDataExportModal">
+                        <div class="modal-wrapper">
+                            <div class="modal-container" :class="isMobile?'mobile':'w1200'" :style="isMobile?'max-height:'+window.innerHeight+'px':''">
+                                
+                <div v-if="showDataExportModal">
+                    <div class="card" style="background-color: #F8F8F8;">
+                        <div class="card-header">
+                                <span class="card-title">
+                                    Export data
+                                </span>
+								<div class="btn btn-light float-right" v-on:click="showDataExportModal = false" >
+									x
+								</div>
+                        </div>
+                        <div class="card-body">
+
+						<div class="alert alert-danger">You are about to export sensitive data.</div>
+                    <table class='blueTable-properties' style="text-align: left">
+					
+                        <tr v-if="options.canExportData">
+                            <td class="text-left">
+                                <input data-testId="sl_chk_exportIncludePractices" name="exportIncludePractices" type="checkbox" v-model='options.exportIncludePractices' />
+							    <label for="exportIncludePractices">Include practices</label>
+                            </td>
+                            <td class="text-left">
+                                <input data-testId="sl_chk_exportIncludeDoctors" name="exportIncludeDoctors" type="checkbox" v-model='options.exportIncludeDoctors' />
+							    <label for="exportIncludeDoctors">Include doctors</label>
+                            </td>
+                            <td class="text-left">
+                                <input data-testId="sl_chk_exportIncludeOwners" name="exportIncludeOwners" type="checkbox" v-model='options.exportIncludeOwners' />
+							    <label for="exportIncludeOwners">Include owners</label>
+                            </td>
+							</tr>
+                        <tr v-if="options.canExportData">
+                            <td class="text-left">
+                                <input data-testId="sl_chk_exportIncludePets" name="exportIncludePets" type="checkbox" v-model='options.exportIncludePets' />
+							    <label for="exportIncludePets">Include pets</label>
+                            </td>
+                            <td class="text-left">
+                                <input data-testId="sl_chk_exportIncludeDrugs" name="exportIncludeDrugs" type="checkbox" v-model='options.exportIncludeDrugs' />
+							    <label for="exportIncludeDrugs">Include drugs</label>
+                            </td>
+                            <td class="text-left">
+                                <input data-testId="sl_chk_exportIncludeEvents" name="exportIncludeEvents" type="checkbox" v-model='options.exportIncludeEvents' />
+							    <label for="exportIncludeEvents">Include events</label>
+                            </td>
+                        </tr>
+                    </table>
+                            
+                        </div>
+
+                        <div class="card-footer">
+
+                    <div class="float-right">
+                        <div class="btn btn-secondary" v-on:click="showDataExportModal = false">Cancel</div>
+                        <div class="btn btn-primary" v-on:click="exportData()">Export</div>
+                    </div>
+                        </div>
+                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </transition>
+                
+            
+			
+			
+
+                <transition name="modal">
+                    <div class="modal-mask"  v-if="showDataImportModal">
+                        <div class="modal-wrapper">
+                            <div class="modal-container" :class="isMobile?'mobile':'w1200'" :style="isMobile?'max-height:'+window.innerHeight+'px':''">
+                                
+                <div v-if="showDataImportModal">
+                    <div class="card" style="background-color: #F8F8F8;">
+                        <div class="card-header">
+                                <span class="card-title">
+                                    Import data
+                                </span>
+								<div class="btn btn-light float-right" v-on:click="showDataImportModal = false" >
+									x
+								</div>
+                        </div>
+                        <div class="card-body">
+						
+                    <table class='blueTable-properties' style="text-align: left">
+					
+                        <tr v-if="options.canImportData">
+                            <td class="text-left">
+                                <input data-testId="sl_chk_exportIncludePractices" name="exportIncludePractices" type="checkbox" v-model='options.importIncludePractices' />
+							    <label for="exportIncludePractices">Include practices</label>
+                            </td>
+                            <td class="text-left">
+                                <input data-testId="sl_chk_exportIncludeDoctors" name="exportIncludeDoctors" type="checkbox" v-model='options.importIncludeDoctors' />
+							    <label for="exportIncludeDoctors">Include doctors</label>
+                            </td>
+                            <td class="text-left">
+                                <input data-testId="sl_chk_exportIncludeOwners" name="exportIncludeOwners" type="checkbox" v-model='options.importIncludeOwners' />
+							    <label for="exportIncludeOwners">Include owners</label>
+                            </td>
+                        </tr>
+                        <tr v-if="options.canImportData">
+                            <td class="text-left">
+                                <input data-testId="sl_chk_exportIncludePets" name="exportIncludePets" type="checkbox" v-model='options.importIncludePets' />
+							    <label for="exportIncludePets">Include pets</label>
+                            </td>
+                            <td class="text-left">
+                                <input data-testId="sl_chk_exportIncludeDrugs" name="exportIncludeDrugs" type="checkbox" v-model='options.importIncludeDrugs' />
+							    <label for="exportIncludeDrugs">Include drugs</label>
+                            </td>
+                            <td class="text-left">
+                                <input data-testId="sl_chk_exportIncludeEvents" name="exportIncludeEvents" type="checkbox" v-model='options.importIncludeEvents' />
+							    <label for="exportIncludeEvents">Include events</label>
+                            </td>
+                        </tr>
+                    </table>
+                    
+					<div class="alert alert-danger">
+					Paste your JSON data here.
+					</div>
+					
+					<div v-if="compatibilityChecked">
+					
+                    <table class='blueTable-properties' style="text-align: right">
+						
+                        <tr>
+                            <th>Field</th>
+                            <th>Equivalent</th>
+                        </tr>
+						
+						<template v-for="field in mapping.doctors.fields.filter(p=>!p.equivalentProperty)">
+							<tr>
+								<th>{{field.name}}</th>
+								<td>
+									<div v-if="field.customPropertyExists" style="color: green">{{field.customProperty}}</div>
+									<div><input v-model="field.customProperty" @keyup="checkFieldCompatibility(field, 'doctors')" /></div>
+								</td>
+							</tr>
+							<tr>
+								<th colspan="2">
+									<div>This field is tagges as: {{field.tags.map(p=>p)}}</div>
+								</td>
+							</tr>
+						</template>
+					</table>
+					</div>
+						
+						
+						
+                    <table class='blueTable-properties' style="text-align: left">
+					
+                        <tr>
+                            <td class="text-left">
+                                <textarea v-model="importingDataJson" style="width: 100%; height: 400px"></textarea>
+                            </td>
+                        </tr>
+                    </table>
+                        </div>
+
+                        <div class="card-footer">
+
+                    <div class="float-right">
+                        <div class="btn btn-secondary" v-on:click="showDataImportModal = false">Cancel</div>
+                        <div class="btn btn-primary" v-on:click="checkCompatibility()">Check compatibility</div>
+                        <div class="btn btn-primary" v-if="options.canImportData" v-on:click="importData()">Import</div>
+                    </div>
+                        </div>
+                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </transition>
+                
+            
+			
+
+                <transition name="modal">
+                    <div class="modal-mask"  v-if="showExportedDataModal">
+                        <div class="modal-wrapper">
+                            <div class="modal-container" :class="isMobile?'mobile':'w1200'" :style="isMobile?'max-height:'+window.innerHeight+'px':''">
+                                
+                <div v-if="showExportedDataModal">
+                    <div class="card" style="background-color: #F8F8F8;">
+                        <div class="card-header">
+                                <span class="card-title">
+                                    Export data
+                                </span>
+								<div class="btn btn-light float-right" v-on:click="showExportedDataModal = false" >
+									x
+								</div>
+                        </div>
+                        <div class="card-body">
+
+						<div class="alert alert-danger">In this version, we are not performing the export for you. <br> Copy this data and save it.</div>
+                    <table class='blueTable-properties' style="text-align: left">
+					
+                        <tr v-if="options.canExportData">
+                            <td class="text-left">
+                                <textarea v-model="exportedData" style="width: 100%; height: 400px"></textarea>
+                            </td>
+                        </tr>
+                    </table>
+                            
+                        </div>
+
+                        <div class="card-footer">
+
+                    <div class="float-right">
+                        <div class="btn btn-secondary" v-on:click="showExportedDataModal = false">Close</div>
+                    </div>
+                        </div>
+                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </transition>
+                
+            
+            
+            
+            
+            <transition name="modal">
+                <div class="modal-mask"  v-if="false && showLoginForm">
+                    <div class="modal-wrapper">
+                        <div class="modal-container" :class="isMobile?'mobile':'w400'" :style="isMobile?'max-height:'+window.innerHeight+'px':''">
+
+
+		<div class="float-left" @click="email='Doc_1'; password = 'test'; checkEmail()">Demo</div>
+        <div v-on:click="showLoginForm = false" style="float: right; ">Close</div>
+        <br>
+		
+		<div class="alert alert-success" v-if="hasLoggedOut">
+			<div>Logout successful</div>
+			<div>Do you want to login again?</div>
+			<div class="btn btn-light" @click="hasLoggedOut = false">Go to login</div>
+		</div>
+		<div v-else>
+        <div style="font-weight: bold; font-size: x-large">Login to DEMO</div>
+        <div ><div>
+            <input
+                    v-model="email"
+                    name="email"
+                    :placeholder="showLoginPlaceholder?' Your email here':''"
+                    v-on:click="showLoginPlaceholder = false"
+                    v-on:keyup="checkEmail()"
+                    v-on:keyup.enter="sendLogin()"
+                    style="padding: 10px 0px 10px 0px;  width: 300px; font-weight: bold; font-size: xx-large; color: #0b2e13; border-radius: 10px" />
+            <input
+                    v-if="showPassword"
+                    v-model="password"
+                    name="password"
+                    type="password"
+                    v-on:keyup="userMessage ='Login'; userMessageColor= 'orange'; showPasswordPlaceholder = !password"
+                    :placeholder="showPasswordPlaceholder?' Type your password':''"
+                    v-on:click="showPasswordPlaceholder = false"
+                    v-on:keyup.enter="sendLogin()"
+                    style="padding: 10px 0px 10px 0px; margin: 3px; width: 300px; font-weight: bold; font-size: xx-large; color: #0b2e13; border-radius: 0px 0px 0px 0px" />
+
+            <div v-if="!userConfirmed && !showPassword">
+                <div v-if="!privacyAgreement" style="width: 300px;  border: 0px solid gray; padding: 5px; border-radius: 0px; display: inline-block;" v-on:click="removeErrors()">
+                    <div class="green"  v-if="false">New to our site?</div>
+                    <input data-testId="sl_chk_Privacy_Agreement" name="PrivacyAgreement" type="checkbox"
+                           v-model='privacyAgreement' />
+                    <label for="PrivacyAgreement">I agree with the <a style="color: orange" href="https://stocktech.org/docs/PrivacyPolicy.html">Privacy Agreement</a></label>
+                </div>
+                <div v-else>
+                    <input data-testId="sl_chk_Privacy_Agreement" name="PrivacyAgreement" type="checkbox"  v-model='privacyAgreement'  />
+                    <label for="PrivacyAgreement">I agree with the <a style="color: orange" href="https://stocktech.org/docs/PrivacyPolicy.html">Privacy Agreement</a></label>
+                </div>
+                <div class="" v-if="email && authResponse.userMessages.length" style="padding: 5px; font-weight: bold;border: 1px solid; border-radius: 10px;">
+                    <br>
+                    <div v-for="message in authResponse.userMessages" v-html="message"></div>
+                    <br>
+                </div>
+            </div>
+
+            <div class="btn "
+                 style="width: 300px; display: inline-block; border-radius: 0px 0px 10px 10px"
+                 :style="'background-color: '+userMessageColor"
+                 v-on:click="sendRegistration()">{{ userMessage }}</div>
+        </div></div></div>
+    </div>
+    </div>
+    </div>
+
+
+
+</div>
+</div>
+</div>
+</transition>
+            
+            
+
+        </div>
+        <!-- END OF CONTAINER -->
+    </div>
+
+    <script>
+        
+        $(document).ready(function() {
+            // 
+        });
+    </script>
+
+    <script type="module">
+
+        import {timeService} from "../lib/services/timeService.js";
+        import {apiService} from "../lib/services/apiServices.js";
+        import * as Datepicker from "./lib/vuejs-datepicker/vuejs-datepicker.js";
+
+
+        let parent = new Vue({
+            el: "#adminApp",
+            props: [],
+            components: {
+                vuejsDatepicker
+            },
+            data() {
+                return {				
+                    timeService:timeService,
+					doctors: null,
+					showMenu: false,
+					showImportedDataModal: false,
+					showDataImportModal: false,
+					showDataExportModal: false,
+					showExportedDataModal: false,
+					showCompatibilityModal: false,
+					exportedData: {},
+					
+					data: {
+						doctors: {
+							items: null,
+							totalCount: 0,
+						},
+						drugs: {
+							items: null,
+							totalCount: 0,
+						},
+						events: {
+							items: null,
+							totalCount: 0,
+						},
+						owners: {
+							items: null,
+							totalCount: 0,
+						},
+						pets: {
+							items: null,
+							totalCount: 0,
+						},
+						practices: {
+							items: null,
+							totalCount: 0,
+						},
+					},
+					lookup: {
+						doctors: {
+							items: [],
+						},
+						drugs: {
+							items: [],
+						},
+						events: {
+							items: [],
+						},
+						owners: {
+							items: [],
+						},
+						pets: {
+							items: [],
+						},
+						practices: {
+							items: [],
+						},
+					},
+
+                    selectedDoctor: null,
+					editDoctor: false,
+                    
+                    selectedDrug: null,
+					editDrug: false,
+                    
+                    selectedEvent: null,
+					editEvent: false,
+                    
+                    selectedOwner: null,
+					editOwner: false,
+                    
+                    selectedPet: null,
+					editPet: false,
+                    
+                    selectedPractice: null,
+					editPractice: false,
+
+                    isMobile: false,
+
+                    showDoctorSelector: false,
+                    doctorSelectorSelectedItem: null,
+                    
+                    showOwnerSelector: false,
+                    ownerSelectorSelectedItem: null,
+                    
+                    showPetSelector: false,
+
+                    onSelectDoctorSelector: null,
+                    onSelectOwnerSelector: null,
+
+                    modalErrors: [],
+                    
+                    // Enums
+                    editPetType: false,
+                    knownPetTypes: [
+                        {
+                            name: "Cat"
+                        },
+                        {
+                            name: "Dog"
+                        },
+                        {
+                            name: "Bird"
+                        },
+                    ],
+                    editPetSex: false,
+                    knownPetSex:[
+                        {
+                            name: "M"
+                        },
+                        {
+                            name: "F"
+                        },
+                        {
+                            name: "Sterilized Male"
+                        },
+                        {
+                            name: "Sterilized Female"
+                        },
+                    ],
+                    editPetDob: false,
+
+                    // LOGIN
+                    showLoginForm: true,
+                    showLoginPlaceholder: true,
+                    showPasswordPlaceholder: true,
+					hasLoggedOut: false,
+                    highlightLogin: true,
+                    privacyAgreement: false,
+                    showPassword: false,
+                    password: null,
+                    email: null,
+					user: null,
+                    userConfirmed: false,
+                    userMessageColor: null,
+                    userMessage: null,
+                    authResponse: {
+                        userMessages: []
+                    },
+					
+					// display
+					options:{
+						doctors: {
+							pageSize: 3,
+							currentPage: 0,
+							filter: "",
+						},
+						drugs: {
+							pageSize: 20,
+							currentPage: 0,
+							filter: "",
+						},
+						events: {
+							pageSize: 5,
+							currentPage: 0,
+							filter: "",
+						},
+						owners: {
+							pageSize: 4,
+							currentPage: 0,
+							filter: "",
+						},
+						pets: {
+							pageSize: 4,
+							currentPage: 0,
+							filter: "",
+						},
+						practices: {
+							pageSize: 2,
+							currentPage: 0,
+							filter: "",
+						},
+						
+						// Layout options
+						seeAsOwner: true,
+						seeAsDoctor: true,
+						
+						// Export options
+						canExportData: true,
+						exportIncludeDoctors: true,
+						exportIncludeOwners: true,
+						exportIncludePets: true,
+						exportIncludeDrugs: true,
+						exportIncludeEvents: true,
+						exportIncludePractices: true,
+						
+						canImportData: true,
+						importIncludeDoctors: true,
+						importIncludeOwners: true,
+						importIncludePets: true,
+						importIncludeDrugs: true,
+						importIncludeEvents: true,
+						importIncludePractices: true,
+						
+						
+						
+							
+							
+							
+					},
+					demo:{
+						doctors: {
+							items: null
+						},
+						drugs: {
+							items: null
+						},
+						events: {
+							items: null
+						},
+						owners: {
+							items: null
+						},
+						pets: {
+							items: null
+						},
+						practices: {
+							items: null
+						},
+					},
+					
+					// Setup					
+                    dataSourceType: 3, // [api, db, mock],
+					showProvisionalIds: false,
+					
+					// compatibility
+						compatibilityReport: {
+							rightMapping: []
+						},
+						importingData: null,
+						importingDataJson: `{
+  "doctors": [
+    {
+      "doctorId": 1,
+      "name": "Doc_1",
+      "phone": "02132141",
+      "postCode": "PO: 0231",
+      "address": "Street: Als.B Nr. 1",
+      "email": "Doc_1@mailinator.com",
+      "created": 1737875901616,
+      "deleted": 0
+    }
+	]}`,
+	
+	compatibilityChecked: false,
+	mapping: {
+	   doctors: { fields: [
+					{
+						name: "doctorId",
+						tags: ["identity"],
+						equivalentProperty: null,
+						customProperty: null,
+						customPropertyExists: false,
+					},
+					{
+						name: "name",
+						tags: ["sensitive"],
+						equivalentProperty: null,
+						sensitivityLevel: 1,
+						customProperty: null,
+						customPropertyExists: false,
+					},
+					{
+						name: "phone",
+						tags: ["sensitive"],
+						equivalentProperty: null,
+						sensitivityLevel: 1,
+						customProperty: null,
+						customPropertyExists: false,
+					},
+					{
+						name: "postcode",
+						tags: ["postcode"],
+						equivalentProperty: null,
+						sensitivityLevel: 2,
+						customProperty: null,
+						customPropertyExists: false,
+					},
+					{
+						name: "address",
+						tags: ["sensitive"],
+						equivalentProperty: null,
+						sensitivityLevel: 1,
+						customProperty: null,
+						customPropertyExists: false,
+					},
+					{
+						name: "email",
+						tags: ["sensitive"],
+						equivalentProperty: null,
+						sensitivityLevel: 1,
+						customProperty: null,
+						customPropertyExists: false,
+					},
+					{
+						name: "created",
+						tags: ["lifecycle"],
+						equivalentProperty: null,
+						customProperty: null,
+						customPropertyExists: false,
+					},
+					{
+						name: "created",
+						tags: ["lifecycle"],
+						equivalentProperty: null,
+						customProperty: null,
+						customPropertyExists: false,
+					},
+				]
+				
+	}}
+                }
+            },
+            mounted(){
+                var context = this;
+                this.fetchDoctors();
+                this.fetchDrugs();
+                this.fetchEvents();
+                this.fetchOwners();
+                this.fetchPets();
+                this.fetchPractices();
+            },
+			computed: {
+			   lastPage() {
+				return (ob, options)=>{
+				 return ob.items ? Math.floor(ob.items.length / options.pageSize) : 0;
+			   }},
+			},
+            methods: {
+				
+			    fetchLookupDoctors(ids){
+					this.lookup.doctors.items = this.demo.doctors.items
+					.filter(p=> ids.indexOf(p.doctorId) >= 0);
+					var O  = 0;
+				},
+			    fetchLookupOwners(ids){
+					this.lookup.owners.items = this.demo.owners.items
+					.filter(p=> ids.indexOf(p.ownerId) >= 0);
+					var O  = 0;
+				},
+                fetchDoctors(){
+                    var context = this;
+					switch(this.dataSourceType){
+						case 1:
+							apiService.post(apiService.endpoints.fetchDoctors, context.selectedDoctor, context.doctorsUpdated, context.listingFailed);
+							break;
+						case 2:
+							break;
+						case 3:
+							context.generateDoctorList(100);
+							context.getDoctors(context.options.doctors.currentPage, context.options.doctors.pageSize, context.doctorsUpdated);
+							break;
+					}
+                },
+                fetchDrugs(){
+                    var context = this;
+					switch(this.dataSourceType){
+						case 1:
+							apiService.post(apiService.endpoints.fetchDrugs, context.selectedDoctor, context.drugsUpdated, context.listingFailed);
+							break;
+						case 2:
+							break;
+						case 3:
+							context.generateDrugList(100);
+							context.getDrugs(context.options.drugs.currentPage, context.options.drugs.pageSize, context.drugsUpdated);
+							break;
+					}
+                },
+                fetchEvents(){
+                    var context = this;
+					switch(this.dataSourceType){
+						case 1:
+							apiService.post(apiService.endpoints.fetchEvents, context.selectedDoctor, context.eventsUpdated, context.listingFailed);
+							break;
+						case 2:
+							break;
+						case 3:
+							context.generateEventList(100);
+							context.getEvents(context.options.events.currentPage, context.options.events.pageSize, context.eventsUpdated);
+							break;
+					}
+                },
+                fetchOwners(){
+                    var context = this;
+					switch(this.dataSourceType){
+						case 1:
+							apiService.post(apiService.endpoints.fetchOwners, context.selectedDoctor, context.ownersUpdated, context.listingFailed);
+							break;
+						case 2:
+							break;
+						case 3:
+							context.generateOwnerList(100);
+							context.getOwners(context.options.owners.currentPage, context.options.owners.pageSize, context.ownersUpdated);
+							break;
+					}
+                },
+                fetchPets(){
+                    var context = this;
+					switch(this.dataSourceType){
+						case 1:
+							apiService.post(apiService.endpoints.fetchPets, context.selectedDoctor, context.petsUpdated, context.listingFailed);
+							break;
+						case 2:
+							break;
+						case 3:
+							context.generatePetList(100);
+							context.getPets(context.options.pets.currentPage, context.options.pets.pageSize, context.petsUpdated);
+					}
+                },
+                fetchPractices(){
+                    var context = this;
+					switch(this.dataSourceType){
+						case 1:
+							apiService.post(apiService.endpoints.fetchPractices, context.selectedDoctor, context.practicesUpdated, context.listingFailed);
+							break;
+						case 2:
+							break;
+						case 3:
+							context.generatePracticeList(100);
+							context.getPractices(context.options.practices.currentPage, context.options.practices.pageSize, context.practicesUpdated);
+							break;
+					}
+                },
+
+                doctorsUpdated(items){
+                    var context = this;
+                    context.data.doctors.items = items.data.items;
+                    context.data.doctors.totalCount = items.data.count;
+                },
+
+                drugsUpdated(items){
+                    var context = this;
+                    context.data.drugs.items = items.data.items;
+                    context.data.drugs.totalCount = items.data.count;
+                },
+
+                eventsUpdated(items){
+                    var context = this;
+                    context.data.events.items = items.data.items;
+                    context.data.events.totalCount = items.data.count;
+                },
+
+                ownersUpdated(items){
+                    var context = this;
+                    context.data.owners.items = items.data.items;
+                    context.data.owners.totalCount = items.data.count;
+                },
+
+                petsUpdated(items){
+						var context = this;
+						context.data.pets.items = items.data.items;
+                    context.data.pets.totalCount = items.data.count;
+					const doctorIds = items.data.items.map(p=>p.doctorId);
+					context.fetchLookupDoctors(doctorIds);
+					const ownerIds = items.data.items.map(p=>p.ownerId);
+					context.fetchLookupOwners(ownerIds);
+					},
+
+					practicesUpdated(items){
+						var context = this;
+						context.data.practices.items = items.data.items;
+                    context.data.practices.totalCount = items.data.count;
+					},
+
+					selectDoctor(doctor){
+						var context = this;
+						context.modalErrors = [];
+						context.selectedDoctor = doctor;
+					},
+					selectDrug(drug){
+						var context = this;
+						context.modalErrors = [];
+						context.selectedDrug = drug;
+					},
+					selectEvent(event){
+						var context = this;
+						context.modalErrors = [];
+						context.selectedEvent = event;
+                },
+                selectOwner(owner){
+                    var context = this;
+                    context.modalErrors = [];
+                    context.selectedOwner = owner;
+                },
+                selectPet(pet){
+                    var context = this;
+                    context.modalErrors = [];
+                    context.selectedPet = pet;
+                },
+                selectPractice(practice){
+                    var context = this;
+                    context.modalErrors = [];
+                    context.selectedPractice = practice;
+                },
+
+                addDoctor(){
+                    var context = this;
+                    context.selectedDoctor = {};
+                },
+                addDrug(){
+                    var context = this;
+                    context.selectedDrug = {};
+                },
+                addEvent(){
+                    var context = this;
+                    context.selectedEvent = {};
+                },
+                addOwner(){
+                    var context = this;
+                    context.selectedOwner = {};
+                },
+                addPet(){
+                    var context = this;
+                    context.selectedPet = {};
+                },
+                addPractice(){
+                    var context = this;
+                    context.selectedPractice = {};
+                },
+
+                saveDoctor(){
+                    var context = this;
+                    context.modalErrors = [];
+                    context.modalInfo = "Saving...";
+					switch(this.dataSourceType){
+						case 1:
+							apiService.post(apiService.endpoints.saveDoctor, context.selectedDoctor, context.doctorSaved, context.notSaved);
+							break;
+						case 2:
+							break;
+						case 3:
+							var data = {data: context.selectedDoctor};
+							context.doctorSaved(data);
+							var item = context.demo.doctors.items.find(p=>p.doctorId === data.data.doctorId);
+							if(item){
+							}
+							break;
+					}
+                },
+                doctorSaved(data){
+                    var context = this;
+                    context.modalInfo = "Save completed";
+                    var item = context.data.doctors.items.find(p=>p.doctorId === data.data.doctorId);
+                    if(item){
+                        item.name = data.data.name;
+                        item.phone = data.data.phone;
+                        item.postCode = data.data.postCode;
+                        item.address = data.data.address;
+                        item.email = data.data.email;
+						item.updated = (new Date()).getTime();				
+                    }
+                    else{
+                        context.doctors.push(context.selectedDoctor);
+                    }
+                    context.selectedDoctor = null;
+                },
+                saveDrug(){
+                    var context = this;
+                    context.modalErrors = [];
+                    context.modalInfo = "Saving...";
+					switch(this.dataSourceType){
+						case 1:
+							apiService.post(apiService.endpoints.saveDrug, context.selectedDrug, context.drugSaved, context.notSaved);
+							break;
+						case 2:
+							break;
+						case 3:
+							var data = {data: context.selectedDrug};
+							context.drugSaved(data);
+							var item = context.demo.drugs.items.find(p=>p.drugId === data.data.drugId);
+							if(item){
+							}
+							break;
+					}
+                },
+                drugSaved(data){
+                    var context = this;
+                    context.modalInfo = "Save completed";
+                    var item = context.data.drugs.items.find(p=>p.drugId === data.data.drugId);
+                    if(item){
+                        item.name = data.data.name;
+                        item.phone = data.data.phone;
+                        item.postCode = data.data.postCode;
+                        item.address = data.data.address;
+                        item.email = data.data.email;
+						item.updated = (new Date()).getTime();	
+                    }
+                    else{
+                        context.drugs.push(context.selectedDrug);
+                    }
+                    context.selectedDrug = null;
+                },
+                saveEvent(){
+                    var context = this;
+                    context.modalErrors = [];
+                    context.modalInfo = "Saving...";
+					switch(this.dataSourceType){
+						case 1:
+							apiService.post(apiService.endpoints.saveEvent, context.selectedEvent, context.eventSaved, context.notSaved);
+							break;
+						case 2:
+							break;
+						case 3:
+							var data = {data: context.selectedEvent};
+							context.eventSaved(data);
+							var item = context.demo.events.items.find(p=>p.eventId === data.data.eventId);
+							if(item){
+							}
+							break;
+					}
+                },
+                eventSaved(data){
+                    var context = this;
+                    context.modalInfo = "Save completed";
+                    var item = context.data.events.items.find(p=>p.eventId === data.data.eventId);
+                    if(item){
+                        item.name = data.data.name;
+                        item.phone = data.data.phone;
+                        item.postCode = data.data.postCode;
+                        item.address = data.data.address;
+                        item.email = data.data.email;
+						item.updated = (new Date()).getTime();	
+                    }
+                    else{
+                        context.events.push(context.selectedEvent);
+                    }
+                    context.selectedEvent = null;
+                },
+                saveOwner(){
+                    var context = this;
+                    context.modalErrors = [];
+                    context.modalInfo = "Saving...";
+					switch(this.dataSourceType){
+						case 1:
+							apiService.post(apiService.endpoints.saveOwner, context.selectedOwner, context.ownerSaved, context.notSaved);
+							break;
+						case 2:
+							break;
+						case 3:
+							var data = {data: context.selectedOwner};
+							context.ownerSaved(data);
+							var item = context.demo.owners.items.find(p=>p.ownerId === data.data.ownerId);
+							if(item){
+							}
+							break;
+					}
+                },
+                ownerSaved(data){
+                    var context = this;
+                    context.modalInfo = "Save completed";
+                    var item = context.data.owners.items.find(p=>p.ownerId === data.data.ownerId);
+                    if(item){
+                        item.name = data.data.name;
+                        item.phone = data.data.phone;
+                        item.postCode = data.data.postCode;
+                        item.address = data.data.address;
+                        item.email = data.data.email;
+						item.updated = (new Date()).getTime();	
+                    }
+                    else{
+                        context.owners.push(context.selectedOwner);
+                    }
+                    context.selectedOwner = null;
+                },
+                savePet(){
+                    var context = this;
+                    context.modalErrors = [];
+                    context.modalInfo = "Saving...";
+					switch(this.dataSourceType){
+						case 1:
+							apiService.post(apiService.endpoints.savePet, context.selectedPet, context.petSaved, context.notSaved);
+							break;
+						case 2:
+							break;
+						case 3:
+							var data = {data: context.selectedPet};
+							context.petSaved(data);
+							var item = context.demo.pets.items.find(p=>p.petId === data.data.petId);
+							if(item){
+							}
+							break;
+					}
+                },
+                petSaved(data){
+                    var context = this;
+                    context.modalInfo = "Save completed";
+                    var item = context.data.pets.items.find(p=>p.petId === data.data.petId);
+                    if(item){
+                        item.name = data.data.name;
+                        item.phone = data.data.phone;
+                        item.postCode = data.data.postCode;
+                        item.address = data.data.address;
+                        item.email = data.data.email;
+						item.updated = (new Date()).getTime();	
+                    }
+                    else{
+                        context.pets.push(context.selectedPet);
+                    }
+                    context.selectedPet = null;
+                },
+                savePractice(){
+                    var context = this;
+                    context.modalErrors = [];
+                    context.modalInfo = "Saving...";
+					switch(this.dataSourceType){
+						case 1:
+							apiService.post(apiService.endpoints.savePractice, context.selectedPractice, context.practiceSaved, context.notSaved);
+							break;
+						case 2:
+							break;
+						case 3:
+							var data = {data: context.selectedPractice};
+							context.practiceSaved(data);
+							var item = context.demo.practices.items.find(p=>p.practiceId === data.data.practiceId);
+							if(item){
+							}
+							break;
+					}
+                },
+                practiceSaved(data){
+                    var context = this;
+                    context.modalInfo = "Save completed";
+                    var item = context.data.practices.items.find(p=>p.practiceId === data.data.practiceId);
+                    if(item){
+                        item.name = data.data.name;
+                        item.phone = data.data.phone;
+                        item.postCode = data.data.postCode;
+                        item.address = data.data.address;
+                        item.email = data.data.email;
+						item.updated = (new Date()).getTime();	
+                    }
+                    else{
+                        context.practices.push(context.selectedPractice);
+                    }
+                    context.selectedPractice = null;
+                },
+                notSaved(data){
+                    var context = this;
+                    context.modalErrors = ["Unable to save!"];
+                    if(data.data && data.data.userMessage){
+                        context.modalErrors.push(data.data.userMessage);
+                    }
+                },
+
+                deleteDoctor(selectedItem){
+                    var context = this;
+                    context.modalInfo = "Deleting...";
+					switch(this.dataSourceType){
+						case 1:
+							var deleteUrl = apiService.endpoints.deleteDoctor;
+							deleteUrl = deleteUrl.replace("{id}", selectedItem.doctorId);
+							apiService.post(deleteUrl, context.selectedDoctor, context.doctorDeleted, context.notDeleted);
+							break;
+						case 2:
+							break;
+						case 3:
+							var data = {data: { doctorId: selectedItem.doctorId}};
+							context.doctorDeleted(data);
+							var item = context.demo.doctors.items.find(p=>p.doctorId === data.data.doctorId);
+							if(item){
+								item.deleted = true;
+							}
+							break;
+					}
+                },
+                doctorDeleted(data){
+                    var context = this;
+                    context.modalInfo = "Item was deleted";
+                    var item = context.data.doctors.items.find(p=>p.doctorId === data.data.doctorId);
+                    if(item){
+                        item.deleted = true;
+                    }
+                    context.selectedDoctor = null;
+                },
+                deleteDrug(selectedItem){
+                    var context = this;
+                    context.modalInfo = "Deleting...";
+					switch(this.dataSourceType){
+						case 1:
+							var deleteUrl = apiService.endpoints.deleteDrug;
+							deleteUrl = deleteUrl.replace("{id}", selectedItem.drugId);
+							apiService.post(deleteUrl, context.selectedDrug, context.drugDeleted, context.notDeleted);
+							break;
+						case 2:
+							break;
+						case 3:
+							var data = {data: { drugId: selectedItem.drugId}};
+							context.drugDeleted(data);
+							var item = context.demo.drugs.items.find(p=>p.drugId === data.data.drugId);
+							if(item){
+								item.deleted = true;
+							}
+							break;
+					}
+                },
+                drugDeleted(data){
+                    var context = this;
+                    context.modalInfo = "Item was deleted";
+                    var item = context.data.drugs.items.find(p=>p.drugId === data.data.drugId);
+                    if(item){
+                        item.deleted = true;
+                    }
+                    context.selectedDrug = null;
+                },
+                deleteEvent(selectedItem){
+                    var context = this;
+                    context.modalInfo = "Deleting...";
+					switch(this.dataSourceType){
+						case 1:
+							var deleteUrl = apiService.endpoints.deleteEvent;
+							deleteUrl = deleteUrl.replace("{id}", selectedItem.eventId);
+							apiService.post(deleteUrl, context.selectedEvent, context.eventDeleted, context.notDeleted);
+							break;
+						case 2:
+							break;
+						case 3:
+							var data = {data: { eventId: selectedItem.eventId}};
+							context.eventDeleted(data);
+							var item = context.demo.events.items.find(p=>p.eventId === data.data.eventId);
+							if(item){
+								item.deleted = true;
+							}
+							break;
+					}
+                },
+                eventDeleted(data){
+                    var context = this;
+                    context.modalInfo = "Item was deleted";
+                    var item = context.data.events.items.find(p=>p.eventId === data.data.eventId);
+                    if(item){
+                        item.deleted = true;
+                    }
+                    context.selectedEvent = null;
+                },
+                deleteOwner(selectedItem){
+                    var context = this;
+                    context.modalInfo = "Deleting...";
+					switch(this.dataSourceType){
+						case 1:
+							var deleteUrl = apiService.endpoints.deleteOwner;
+							deleteUrl = deleteUrl.replace("{id}", selectedItem.ownerId);
+							apiService.post(deleteUrl, context.selectedOwner, context.ownerDeleted, context.notDeleted);
+							break;
+						case 2:
+							break;
+						case 3:
+							var data = {data: { ownerId: selectedItem.ownerId}};
+							context.ownerDeleted(data);
+							var item = context.demo.owners.items.find(p=>p.ownerId === data.data.ownerId);
+							if(item){
+								item.deleted = true;
+							}
+							break;
+					}
+                },
+                ownerDeleted(data){
+                    var context = this;
+                    context.modalInfo = "Item was deleted";
+                    var item = context.data.owners.items.find(p=>p.ownerId === data.data.ownerId);
+                    if(item){
+                        item.deleted = true;
+                    }
+                    context.selectedOwner = null;
+                },
+                deletePet(selectedItem){
+                    var context = this;
+                    context.modalInfo = "Deleting...";
+					switch(this.dataSourceType){
+						case 1:
+							var deleteUrl = apiService.endpoints.deletePet;
+							deleteUrl = deleteUrl.replace("{id}", selectedItem.petId);
+							apiService.post(deleteUrl, context.selectedPet, context.petDeleted, context.notDeleted);
+							break;
+						case 2:
+							break;
+						case 3:
+							var data = {data: { petId: selectedItem.petId}};
+							context.petDeleted(data);
+							var item = context.demo.pets.items.find(p=>p.petId === data.data.petId);
+							if(item){
+								item.deleted = true;
+							}
+							break;
+					}
+                },
+                petDeleted(data){
+                    var context = this;
+                    context.modalInfo = "Item was deleted";
+                    var item = context.data.pets.items.find(p=>p.petId === data.data.petId);
+                    if(item){
+                        item.deleted = true;
+                    }
+                    context.selectedPet = null;
+                },
+                deletePractice(selectedItem){
+                    var context = this;
+                    context.modalInfo = "Deleting...";
+					switch(this.dataSourceType){
+						case 1:
+							var deletePracticeUrl = apiService.endpoints.deletePractice;
+							deletePracticeUrl = deletePracticeUrl.replace("{id}", selectedItem.practiceId);
+							apiService.post(deletePracticeUrl, context.selectedPractice, context.practiceDeleted, context.notDeleted);
+							break;
+						case 2:
+							break;
+						case 3:
+							var data = {data: { practiceId: selectedItem.practiceId}};
+							context.practiceDeleted(data);
+							var item = context.demo.practices.items.find(p=>p.practiceId === data.data.practiceId);
+							if(item){
+								item.deleted = true;
+							}
+							break;
+					}
+                },
+                practiceDeleted(data){
+                    var context = this;
+                    context.modalInfo = "Item was deleted";
+                    var item = context.data.practices.items.find(p=>p.practiceId === data.data.practiceId);
+                    if(item){
+                        item.deleted = true;
+                    }
+                    context.selectedPractice = null;
+                },
+                notDeleted(data){
+                    var context = this;
+                    context.modalErrors = ["Unable to delete!"];
+                },
+                
+                // Datetime
+                updatePetDob(newDate){
+                    this.selectedPet.dob = this.dateToEpoch(newDate);
+                },
+                
+                // Selectors
+                
+                // Doctor Selector
+                openDoctorSelector(item, onSelect){
+                    this.showDoctorSelector = true;
+                    this.onSelectDoctorSelector = onSelect;
+                },
+                selectionChangedDoctor(item){
+                    this.doctorSelectorSelectedItem = item;
+                },
+                adoptDoctor(newDoctor){
+                    this.selectedPet.doctor = newDoctor;
+                    this.selectedPet.doctorId = newDoctor.doctorId;
+                    this.showDoctorSelector = false;
+                    // this.onSelectDoctorSelector(newDoctor);
+                },
+
+                // Owner Selector
+                openOwnerSelector(item, onSelect){
+                    this.showOwnerSelector = true;
+                    this.onSelectOwnerSelector = onSelect;
+                },
+                selectionChangedOwner(item){
+                    this.ownerSelectorSelectedItem = item;
+                },
+                adoptOwner(newOwner){
+                    this.selectedPet.owner = newOwner;
+                    this.selectedPet.ownerId = newOwner.ownerId;
+                    this.showOwnerSelector = false;
+                    // this.onSelectOwnerSelector(newDoctor);
+                },
+
+                timeAgo(seconds) {
+                    const formatter = new Intl.RelativeTimeFormat("en");
+                    const ranges = {
+                        years: 3600 * 24 * 365,
+                        months: 3600 * 24 * 30,
+                        weeks: 3600 * 24 * 7,
+                        days: 3600 * 24,
+                        hours: 3600,
+                        minutes: 60,
+                        seconds: 1
+                    };
+                    const secondsElapsed = (seconds*1000 - Date.now()) / 1000;
+                    for (let key in ranges) {
+                        if (ranges[key] < Math.abs(secondsElapsed)) {
+                            const delta = secondsElapsed / ranges[key];
+                            var str = formatter.format(Math.floor(delta), key)
+                                .replace("years", "y")
+                                .replace("year", "y")
+                                .replace("months", "mo")
+                                .replace("month", "mo")
+                                .replace("days", "d")
+                                .replace("day", "d")
+                                .replace("hours", "h")
+                                .replace("hour", "h")
+                                .replace("minutes", "m")
+                                .replace("minute", "m")
+                                .replace("seconds", "s")
+                                .replace("second", "s")
+                            ;
+                            return str.substring(0, str.length-4);
+                        }
+                    }
+                },
+
+                toDate(seconds){
+                    if(seconds > 9000000000){
+                        seconds /=10000;
+                    }
+                    var t = new Date(1970, 0, 1);
+                    return moment(t).format('DD-MM-YYYY');
+                },
+
+                toTimeAgo(seconds){
+                    if(seconds > 9000000000){
+                        seconds /=10000;
+                    }
+                    var t = new Date(1970, 0, 1);
+                    t.setSeconds(seconds);
+                    if(seconds < moment()){
+                        return moment(t).format('DD-MM-YYYY HH:mm:ss');
+                    }
+                    else{
+                        return moment(t).format('HH:mm');
+                    }
+                },
+
+                dateToEpoch(date){
+                    return moment(date).unix()
+                },
+                epochToDate(epoch){
+                    return moment.unix(epoch).format("DD-MM-YYYY")
+                },
+
+
+                // test
+                
+            // Login
+            removeErrors(){
+                this.userMessage = this.email ? 'Create free account' : 'Enter your email';
+                this.userMessageColor = 'orange';
+                this.privacyAgreement = true;
+            },
+            checkEmail(){
+                var context = this;
+                this.userMessage ='Create free account'; 
+				this.userMessageColor= 'orange';
+				
+				
+				switch(this.dataSourceType){
+					case 2:
+						break;
+					case 3:
+						var item = context.demo.doctors.items.find(p=>p.email.toLowerCase() === this.email.toLowerCase() || p.name.toLowerCase() == this.email.toLowerCase());
+						if(item){
+                            context.showPassword = true;
+                            context.privacyAgreement = true;
+                            context.userMessage = "Login"
+						}
+						return;
+						break;
+				}
+                
+                var domain = window.location.host.indexOf("localhost") >= 0 ? "localhost:4133" : "stocktech.org:5000";
+                var resolvedEndpoint = "https://" + domain + "/api/vet/secure/lookup/email";
+                var model = {"env":"Prod","email":this.email,"privacyAgreement":this.privacyAgreement,"isTesting":false,"view":"API", host: this.host}
+
+                $.ajax({
+                    url: resolvedEndpoint,
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify(model),
+                    success: function(json){
+                        if(json){
+                            context.showPassword = true;
+                            context.privacyAgreement = true;
+                            context.userMessage = "Login"
+                        }
+                    },
+                }).fail(function(xhr, status, error) {
+                    context.userWarning = "Unable to contact server.";
+                });
+            },
+            sendRegistration(){
+                if(this.password){
+                    this.sendLogin();
+                    return;
+                }
+                var context = this;
+                if(!this.privacyAgreement){
+                    this.userMessage ='Privacy Agreement is needed.';
+                    this.userMessageColor ='#F07030';
+                    return;
+                }
+                if(!this.email){
+                    this.userMessage ='Enter your email';
+                    this.userMessageColor ='#F07030';
+                    return;
+                }
+                if(this.email.indexOf('@') < 0 || this.email.indexOf('.') < 0 || this.email.indexOf('@') > this.email.indexOf('.') || this.email.indexOf('.')+1 == this.email.length){
+                    this.userMessage ='Email is invalid';
+                    this.userMessageColor ='#F07030';
+                    return;
+                }
+                this.timeout = 10;
+                this.confirmationChecks = 900;
+                this.authResponse.userMessages = ["Check your email for activation link."];
+                this.userMessage = "Check your email";
+                if(this.loginIntervalHandler){
+                    clearInterval(this.loginIntervalHandler);
+                }
+                this.loginIntervalHandler = setInterval(context.registrationCheck, 1000);
+                
+                var domain = window.location.host.indexOf("localhost") >= 0 ? "localhost:4133" : "stocktech.org:5000";
+                var resolvedEndpoint = "https://" + domain + "/api/vet/secure/Register";
+                var model = {"env":"Prod","email":this.email,"privacyAgreement":this.privacyAgreement,"isTesting":false,"view":"API", host: this.host}
+
+                $.ajax({
+                    url: resolvedEndpoint,
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify(model),
+                    success: function(json){
+
+                    },
+                }).fail(function(xhr, status, error) {
+                    context.userWarning = "Unable to contact server.";
+                });
+            },
+            sendLogin(){
+                var context = this;
+				
+				
+				switch(this.dataSourceType){
+					case 2:
+						break;
+					case 3:
+						var item = context.demo.doctors.items.find(p=>p.email.toLowerCase() === this.email.toLowerCase() || p.name.toLowerCase() == this.email.toLowerCase());
+						if(item){
+                            this.processLoginResponse({ object: item });
+						}
+						return;
+						break;
+				}
+
+                var domain = window.location.host.indexOf("localhost") >= 0 ? "localhost:4133" : "stocktech.org:5000";
+                var resolvedEndpoint = "https://" + domain + "/api/vet/secure/Login";
+                var model = {"env":"Prod","email":this.email,"password":this.password,"isTesting":false}
+
+                $.ajax({
+                    url: resolvedEndpoint,
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify(model),
+                    success: this.processLoginResponse
+                }).fail(function(xhr, status, error) {
+                    context.userWarning = "Unable to contact server.";
+                });
+            },
+			processLoginResponse(json){
+                var context = this;
+				context.user = json.object;
+				context.user.user = null;
+				// this.$parent.getSubscriptionInfo();
+				context.saveUser(context.user);
+				context.userConfirmed = true;
+				context.showLoginForm = false;
+				context.password = null;
+				context.showPasswordPlaceholder = true;
+			},
+            sendLogout(){
+                this.hasLoggedOut = true;
+                this.user = null;
+                this.showLoginForm = true;
+                this.userConfirmed = false;
+                localStorage.removeItem("user");
+            },
+            saveUser(user) {
+                localStorage.setItem("user", JSON.stringify({
+                    userId: user.userId,
+                    email: user.email,
+                    token: user.token,
+                    jwt: user.jwt,
+                }));
+                localStorage.setItem("env", JSON.stringify({ id: 1 , name: 'Prod'}) );
+            },
+            registrationCheck(){
+                this.confirmationChecks--;
+                if(this.confirmationChecks < 0){
+                    return;
+                }
+
+                var domain = window.location.host.indexOf("localhost") >= 0 ? "localhost:4133" : "stocktech.org:5000";
+                var resolvedEndpoint = "https://" + domain + "/api/vet/secure/RegistrationCheck";
+                var model = {"env":"Prod","email":this.email,"isTesting":false,"view":"API", host: this.host}
+
+                var context = this;
+                $.ajax({
+                    url: resolvedEndpoint,
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify(model),
+                    success: function(json){
+                        if(!json.userInstructions){
+                            return;
+                        }
+                        if(json.userInstructions[0] == "User is confirmed") {
+                            // context.userConfirmed = true;
+                            if(json.object.loginToken == "IP changed"){
+                                context.qr.status = json.object.loginToken;
+                            }
+                            else{
+                                context.qr.value = json.object.loginToken;
+                                context.qrTimestamp = Date.now();
+                                context.computeTimeLeft();
+                            }
+                            context.confirmationChecks = -1;
+                            context.userMessage = "Welcome to StockTech";
+                            context.userMessageColor = "lemon";
+                        }
+                    },
+                }).fail(function(xhr, status, error) {
+                    context.userWarning = "Unable to contact server.";
+                });
+            },
+
+            generateQrLogin() {
+                var context = this;
+                
+                var domain = window.location.host.indexOf("localhost") >= 0 ? "localhost:4133" : "stocktech.org:5000";
+                var resolvedEndpoint = "https://" + domain + "/api/vet/secure/Prod/Flo/generateQrLogin";
+                var model = {"env": "Prod", "email": this.email, "isTesting": false, "view": "API", host: this.host}
+
+                $.ajax({
+                    url: resolvedEndpoint,
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify(model),
+                    success: function (json) {
+                        if (!json.userInstructions) {
+                            return;
+                        }
+                        if (json.userInstructions[0] == "User is confirmed") {
+                            if(json.object.loginToken == "IP changed"){
+                                context.qr.status = json.object.loginToken;
+                            }
+                            else{
+                                context.qr.value = json.object.loginToken;
+                                context.qrTimestamp = Date.now();
+                                context.computeTimeLeft();
+                            }
+                        }
+                    },
+                }).fail(function (xhr, status, error) {
+                    context.userWarning = "Unable to contact server.";
+                });
+            },
+			
+			/* DEMO DATA GENERATORS */
+			
+			generateDoctorList(count, handler){
+				if(this.demo.doctors.items){
+					return;
+				}
+			 const ids = Array(count).fill(1).map((x, y) => x + y);
+			 const items = ids.map(p => {
+			 return{
+				doctorId: p,
+				name: "Doc_" + p,
+				phone: "02" + p + "32" + p + "4" + p,
+				postCode: "PO: 023" + p,
+				address: "Street: Als.B Nr. " + p,
+				email: "Doc_" + p + "@mailinator.com",
+				created: (new Date()).getTime(),
+				deleted: 0,
+			 }});
+			 this.demo.doctors.items = items;
+			},
+			
+			generateDrugList(count, handler){
+				if(this.demo.drugs.items){
+					return;
+				}
+                var context = this;
+			 const ids = Array(count).fill(1).map((x, y) => x + y);
+			 const items = ids.map(p => {
+			 return{
+				drugId: p,
+				name: ("Drug_" + p),
+				use: context.floatGenerator(1, 4),
+				doses: context.floatGenerator(1, 4),
+				note: "Note_" + p,
+				upVotes: context.floatGenerator(1, 4),
+				downVotes: context.floatGenerator(1, 4),
+				created: (new Date()).getTime(),
+				deleted: 0,
+			 }});
+			 this.demo.drugs.items = items;
+			},
+			
+			generateEventList(count, handler){
+				if(this.demo.events.items){
+					return;
+				}
+			 const ids = Array(count).fill(1).map((x, y) => x + y);
+			 const items = ids.map(p => {
+			 return{
+				eventId: p,
+				name: ("Event_" + p),
+				phone: null,
+				email: "Doc_" + p + "@mailinator.com",
+				created: (new Date()).getTime(),
+				deleted: 0,
+			 }});
+			 this.demo.events.items = items;
+			},
+			
+			generateOwnerList(count, handler){
+				if(this.demo.owners.items){
+					return;
+				}
+			 const ids = Array(count).fill(1).map((x, y) => x + y);
+			 const items = ids.map(p => {
+			 return{
+				ownerId: p,
+				name: "Owner_" + p,
+				phone: "02" + p + "32" + p + "4" + p,
+				postCode: "PO: 023" + p,
+				address: "Street: Als.B Nr. " + p,
+				email: "Doc_" + p + "@mailinator.com",
+				created: (new Date()).getTime(),
+				deleted: 0,
+			 }});
+			 this.demo.owners.items = items;
+			},
+			
+			generatePetList(count, handler){
+				if(this.demo.pets.items){
+					return;
+				}
+                var context = this;
+			 const ids = Array(count).fill(1).map((x, y) => x + y);
+			 const items = ids.map(p => {
+			 return{
+				petId: p,
+				name: ("Pet_" + p),
+				phone: null,
+				email: "Doc_" + p + "@mailinator.com",
+				type: context.intGenerator(1, 2),
+				sex: context.intGenerator(1, 2),
+				age: context.floatGenerator(1, 4),
+				kg: context.floatGenerator(1, 4),
+				id: null,
+				postCode: "PO: 023" + p,
+				ownerId: context.intGenerator(1, 2),
+				doctorId: context.intGenerator(1, 2),
+				created: (new Date()).getTime(),
+				deleted: 0,
+			 }});
+			 this.demo.pets.items = items;
+			},
+			
+			floatGenerator(min, max){
+				return 22;
+			},
+			intGenerator(min, max){
+				return 1;
+			},
+			
+			generatePracticeList(count, handler){
+				if(this.demo.practices.items){
+					return;
+				}
+			 const ids = Array(count).fill(1).map((x, y) => x + y);
+			 const items = ids.map(p => {
+			 return{
+				practiceId: p,
+				name: "Doc_" + p,
+				phone: "02" + p + "32" + p + "4" + p,
+				postCode: "PO: 023" + p,
+				address: "Street: Als.B Nr. " + p,
+				email: "Doc_" + p + "@mailinator.com",
+				created: (new Date()).getTime(),
+				deleted: 0,
+			 }});
+			 this.demo.practices.items = items;
+			},
+			
+			/* DEMO DATA GETTERS */
+			
+			getDoctors(page, take, handler){
+			 if(!handler){ handler = this.doctorsUpdated; }
+			 if(!page){ page = this.options.doctors.currentPage; }
+			 if(!take){ take = this.options.doctors.pageSize; }
+			 handler( {data: {items: this.demo.doctors.items
+			 .filter(p=>!p.deleted && (!this.options.doctors.filter.length || p.name.toLowerCase().indexOf(this.options.doctors.filter) >= 0))
+			 .slice(page * take, page * take + take), count: this.demo.doctors.items.length}} );
+			},
+			
+			getDrugs(page, take, handler){
+			 if(!handler){ handler = this.drugsUpdated; }
+			 if(!page){ page = this.options.drugs.currentPage; }
+			 if(!take){ take = this.options.drugs.pageSize; }
+			 handler( {data: {items: this.demo.drugs.items
+			 .filter(p=>!p.deleted && (!this.options.drugs.filter.length || p.name.toLowerCase().indexOf(this.options.drugs.filter) >= 0))
+			 .slice(page * take, page * take + take), count: this.demo.drugs.items.length}} );
+			},
+			
+			getEvents(page, take, handler){
+			 if(!handler){ handler = this.eventsUpdated; }
+			 if(!page){ page = this.options.events.currentPage; }
+			 if(!take){ take = this.options.events.pageSize; }
+			 handler( {data: {items: this.demo.events.items
+			 .filter(p=>!p.deleted && (!this.options.events.filter.length || p.name.toLowerCase().indexOf(this.options.events.filter) >= 0))
+			 .slice(page * take, page * take + take), count: this.demo.events.items.length}} );
+			},
+			
+			getOwners(page, take, handler){
+			 if(!handler){ handler = this.ownersUpdated; }
+			 if(!page){ page = this.options.owners.currentPage; }
+			 if(!take){ take = this.options.owners.pageSize; }
+			 handler( {data: {items: this.demo.owners.items
+			 .filter(p=>!p.deleted && (!this.options.owners.filter.length || p.name.toLowerCase().indexOf(this.options.owners.filter) >= 0))
+			 .slice(page * take, page * take + take), count: this.demo.owners.items.length}} );
+			},
+			
+			getPets(page, take, handler){
+			 if(!handler){ handler = this.petsUpdated; }
+			 if(!page){ page = this.options.pets.currentPage; }
+			 if(!take){ take = this.options.pets.pageSize; }
+			 handler( {data: {items: this.demo.pets.items
+			 .filter(p=>!p.deleted && (!this.options.pets.filter.length || p.name.toLowerCase().indexOf(this.options.pets.filter) >= 0))
+			 .slice(page * take, page * take + take), count: this.demo.pets.items.length}} );
+			},
+			
+			getPractices(page, take, handler){
+			 if(!handler){ handler = this.practicesUpdated; }
+			 if(!page){ page = this.options.practices.currentPage; }
+			 if(!take){ take = this.options.practices.pageSize; }
+			 handler( {data: {items: this.demo.practices.items
+			 .filter(p=>!p.deleted && (!this.options.practices.filter.length || p.name.toLowerCase().indexOf(this.options.practices.filter) >= 0))
+			 .slice(page * take, page * take + take), count: this.demo.practices.items.length}} );
+			},
+			lookupDoctors(id){
+				const item = this.lookup.doctors.items.find(p=>p.doctorId == id);
+				return item ? item.name : id;
+			},
+			lookupOwners(id){
+				const item = this.lookup.owners.items.find(p=>p.ownerId == id);
+				return item ? item.name : id;
+			},
+			
+			/* PAGINATION */
+			addPage(data, add){
+			   data.currentPage += add;
+			   if(data.currentPage < 0){
+				data.currentPage = 0;
+			   }
+			},
+
+			exportData(){
+				this.showExportedDataModal = true;
+				var exportedDataBuilder = {};
+				if(this.options.exportIncludeDoctors){
+					exportedDataBuilder.doctors = this.demo.doctors.items;
+				}
+				this.exportedData = JSON.stringify(exportedDataBuilder, null, 2);
+			},
+
+			importData(){
+				this.showImportDataModal = true;
+				var exportedDataBuilder = {};
+				if(this.options.importIncludeDoctors){
+					// exportedDataBuilder.doctors = this.demo.doctors.items;
+				}
+				// this.exportedData = JSON.stringify(exportedDataBuilder, null, 2);
+			},
+			checkCompatibility(){
+				this.importingData = JSON.parse(this.importingDataJson);
+				var importingDoctorsSchema = this.importingData.doctors[0];
+				
+				this.mapping.doctors.fields.forEach(field => {
+					if(field.equivalentProperty){
+						if(!importingDoctorsSchema[field.equivalentProperty]){
+							field.equivalentProperty = null;
+						}
+					}
+					
+					if(!field.equivalentProperty && importingDoctorsSchema[field.name]){
+						field.equivalentProperty = field.name;
+					}
+				});
+				this.compatibilityChecked = true;
+				
+				// this.importingDataJson = JSON.stringify(this.mapping);
+            },
+			checkFieldCompatibility(field, entityName){
+				var importingDoctorsSchema = this.importingData[entityName][0];
+				field.customPropertyExists = importingDoctorsSchema[field.customProperty];
+            },
+        }});
+    </script>
+
+    <!-- Page content -->
+</html>
+
