@@ -2,7 +2,8 @@ export const PetHeaderComponent = {
     props: ["petService", "accountService", "parent", "bus"],
     template: `<div>
 
-    <span @click="petService.generatePetId()" class="btn btn-success">Get a free PetId</span>
+    <span @click="petService.generatePetId()" class="btn btn-success float-right">Get a free PetId</span>
+    <a href="./../pets/?page=Explorer" @click="petService.generatePetId()" class="btn btn-secondary float-left">Explore nearby</a>
     <br>
     <br>
 <transition name="modal">
@@ -52,7 +53,7 @@ export const PetHeaderComponent = {
                 <input data-testId="" id="PrivacyAgreement" type="checkbox" v-model='petService.agreementAccepted' />
                 <label for="PrivacyAgreement">I agree with the <a style="color: orange" href="https://stocktech.org/docs/PrivacyPolicy.html">Privacy Agreement</a></label>
                 <div v-if="petService.agreementAccepted" style="font-weight: bold; font-size: large; color: #856404">
-                    <div class="btn btn-success float-right" @click="petService.showPetEditor = true; petService.showPetIdDisclaimer = false">Continue</div>
+                    <div class="btn btn-success float-right" @click="petService.createPet()">Continue</div>
                 </div>
             </div>
             <br>
@@ -100,42 +101,52 @@ export const PetEditorComponent = {
 
     <div v-if="petService.showPetEditor">
                 
-        <div @click="petService.showPetNameEditor = !petService.showPetNameEditor">
-            Pet Name: 
-            <span class="text-secondary">{{petService.selectedPet.name}}</span>
-            <div v-if="petService.selectedPet.name && petService.showPetNameEditor" @click.stop="petService.showPetNameEditor = false" class="link float-right">
+        <div v-if="petService.selectedPet.real.petId" @click="petService.showPetNameEditor = !petService.showPetNameEditor">
+            Pseudo Name: 
+            <span class="pet-name">{{petService.selectedPet.name}}</span>
+            <div v-if="petService.isEditing && petService.selectedPet && petService.showPetNameEditor">
+                <span class="btn btn-light" @click.stop="petService.updateCustomOffset(petService.selectedPet, +1)">Prev pseudo-name</span>
+                <span class="btn btn-light" @click.stop="petService.updateCustomOffset(petService.selectedPet, -1)">Next pseudo-name</span>
+            </div>
+            <div v-if="petService.isEditing && petService.selectedPet.name && petService.showPetNameEditor" @click.stop="petService.showPetNameEditor = false" class="link float-right">
                 <span class="text-primary">ok</span>
             </div>
         </div>
-        <div v-if="petService.selectedPet && petService.showPetNameEditor">
-            <input v-model="petService.selectedPet.name" />
-            <span class="text-danger">(This property is private)</span>
+        <div v-if="petService.isEditing && petService.selectedPet && petService.showPetNameEditor">
+            <div>Real name:</div>
+            <input class="message-box" style="width: 250px; border: 1px solid gray" v-model="petService.selectedPet.real.name" />
+            <div class="text-secondary">This property is private</div>
         </div>
-                  
-        <hr>
+                
+        <hr v-if="petService.isEditing">
 
         <div @click="petService.showPetAgeEditor = !petService.showPetAgeEditor">
-            Pet DOB: 
-            <span class="text-secondary">{{petService.selectedPet.dob}}</span>
-            <div v-if="petService.selectedPet.dob && petService.showPetAgeEditor" @click.stop="petService.showPetAgeEditor = false" class="link float-right">
+            Pet age: 
+            <span class="text-secondary">{{petService.humanAge(petService.selectedPet.real.dob)}}</span>
+            <div v-if="petService.isEditing && petService.selectedPet.real.dob && petService.showPetAgeEditor" @click.stop="petService.showPetAgeEditor = false" class="link float-right">
                 <span class="text-primary">ok</span>
             </div>
         </div>
-        <div v-if="petService.selectedPet && petService.showPetAgeEditor">
-            <input v-model="petService.selectedPet.dob" />
-            <span class="text-danger">(This property is private)</span>
+        <div v-if="petService.isEditing && petService.selectedPet && petService.showPetAgeEditor">
+            <input class="message-box" style="width: 200px; border: 1px solid gray" v-model="petService.selectedPet.real.dobText" type="date" v-on:change="petService.setDob(petService.selectedPet, $event.target.value)" />
+            <span class="text-danger"></span>
         </div>
           
-        <hr>
+        <hr v-if="petService.isEditing">
 
         <div @click="petService.showPetTypeSelector = !petService.showPetTypeSelector">Pet Type: 
         <span class="text-secondary">{{petService.selectedPet.petType.name}}</span>
-        <div v-if="petService.selectedPet.petType.id && petService.showPetTypeSelector" @click.stop="petService.showPetTypeSelector = false" class="link float-right">
+        <div v-if="petService.isEditing && petService.selectedPet.petType.id && petService.showPetTypeSelector" @click.stop="petService.showPetTypeSelector = false" class="link float-right">
             <span class="text-primary">ok</span>
         </div>
         </div>
-        <div v-if="petService.selectedPet && petService.showPetTypeSelector">
-            <div>
+        <div v-if="petService.isEditing && petService.selectedPet && petService.showPetTypeSelector">
+            <div v-if="!petService.showRangeEditor"  >
+                <select @change="petService.petTypeChanged(value)" v-bind:value="petType" v-model="petService.selectedPet.petType" class="message-box" style="width: 200px; border: 1px solid gray">
+                    <option v-for="petType in petService.petTypes" :value="petType">{{petType.name}}</option>
+                </select>
+            </div>
+            <div v-if="petService.showRangeEditor">
                 <div 
                 v-for="(petType, index) in petService.petTypes" 
                 @click="petService.petTypeChanged(petType)"
@@ -160,16 +171,21 @@ export const PetEditorComponent = {
             </div>
         </div>
           
-        <hr>
+        <hr v-if="petService.isEditing">
 
-        <div @click="petService.showPetReproductivitySelector = !petService.showPetReproductivitySelector">Pet Type: 
+        <div @click="petService.showPetReproductivitySelector = !petService.showPetReproductivitySelector">State: 
         <span class="text-secondary">{{petService.selectedPet.reproductivity.name}}</span>
-        <div v-if="petService.selectedPet.reproductivity.id && petService.showPetReproductivitySelector" @click.stop="petService.showPetReproductivitySelector = false" class="link float-right">
+        <div v-if="petService.isEditing && petService.selectedPet.reproductivity.id && petService.showPetReproductivitySelector" @click.stop="petService.showPetReproductivitySelector = false" class="link float-right">
             <span class="text-primary">ok</span>
         </div>
         </div>
-        <div v-if="petService.selectedPet && petService.showPetReproductivitySelector">
-            <div>
+        <div v-if="petService.isEditing && petService.selectedPet && petService.showPetReproductivitySelector">
+            <div v-if="!petService.showRangeEditor"  >
+                <select @change="petService.petReproductivityChanged(petType)" v-bind:value="petType" v-model="petService.selectedPet.reproductivity" class="message-box" style="width: 200px; border: 1px solid gray">
+                    <option v-for="petType in petService.petReproductivity" :value="petType">{{petType.name}}</option>
+                </select>
+            </div>
+            <div v-if="petService.showRangeEditor">
                 <div 
                 v-for="(petType, index) in petService.petReproductivity" 
                 @click="petService.petReproductivityChanged(petType)"
@@ -194,16 +210,20 @@ export const PetEditorComponent = {
             </div>
         </div>
   
-        <hr>
+        <hr v-if="petService.isEditing">
 
-        <div @click="petService.showPetWeightSelector = !petService.showPetWeightSelector">Pet weight about: 
+        <div @click="petService.showPetWeightSelector = !petService.showPetWeightSelector">Weight: 
         <span class="text-secondary">{{petService.selectedPet.weightRange.name}}</span>
-        <div v-if="petService.selectedPet.weightRange.id && petService.showPetWeightSelector" @click.stop="petService.showPetWeightSelector = false" class="link float-right">
+        <div v-if="petService.isEditing && petService.selectedPet.weightRange.id && petService.showPetWeightSelector" @click.stop="petService.showPetWeightSelector = false" class="link float-right">
             <span class="text-primary">ok</span>
         </div>
         </div>
-        <div v-if="petService.selectedPet && petService.showPetWeightSelector">
-            <div>
+        <div v-if="petService.isEditing && petService.selectedPet && petService.showPetWeightSelector">
+            <div v-if="!petService.showRangeEditor">
+                <input @keyup="petService.updateWeight()" class="message-box" style="width: 200px; border: 1px solid gray" v-model="petService.selectedPet.weight"> 
+                <span class="message-box-right">Kg</span>
+            </div>
+            <div v-if="petService.showRangeEditor">
                 <div 
                 v-for="(petType, index) in petService.petRWeightRange" 
                 @click="petService.petWeightRangeChanged(petType)"
@@ -231,13 +251,22 @@ export const PetEditorComponent = {
     <br>
     <br>
     <div class="float-right">
-    <span @click="petService.showPetEditor = false" class="btn btn-secondary" v-if="petService.selectedPet.petType.id && petService.selectedPet.reproductivity.id && petService.selectedPet.weightRange.id">
-    Close
-    </span>
-    <span class="btn btn-success" @click="petService.savePet(petService.selectedPet)">
-    Save
-    </span>
+        <span @click="petService.closeEditor()" class="btn btn-secondary" v-if="true || (petService.selectedPet.petType.id && petService.selectedPet.reproductivity.id && petService.selectedPet.weightRange.id)">
+            Close
+        </span>
+        <span v-if="petService.isEditing" class="btn btn-success" @click="petService.savePet(petService.selectedPet)">
+            Save
+        </span>
+        <span v-if="!petService.isEditing" class="btn btn-success" @click="petService.editPet()">
+            Edit
+        </span>
     </div>
+    <div>
+        <span v-if="petService.selectedPet.real" class="btn btn-danger" @click="petService.deletePet(petService.selectedPet)">
+            Delete this pet
+        </span>
+    </div>
+    <span v-show="false">{{petService.index}}</span>
     <br>
     <br>
     </div>
@@ -269,11 +298,14 @@ export const petService = {
     showPetNameEditor: true,
     showPetAgeEditor: true,
 
+    showRangeEditor: false,
+
     showMorePetType: false,
     showMoreReproductivityType: false,
     showMoreWeightType: false,
 
     showPetEditor: false,
+    isEditing: false,
     petsList: [],
 
 
@@ -284,19 +316,7 @@ export const petService = {
     },
 
 
-    selectedPet: {
-        name: null,
-        petType: 
-        {
-            name: "Unknown",
-        },
-        reproductivity: {
-            name: "Unknown",
-        },
-        weightRange: {
-            name: "Unknown",
-        }
-    },
+    selectedPet: null,
 
     petRWeightRange: [
         {
@@ -412,6 +432,7 @@ export const petService = {
             avatarUrl: "../img/icon/cat.png",
         },
     ],
+    index: 0,
 
     petReproductivity: [
         {
@@ -503,6 +524,60 @@ export const petService = {
             avatarUrl: "../img/icon/other.png",
         },
     ],
+    setDob(pet, dobText){
+        let date = moment(pet.real.dobText).unix();
+        pet.real.dob = date;
+    },
+
+    updateCustomOffset(pet, offset){
+        pet.customOffset += offset;
+        pet.name = petService.generatePetName(pet.id + pet.customOffset);
+        this.index++;
+    },
+    createPet(){
+        petService.selectedPet = {
+            name: "???",
+            real: {
+                dob: moment().unix(),
+                dobText: moment().format("YYYY-MM-DD"),
+                name: null,
+            },
+            petType: 
+            {
+                name: "Unknown",
+            },
+            reproductivity: {
+                name: "Unknown",
+            },
+            weightRange: {
+                name: "Unknown",
+            }
+        };
+        petService.showPetEditor = true; 
+        petService.showPetIdDisclaimer = false;
+        petService.editPet();
+    },
+    editPet(){
+        petService.bus("PetsReceived");
+
+        this.showPetTypeSelector = true;
+        this.showPetReproductivitySelector = true;
+        this.showPetWeightSelector = true;
+        this.showPetNameEditor = true;
+        this.showPetAgeEditor = true;
+
+        this.isEditing = true;
+    },
+    closeEditor(){
+        this.isEditing = false;
+        this.showPetEditor = false;
+
+        this.showPetTypeSelector = false;
+        this.showPetReproductivitySelector = false;
+        this.showPetWeightSelector = false;
+        this.showPetNameEditor = false;
+        this.showPetAgeEditor = false;
+    },
 
     generatePetId(){
         this.petId = (new Date()).getTime();
@@ -510,13 +585,16 @@ export const petService = {
     },
 
     petTypeChanged(petType){
-        this.selectedPet.petType = petType;
+        //petService.selectedPet.petType = petType;
+        petService.index++;
     },
     petReproductivityChanged(reproductivityType){
-        this.selectedPet.reproductivity = reproductivityType;
+        //petService.selectedPet.reproductivity = reproductivityType;
+        petService.index++;
     },
     petWeightRangeChanged(weightRange){
-        this.selectedPet.weightRange = weightRange;
+        petService.selectedPet.weightRange = weightRange;
+        petService.index++;
     },
 
     loadPets(){
@@ -528,7 +606,7 @@ export const petService = {
                     userId: 9,
                     name: "Real Sisi",
                     weight: 5,
-                    dob: 1740076645,
+                    dob: 1730076645,
                     type: 3,
                     created: 1740086645,
                     updated: 0,
@@ -542,7 +620,7 @@ export const petService = {
                     userId: 9,
                     name: "Real Coco",
                     weight: 5,
-                    dob: 1740076645,
+                    dob: 1730076645,
                     type: 3,
                     created: 1740086646,
                     updated: 0,
@@ -560,7 +638,7 @@ export const petService = {
         if(this.accountService.simulate){
             this.petsListReceived([
                 {
-                    petId: 1740086645,
+                    id: 1740086645,
                     scopeId: 0,
                     userId: 9,
                     name: null,
@@ -574,13 +652,13 @@ export const petService = {
                     customOffset: 0
                 },
                 {
-                    petId: 1740086646,
+                    id: 1740086646,
                     scopeId: 0,
                     userId: 9,
                     name: null,
                     weight: 5,
                     dob: 1740076645,
-                    type: 3,
+                    type: 5,
                     created: 1740086646,
                     updated: 0,
                     deleted: 0,
@@ -595,26 +673,71 @@ export const petService = {
     },
 
     savePet(pet){
-        let petModel =  {
-            petId: null,
-            name: this.selectedPet.name,
-            weight: this.selectedPet.weightRange.id,
-            dob: this.selectedPet.dob,
-            type: this.selectedPet.petType.id,
-            customOffset: 1
+        pet.real.dob = pet.real.dob ? parseInt(pet.real.dob) : 0;
+        let petModel = {
+            petId: pet.real.petId,
+            name: pet.real.name,
+            weight: pet.weight,
+            repro: pet.reproductivity.id,
+            dob: pet.real.dob,
+            type: pet.petType.id,
+            customOffset: pet.customOffset
+        }
+
+        if(this.accountService.simulate){
+            pet.petId = pet.real.petId;
+            this.savePetSuccess(pet);
+            return;
         }
         let savePetUrl = "https://vmie.org:5000/api/pet/save"
         this.apiService.post(savePetUrl, petModel, this.savePetSuccess);
     },
+    deletePet(pet){
+        if(!pet){
+            return;
+        }
+        if(this.accountService.simulate){
+            pet.petId = pet.real.petId;
+            this.deletePetSuccess(pet);
+            return;
+        }
+        let savePetUrl = `https://vmie.org:5000/api/pet/${pet.real.petId}/delete`
+        this.apiService.post(savePetUrl, null, this.deletePetSuccess);
+    },
     savePetSuccess(savedPet){
-
+        if(savedPet){
+            let pet = petService.petsList.find(r=>r.real.petId == savedPet.petId);
+            if(!pet){
+                pet = savedPet;
+            }
+            pet.tags = [`${pet.petType.name}, ${petService.humanAge(savedPet.real.dob)} ${(pet.reproductivity.id < 3 ? ', ' + pet.reproductivity.name : '')}`];
+        }
+        petService.isEditing = false;
+        petService.bus("PetsReceived");
+    },
+    deletePetSuccess(deletedPet){
+        if(deletedPet){
+            let pet = petService.petsList.find(r=>r.real.petId == deletedPet.petId);
+            pet.deleted = true;
+            petService.closeEditor();
+        }
     },
     realPetsListReceived(realPetsList){
         let petsList = [];
         for(let i = 0; i< realPetsList.length; i++){
             let pet = realPetsList[i];
+            pet.dobText = moment(pet.dob).format("YYYY-MM-DD");
+
+
             petsList.push({
-                real: pet
+                real: pet,
+
+                response: null,
+                deleted: 0,
+                readMore: false,
+                tags: [],
+                skills: [],
+                responses: [null, null, null]
             });
         };
         petService.petsList = petsList;
@@ -624,13 +747,22 @@ export const petService = {
         let context = this;
         for(let i = 0; i< petsList.length; i++){
             let p = petsList[i];
-            let petType = context.petTypes.find(t=>t.id == p.type);
-            let petRWeightRange = context.petRWeightRange.find(t=>t.id == p.type);
-            let petReproductivity = context.petReproductivity.find(t=>t.id == p.type);
-            let petName = context.generatePetName(p.petId + p.customOffset);
-            let pet = context.petsList.find(r=>r.real.created == p.petId);
+            if(!p.repro){
+                p.repro = 0;
+            }
+            let petType = petService.petTypes.find(t=>t.id == p.type);
+            let petRWeightRange = petService.petRWeightRange.find(t=>t.value >= p.weight);
+            if(!petRWeightRange){
+                petRWeightRange = petService.petRWeightRange[petService.petRWeightRange.length-1];
+            }
+            let petReproductivity = petService.petReproductivity.find(t=>t.id == p.repro);
+            let petName = petService.generatePetName(p.id + p.customOffset);
+
+
+            let pet = petService.petsList.find(r=>r.real.created == p.id);
             if(pet){
                 pet.id = p.id;
+                // pet.dob = p.dob;
                 pet.type = p.type;
                 pet.name = petName;
                 pet.weight = p.weight;
@@ -638,9 +770,38 @@ export const petService = {
                 pet.petType = petType;
                 pet.reproductivity = petReproductivity;
                 pet.weightRange = petRWeightRange;
+
+                pet.tags = [`${pet.petType.name}, ${petService.humanAge(pet.real.dob)} ${(pet.reproductivity && pet.reproductivity.id < 3 ? ', ' + pet.reproductivity.name : '')}`];
+                pet.skills = ['no data'];
             }
         };
         petService.bus("PetsReceived");
+    },
+    humanAge(timestamp){
+        const now = new Date();
+        const past = new Date(timestamp * 1000);
+        
+        let years = now.getFullYear() - past.getFullYear();
+        let months = now.getMonth() - past.getMonth();
+        let days = now.getDate() - past.getDate();
+    
+        if (days < 0) {
+            months -= 1;
+            const previousMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+            days += previousMonth.getDate();
+        }
+    
+        if (months < 0) {
+            years -= 1;
+            months += 12;
+        }
+    
+        let result = [];
+        if (years > 0) result.push(`${years} year${years > 1 ? 's' : ''}`);
+        if (months > 0) result.push(`${months} month${months > 1 ? 's' : ''}`);
+        if (days > 0 && months < 1) result.push(`${days} day${days > 1 ? 's' : ''}`);
+    
+        return result.length ? result.join(', ') + ' old' : '0 days';
     },
     generatePetName(seed) {    
         const prefixes = ["Fluffy", "Spark", "Whisker", "Shadow", "Bouncy", "Snuggle", "Furry", "Misty", "Brave", "Luna", "Bella"];
@@ -651,6 +812,18 @@ export const petService = {
         const suffix = suffixes[(seed * 2) % suffixes.length];
     
         return `${prefix}-${suffix}`;
+    },
+    updateWeight(value){
+        if(!petService.selectedPet.weight){
+            petService.selectedPet.weight = 0;
+        }
+        let weight = parseInt(petService.selectedPet.weight);
+        let petRWeightRange = petService.petRWeightRange.find(t=>t.value >= weight);
+        if(!petRWeightRange){
+            petRWeightRange = petService.petRWeightRange[petService.petRWeightRange.length-1];
+        }
+        petService.selectedPet.weightRange = petRWeightRange;
+        petService.index++;
     }
 }
 

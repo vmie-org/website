@@ -45,6 +45,7 @@
       gtag('config', 'G-V2CY4R09SB');
     </script>
     <script src="./../lib/moment/moment.min.js"></script>
+
 </head>
 <body>
     <div id="app">
@@ -102,7 +103,11 @@
                 <hr>
             </div> 
 
-            <p v-if="htmlContent" v-html="htmlContent"></p>
+            <div v-show="showDisclaimer">
+                <p v-if="htmlContent" v-html="htmlContent"></p>
+
+                <div @click="showDisclaimer = false" class="btn btn-success float-right">I understand</div>
+            </div>
 
             <div class="question-area" v-if="!questionsCompleted">
                 <div class="question-status">
@@ -140,12 +145,13 @@
 
                 <span class="btn btn-light float-right" @click="startOver()">Pets</span>
                 <br>
-                Available pets:
+                Your pets:
+                <div v-if="!petService.petsList.length" class="alert alert-light">You have not created pets yet</div>
                 <br>
 
-                <div v-for="pet in questions" style="margin-bottom: 5px;" v-if="!pet.deleted">
+                <div v-for="pet in petService.petsList" style="margin-bottom: 5px;" v-if="!pet.deleted">
                     <div class="question" @click="editPet(pet)">
-                        <div class="btn btn-light float-right" @click="selectTask(pet)">
+                        <div class="btn btn-light float-right" @click="selectTask(pet)" v-if="pet.real && !pet.real.deleted">
                             <span style="margin-bottom: 0; color: black">View profile</span>
                         </div>
                         <div class="question-text">
@@ -153,17 +159,20 @@
                                 <div class="group-label">Pseudo identity</div>
                                 {{pet.name}}
                                 <small v-for="skill in pet.skills"><span class="skill">{{skill}}</span></small>
-                                <small v-for="tag in pet.tags"><a :href="getProjectUrlByTitle(tag)" class="tag">{{tag}}</a></small>
+                                <small v-for="tag in pet.tags"><span :href="getProjectUrlByTitle(tag)" class="tag">{{tag}}</span></small>
                             </div>
                         </div>
-                        <br>
-                        <div class="question-text">
+                        <div class="question-text" v-if="pet.real && !pet.real.deleted">
+                            <br>
                             <div class="group-container">
                                 <div class="group-label">Real identity</div>
                                 <span class="text-secondary">{{pet.real.name}}</span>
                                 <small v-for="skill in pet.skills"><span class="text-secondary">{{skill}}</span></small>
-                                <small v-for="tag in pet.tags"><a :href="getProjectUrlByTitle(tag)" class="text-secondary">{{tag}}</a></small>
+                                <small v-for="tag in pet.tags"><span :href="getProjectUrlByTitle(tag)" class="text-secondary">{{tag}}</span></small>
                             </div>
+                        </div>
+                        <div v-else style="color: silver; font-size: small;">
+                            The real pet has been deleted.
                         </div>
                         <div class="text-secondary"> {{pet.info}} <small class="text-primary"><span @click.stop="pet.readMore = !pet.readMore" v-if="pet.status">Settings</span></small></div>
                         <div v-if="pet.readMore"> 
@@ -329,14 +338,14 @@
             "pet-editor-component":  PetEditorComponent,
         },
         data: {
-            messengerScopeId: 4,
+            showDisclaimer: false,
+            messengerScopeId: 7,
             taskUsers: [],
             apiService: apiService,
             chatService: chatService,
             accountService: accountService,
             petService: petService,
 
-            questions: [],
             questionIndex: 0,
             question: {},
             search: null,
@@ -371,7 +380,7 @@
                 }
             }
 
-            this.loadProjects();
+            // this.loadProjects();
             this.renderPage(this.selectedPage);
             chatService.initialize(apiService, accountService, this.bus, this.messengerScopeId);
             petService.initialize(apiService, accountService, this.chat, this.bus);
@@ -381,9 +390,11 @@
         },
         methods: {
             editPet(pet){
-                pet.editState = !pet.editState;
-                petService.selectedPet = pet;
-                petService.showPetEditor = true;
+                if(pet.real && !pet.real.deleted)
+                {
+                    petService.selectedPet = pet;
+                    petService.showPetEditor = true;
+                }
             },
             selectTask(task){
                 task.follow = !task.follow;
@@ -393,13 +404,13 @@
 
             },
             startOver(){
-                this.questions.forEach(p=>p.response = null);
+                petService.petsList.forEach(p=>p.response = null);
                 this.questionIndex = 0;
                 this.questionsCompleted = false;
                 this.moveNext(0);
             },
             moveNext(offset){
-                if(!this.questions.find(p=>!p.response)){
+                if(!petService.petsList.find(p=>!p.response)){
                     this.questionsCompleted = true;
                     return;
                 }
@@ -408,10 +419,10 @@
                 if(this.questionIndex < 0){
                     this.questionIndex = 0;
                 }
-                if(this.questionIndex >= this.questions.length){
-                    this.questionIndex = this.questions.length - 1;
+                if(this.questionIndex >= petService.petsList.length){
+                    this.questionIndex = petService.petsList.length - 1;
                 }
-                this.question = this.questions[this.questionIndex];
+                this.question = petService.petsList[this.questionIndex];
             },
             getProjectUrlByTitle(title){
                 var page = this.websitePages.find(p=> p.title == title);
@@ -423,30 +434,11 @@
             tasksListReceived(tasks){
                 this.tasks = tasks;
                 tasks.forEach(p=>{
-                    let task = this.questions.find(task=>task.id == p.taskId);
+                    let task = petService.petsList.find(task=>task.id == p.taskId);
                     if(task){
                         task.follow = p.follow;
                     }
                 });
-            },
-            loadProjects(){
-                //  sw2if(accountService.simulate)
-                {
-                    let tasks = [
-                    ];
-                    this.question = tasks[0];
-                    this.questionsListReceived(tasks);
-                    return;
-                }
-                apiService.postData("https://vmie.org:5000/api/chat/questions", { take: 50 }, this.questionsListReceived);
-            },
-            questionsListReceived(questions){
-                questions.forEach(p => { 
-                    p.response = null;
-                    p.deleted = 0;
-                    p.readMore = false;
-                });
-                this.questions = questions;
             },
             setResponse(question, response, position){
                 if(position >= 0){
@@ -466,34 +458,22 @@
 
             // user management 
             bus(event){
+                if(event == "MissingUser"){
+                    this.showDisclaimer = true;
+                } else
                 if(event == "UserUpdated"){
-                    this.loadProjects();
+                    // this.loadProjects();
                     chatService.loadMessages();
                     this.loadTasks();
                     petService.loadPets();
+                    this.showDisclaimer = !accountService.user.id;
                 }
                 else
                 if(event == "PetsReceived"){
-                    this.ProcessPets();
+                    // this.ProcessPets();
+                    this.showDisclaimer = !petService.petsList.length;
+                    this.index++;
                 }
-            },
-            ProcessPets(){
-                let context = this;
-                this.questions = [];
-                petService.petsList.forEach(pet => {
-                    pet.info = "";
-                    pet.details = "";
-                    pet.tags = [`${pet.petType.name}, 2 years old ${(pet.reproductivity.id < 3 ? ', ' + pet.reproductivity.name : '')}`];
-                    pet.skills = ['no data'];
-                    pet.status = 1;
-                    pet.follow = 0;
-                    pet.editState= false;
-                    pet.readMore= false;
-                    pet.response= null;
-                    pet.responses= [null, null, null];
-
-                    this.questions.push(pet);
-                });
             },
             chat(messsage){
                 chatService.receivedMessages(messsage);
