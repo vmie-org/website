@@ -24,9 +24,9 @@ export const vmieData = {
         },
         {
             id: "Explorer",
-            title:  "Manage your pets",
+            title:  "Find pets around",
             contentUrl: "./content/pets-list.txt",
-            url: "owner",
+            url: "pets",
             hideOnMobile: true,
             isSelected: false,
         },

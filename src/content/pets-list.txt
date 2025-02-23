@@ -1,4 +1,3 @@
-## Manage your pet's privacy
 
 <div class="alert alert-warning">Disclaimer: 
 <div class="alert alert-danger">Your pet's privacy has to be stronger than your own.</div>Here's why:

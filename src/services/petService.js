@@ -3,7 +3,8 @@ export const PetHeaderComponent = {
     template: `<div>
 
     <span @click="petService.generatePetId()" class="btn btn-success float-right">Get a free PetId</span>
-    <a href="./../pets/?page=Explorer" @click="petService.generatePetId()" class="btn btn-secondary float-left">Explore nearby</a>
+    <a v-if="parent.selectedPage.url != 'pets'" href="./../pets/?page=Explorer" class="btn btn-secondary float-left">Explore nearby</a>
+    <a v-if="parent.selectedPage.url == 'pets'" href="./../owner/?page=Pets" class="btn btn-secondary float-left">Show my pets</a>
     <br>
     <br>
 <transition name="modal">
@@ -308,6 +309,13 @@ export const petService = {
     isEditing: false,
     petsList: [],
 
+    search: {
+        postcode: null,
+        distance: 5,
+        petType: {petType: 'Select One'},
+        take: 20
+    },
+
 
     initialize(apiService, accountService, chat, bus){
         this.apiService = apiService;
@@ -317,6 +325,8 @@ export const petService = {
 
 
     selectedPet: null,
+
+    distances: [0, 1, 3, 5, 10, 30, 100],
 
     petRWeightRange: [
         {

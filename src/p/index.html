@@ -89,7 +89,6 @@
       <!-- banner end -->
 
     <div class="wrapper">
-
         <side-menu-component :account-service="accountService" :parent="this"></side-menu-component>
 
         <section style="height: auto; background-color: #fffcf7;">
@@ -104,84 +103,41 @@
                 <hr>
             </div> 
 
-            
-
-        <div>
+            <div v-for="pet in petsList" class="pet-card" v-if="!pet.deleted">
+                <div class="question" @click="editPet(pet)">
+                    <div class="btn btn-light float-right" @click="selectTask(pet)" v-if="pet.real && !pet.real.deleted">
+                        <span style="margin-bottom: 0; color: black">View profile</span>
+                    </div>
+                    <div class="question-text">
+                        <div class="group-container">
+                            <div class="group-label">{{pet.type}}</div>
+                            {{pet.name}}
+                            <small>
+                                <div class="skill">{{pet.dob}}</div>
+                            </small>
+                            <small v-for="tag in pet.tags"><span :href="getProjectUrlByTitle(tag)" class="tag">{{tag}}</span></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <center>
-            <div class="group-container" style="width: 270px; text-align: left; border-radius: 10px; margin: 20px 0px">
-                <div class="group-label" style="font-size: large;">Search form</div>
-
-                <div style="padding: 15px">
-                    <span>
-                        <select placeholder="Select type" v-bind:value="petType"  v-model="petService.search.petType" class="message-box" style="width: 200px; border: 1px solid gray">
-                            <option selected="true" :value="{petType: 'Select One'}" >Select one</option>
-                            <option v-for="petType in petService.petTypes" :value="petType">{{petType.name}}</option>
-                        </select>
-                    </span>
-                    
-                    <div>
-                        <input placeholder="Postcode" class="message-box" style="width: 200px; border: 1px solid gray" v-model="petService.search.postcode"> 
-                    </div>
-                    <div>
-                        <span>
-                            <select @change="petService.petTypeChanged(value)"  v-model="petService.search.distance" class="message-box" style="width: 200px; border: 1px solid gray">
-                                <option v-for="distance in petService.distances" :value="distance">Within {{distance}} Km</option>
-                            </select>
-                        </span>
-                    </div>
-                </div>
-
-                <div class="btn float-right" @click="loadPets()" :class="petService.search.petType && petService.search.distance ? 'btn-primary' : 'btn-light'">
-                    Search now
-                </div>
+                <div class="btn btn-primary" @click="loadPets()">Load More...</div>
                 <br>
                 <br>
-            </div>
             </center>
-            </div>
 
-            <div v-if="petsList.length">
-                <div v-for="pet in petsList" class="pet-card" v-if="!pet.deleted">
+            <p v-if="htmlContent" v-html="htmlContent"></p>
+            <div v-for="pet in petService.petsList" class="pet-card" v-if="!pet.deleted">
                     <div class="question" @click="editPet(pet)">
                         <div class="btn btn-light float-right" @click="selectTask(pet)" v-if="pet.real && !pet.real.deleted">
                             <span style="margin-bottom: 0; color: black">View profile</span>
                         </div>
                         <div class="question-text">
                             <div class="group-container">
-                                <div class="group-label">{{pet.type}}</div>
-                                <a :href="'../p/?id=' + pet.id" class="pet-name">{{pet.name}}</a>
-                                <small>
-                                    <div class="skill">{{pet.dob}}</div>
-                                </small>
+                                <div class="group-label">Pseudo identity</div>
+                                {{pet.name}}
+                                <small v-for="skill in pet.skills"><span class="skill">{{skill}}</span></small>
                                 <small v-for="tag in pet.tags"><span :href="getProjectUrlByTitle(tag)" class="tag">{{tag}}</span></small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <center>
-                    <div class="btn btn-primary" @click="loadPets()">Load More...</div>
-                    <br>
-                    <br>
-                </center>
-            </div>
-
-
-            <p v-if="htmlContent" v-html="htmlContent"></p>
-
-            <div v-if="petsList.length">
-                My pets list:
-                <div v-for="pet in petService.petsList" class="pet-card" v-if="!pet.deleted">
-                        <div class="question" @click="editPet(pet)">
-                            <div class="btn btn-light float-right" @click="selectTask(pet)" v-if="pet.real && !pet.real.deleted">
-                                <span style="margin-bottom: 0; color: black">View profile</span>
-                            </div>
-                            <div class="question-text">
-                                <div class="group-container">
-                                    <div class="group-label">Pseudo identity</div>
-                                    {{pet.name}}
-                                    <small v-for="skill in pet.skills"><span class="skill">{{skill}}</span></small>
-                                    <small v-for="tag in pet.tags"><span :href="getProjectUrlByTitle(tag)" class="tag">{{tag}}</span></small>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -258,6 +214,8 @@
             accountService: accountService,
             petService: petService,
 
+            petId: null,
+
             questions: [],
             questionIndex: 0,
             question: {},
@@ -279,18 +237,24 @@
             ModalProfileComponent.accountService = accountService;
             this.websitePages = vmieData.websitePages;
 
-            let page = this.websitePages.find(p=> p.id == "Explorer");
+            let page = this.websitePages.find(p=> p.id == 'Developer');
             this.selectedPage = page;
+            let petId = this.apiService.findGetParameter('id');
+            if(petId){
+                this.petId = parseInt(petId);
+            }
             let pageId = this.apiService.findGetParameter('page');
             if(pageId){
                 let hrefPage = this.websitePages.find(p=> p.id == pageId);
                 if(hrefPage){
                     page = hrefPage;
                     this.selectedPage = page;
+                    if(page.id == 'Board'){
+                    }
                 }
             }
 
-            // this.loadPets();
+            this.loadPets();
             this.renderPage(this.selectedPage);
             chatService.initialize(apiService, accountService, this.bus, this.messengerScopeId);
             petService.initialize(apiService, accountService, this.chat, this.bus);
@@ -349,9 +313,9 @@
                     let rnd = parseInt(Math.random(100)*100);
                     let petType = petService.petTypes[rnd % petService.petTypes.length];
                     let time = parseInt(moment().unix()*1000);
-
+                    
                     let pet = {
-                        id: 1740334445000,
+                        id: this.petId,
                         scopeId: 0,
                         userId: 9,
                         name: petService.generatePetName(time),
@@ -365,28 +329,10 @@
                         customOffset: 0
                     };
                     pets.push(pet);
-
-                    for(let i=0; i < 10; i++){
-                        let pet = {
-                            id: time + i,
-                            scopeId: 0,
-                            userId: 9,
-                            name: petService.generatePetName(time + i),
-                            weight: 5,
-                            dob: petService.humanAge(time - 4000 * rnd * 100000),
-                            type: petType.name,
-                            created: time,
-                            updated: 0,
-                            deleted: 0,
-                            deletedBy: null,
-                            customOffset: 0
-                        };
-                        pets.push(pet);
-                    }
                     this.petsListReceived(pets);
                     return;
                 }
-                apiService.postData("https://vmie.org:5000/api/pet/list", petService.search, this.questionsListReceived);
+                apiService.postData("https://vmie.org:5000/api/pet/list", { take: 50 }, this.questionsListReceived);
             },
             petsListReceived(petsList){
                 petsList.forEach(pet => { 
@@ -409,7 +355,7 @@
             // user management 
             bus(event){
                 if(event == 'UserUpdated'){
-                    //this.loadPets();
+                    this.loadPets();
                     petService.loadPets();
                     chatService.loadMessages();
                     this.loadTasks();
